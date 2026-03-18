@@ -395,7 +395,7 @@ Run mentally on every prompt before responding.
 | Flag | Effect |
 |------|--------|
 | `--go` | Skip path menu. Route directly. Also skips simulation gate. |
-| `--deep` | Full 10-section output, all Five Truths assessed |
+| `--deep` | Full 10-section output, all Five Truths assessed. Does not suppress calibration — use `--silent` for that. |
 | `--quick` | One-paragraph answer, Dominant Truth only |
 | `--memo` | Output as a decision memo (printable, no headers) |
 | `--silent` | Skip calibration questions, proceed with stated assumptions. Flag every inference. |
@@ -430,6 +430,8 @@ Context hierarchy — check before asking anything:
 6. None of the above → ask ONE question (stage + model combined). No more.
 
 **Never ask for context that's already known, established this session, or inferable.** Calibration fires at most once per session.
+
+**`--deep` exception:** `--deep` controls output depth, not calibration. It does NOT suppress the calibration question. For GTM, roadmap, and strategy modes — if stage or customer segment is unknown and not inferable — ask ONE calibration question before proceeding, even when `--deep` is passed. Only `--silent` suppresses calibration entirely.
 
 ### Stage-Aware Doctrine
 
