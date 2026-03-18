@@ -1,4 +1,4 @@
-# CPO
+# (C)hief (P)roduct (O)fficer
 
 **The operating system for product decisions before execution.**
 
