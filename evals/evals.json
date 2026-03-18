@@ -1,0 +1,137 @@
+{
+  "skill_name": "product-strategy",
+  "evals": [
+    {
+      "id": 0,
+      "prompt": "/product-strategy ceo We're building a credential verification API for enterprises. Right now we have 3 design partners, ~$8K MRR from a pilot, and a 4-person eng team. Our CEO wants to add a consumer-facing 'identity wallet' app in parallel. The argument is that we need both sides of the network to create defensibility. I think it's too early and we should focus on the enterprise API. What's the call?",
+      "expected_output": "A structured CEO-mode analysis that leads with a clear judgment call, applies Five Truths with Economic Truth primary, identifies the network effect argument as premature, calls out 4-person team execution risk, includes RECOMMENDATION + decision footer, names what NOT to do, and identifies the cold-start problem.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "ceo-0-structure",
+          "text": "Response follows CEO mode template structure (CEO Judgment, Strengths, Weaknesses, Strategic Issue, Commercial Issue, Macro Context, Recommendation, Priority, Next Step)"
+        },
+        {
+          "id": "ceo-0-conviction",
+          "text": "Opens with a high-conviction judgment call (not hedged 'it depends' or 'there are pros and cons')"
+        },
+        {
+          "id": "ceo-0-economic-truth",
+          "text": "Explicitly discusses unit economics, $8K MRR context, or commercial viability — not just strategic hand-waving"
+        },
+        {
+          "id": "ceo-0-execution-risk",
+          "text": "Identifies execution risk of splitting a 4-person team across two products"
+        },
+        {
+          "id": "ceo-0-recommendation",
+          "text": "Contains an explicit RECOMMENDATION: line with a clear action verb"
+        },
+        {
+          "id": "ceo-0-next-step",
+          "text": "Ends with a concrete next step — specific action, not generic 'do more research'"
+        },
+        {
+          "id": "ceo-0-decision-footer",
+          "text": "Includes a decision footer with confidence level and unresolved question"
+        },
+        {
+          "id": "ceo-0-what-not-to-do",
+          "text": "Includes a 'What NOT to Do' section naming specific traps to avoid"
+        },
+        {
+          "id": "ceo-0-cold-start",
+          "text": "Identifies the cold-start / chicken-and-egg problem: consumer wallet needs enterprise adoption first"
+        }
+      ]
+    },
+    {
+      "id": 1,
+      "prompt": "/product-strategy blue-ocean We have a working proof-of-human verification system using palm vein biometrics + ZK proofs. Currently used for sybil resistance in crypto airdrops. We're getting inbound interest from gaming companies worried about bot accounts and from fintech companies needing KYC alternatives. Where's the real opportunity?",
+      "expected_output": "A creative blue-ocean analysis that reframes beyond selling to more verticals, identifies a non-obvious category opportunity, evaluates the ZK+biometric moat with evidence labels, gives a concrete product concept, includes economic logic, names a specific competitor risk, and ends with a RECOMMENDATION with a specific first experiment.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "bo-1-structure",
+          "text": "Response follows blue-ocean template structure (Reframing, Opportunity, Why Us, What Must Be True, Product Concept, Strategic Leverage, Economic Logic, Risks, Recommendation)"
+        },
+        {
+          "id": "bo-1-reframe",
+          "text": "Opens with a genuine reframe — challenges the conventional framing, not just 'sell to more verticals'"
+        },
+        {
+          "id": "bo-1-domain-lens",
+          "text": "Applies identity/proof-of-human domain knowledge (network effects, cold start, beachhead, trust as product)"
+        },
+        {
+          "id": "bo-1-technical-moat",
+          "text": "Evaluates the ZK + biometric combination as a technical moat — assesses durability and replicability"
+        },
+        {
+          "id": "bo-1-product-concept",
+          "text": "Includes a concrete product concept specific enough to prototype (not 'an AI-powered platform for X')"
+        },
+        {
+          "id": "bo-1-economic-logic",
+          "text": "Includes economic logic section with revenue model, who pays, and margin reasoning"
+        },
+        {
+          "id": "bo-1-recommendation",
+          "text": "Contains an explicit RECOMMENDATION: line with go/no-go and specific first experiment"
+        },
+        {
+          "id": "bo-1-evidence-labels",
+          "text": "Uses evidence labeling (fact/inference/judgment) to distinguish proven claims from assumptions"
+        },
+        {
+          "id": "bo-1-competitor-awareness",
+          "text": "Identifies a specific named competitor risk (e.g. Worldcoin, Apple/Google) with assessment"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "/product-strategy eng-translate Our lead backend engineer just told me: 'We can't keep bolting features onto the monolith. The auth service is tightly coupled to the identity verification flow, and every time we add a new credential type we risk breaking existing integrations. We need to spend 2-3 months refactoring into microservices before we can ship anything new.' Meanwhile we have enterprise customers waiting for EU eIDAS2 compliance support that was promised for Q2. How should I interpret this and what do we do?",
+      "expected_output": "An eng-translate analysis that decodes the engineering signal type, connects technical debt to business impact, identifies the correct abstraction level, proposes a pragmatic middle path, delivers a jargon-free reframe, names what-not-to-do traps explicitly, and ends with a specific next step with owner and timeline.",
+      "files": [],
+      "assertions": [
+        {
+          "id": "et-2-structure",
+          "text": "Response follows eng-translate template (What Engineering Is Really Saying, Why It Matters, Correct Level, Implication, Reframed Version, Actionable Next Step, What NOT to Do)"
+        },
+        {
+          "id": "et-2-signal-decode",
+          "text": "Classifies the engineering signal as one of: 'this is hard' / 'this is risky' / 'this is wrong' / 'this is an opportunity'"
+        },
+        {
+          "id": "et-2-business-connect",
+          "text": "Explicitly connects technical debt to business impact — customer promises, churn risk, revenue implications"
+        },
+        {
+          "id": "et-2-abstraction-level",
+          "text": "Identifies correct abstraction level (product architecture decision, not just implementation detail or pure executive strategy)"
+        },
+        {
+          "id": "et-2-middle-path",
+          "text": "Proposes a pragmatic middle path (e.g. strangler fig, targeted extraction) rather than binary refactor-or-ship"
+        },
+        {
+          "id": "et-2-jargon-free",
+          "text": "Reframed version is readable by a non-technical executive — no unexplained jargon"
+        },
+        {
+          "id": "et-2-next-step",
+          "text": "Actionable next step includes a specific owner and timeline, not just 'have a meeting'"
+        },
+        {
+          "id": "et-2-what-not-to-do",
+          "text": "Includes a 'What NOT to Do' section naming 2+ specific traps (e.g. 'don't override engineer', 'don't agree to 2-month freeze without scoping minimum fix')"
+        },
+        {
+          "id": "et-2-evidence-labels",
+          "text": "Uses evidence labeling to distinguish what the engineer said (fact) from what it implies (inference/judgment)"
+        }
+      ]
+    }
+  ]
+}
