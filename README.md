@@ -36,6 +36,10 @@ First time here?
 
 ---
 
+> CPO is not a prompt. It's a system: structured reasoning, persistent memory, and live simulations working together across every major product decision.
+
+---
+
 ## Why I built this
 
 We are moving into a world where the ability to build is becoming widely accessible.
