@@ -364,6 +364,36 @@ actually we're pre-PMF, $200k ARR
 
 ---
 
+## Test 15: --deep expands Assess to all five Truths
+
+**Input:**
+```
+/cpo --deep should we launch a free tier
+```
+
+**Expected behavior:**
+- Frame line present as normal (`*I'm reading this as:`)
+- Assess expands to all five Truths — one paragraph each, not just the Dominant Truth
+- All five Truth names appear: User, Strategic, Economic, Macro-Political, Execution
+- Full 10-section output follows after Conservative path
+- Verdict still present at end with Confidence level
+
+**Pass criteria:**
+- Frame line present
+- All five Truth names appear in Assess section
+- Output contains sections: Problem Definition, Five Truths Assessment, Strategic Options, Recommendation + Kill Criteria, Sequencing, Risks, GTM Considerations, Organizational Implications, Open Questions, Decision Memo
+- Verdict present at end with `Confidence: [level].*`
+- Output is substantially longer than a default four-action response
+
+**Fail signals:**
+- Only Dominant Truth appears (same as default behavior)
+- 10-section output absent
+- Verdict missing
+- Frame line absent (--deep does not suppress Frame)
+- Output same length as non-`--deep` response
+
+---
+
 ## Running these tests
 
 These are behavioral tests — run them manually by invoking `/cpo` with the specified inputs and checking the output against pass criteria.
