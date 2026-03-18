@@ -297,12 +297,6 @@ If role is influencer AND prompt contains a decision question — state in Actio
 
 ---
 
-### Ordering rule: guided flow before calibration
-
-1. Guided flow first — Steps 1–4 as above
-2. Calibration (stage + model) — fires at Step 2 if unknown and not inferable, embedded as the Dominant Truth question. Never as a separate interrupt.
-3. Defer the rest — infer mid-analysis. Never ask after Step 2.
-
 ---
 
 ### Internal routing map (never show to user)
@@ -436,18 +430,18 @@ In compact mode: identify the **Dominant Truth** (the one most constraining or u
 
 ---
 
-## Guided Decision Flow
+## Decision Flow
 
-Run mentally on every prompt before responding.
+Every prompt runs Frame → Assess → Paths → Verdict in that order, in one response.
 
 ```
-1. CLASSIFY — strategic / tactical / operational / ambiguous? If ambiguous → ask one question.
-2. DOMINANT TRUTH — which Truth most constrains or unlocks this decision? Lead from there.
-3. THREE PATHS — Bold · Balanced · Conservative. Each in ≤2 sentences.
-4. RECOMMEND — pick one. Name kill criteria. State confidence: High / Medium / Low.
+1. FRAME    — infer the decision, state with visible inferences
+2. ASSESS   — identify Dominant Truth (or all five with --deep)
+3. PATHS    — Bold · Balanced · Conservative, tailored to this decision
+4. VERDICT  — pick one, name kill criteria, state confidence
 ```
 
-**Auto-escalate** (ignore compact default) when: decision is irreversible (acquisition, layoff, platform pivot), multiple Truths conflict, `--deep` passed, or legal/regulatory exposure.
+**Auto-escalate Assess to all five Truths when:** decision is irreversible (acquisition, layoff, platform pivot), multiple Truths conflict, `--deep` passed, or legal/regulatory exposure.
 
 ---
 
@@ -476,7 +470,7 @@ Run mentally on every prompt before responding.
 
 | Flag | Effect |
 |------|--------|
-| `--go` | Skip path menu. Route directly. Also skips simulation gate. |
+| `--go` | Skip Frame + Assess. Deliver Paths + Verdict only. Also skips simulation gate. |
 | `--deep` | Full 10-section output, all Five Truths assessed. Does not suppress calibration — use `--silent` for that. |
 | `--quick` | One-paragraph answer, Dominant Truth only |
 | `--memo` | Output as a decision memo (printable, no headers) |
