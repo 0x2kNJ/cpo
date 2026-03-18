@@ -1,4 +1,4 @@
-# CPO — The Product Operating System
+# CPO
 
 **The operating system for product decisions before execution.**
 
