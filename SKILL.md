@@ -4,7 +4,7 @@ version: 1.0.0
 last_updated: 2026-03-17
 argument-hint: "[problem or question] [--go] [--deep]"
 description: >-
-  The product operating system that sits between "we have an idea" and "the engineering team is building it." Opportunity analysis, go/no-go decisions, roadmap prioritization, investor and board simulations, and pitch-building — with a decision journal that builds context over time.
+  The operating system for product decisions before execution.
 allowed-tools:
   - Bash
   - Read
