@@ -86,7 +86,7 @@ If that resonates with you, you are exactly who I built this for.
 
 ---
 
-## Why CPO exists
+## The core model
 
 `/cpo` gives you **decision structure** and turns strategic thinking into **clear, defensible communication**.
 
@@ -216,7 +216,7 @@ Investor meetings, board meetings, roadmap reviews, strategic offsites, and post
 Every decision is tested across five dimensions:
 
 | Truth | What it asks |
-|---|---|
+|:---|:---|
 | User | Does this solve a real pain or unlock real demand? |
 | Strategic | Does this fit where the company is actually going? |
 | Economic | Can this become a meaningful return on time, capital, or focus? |
@@ -228,7 +228,7 @@ Every decision is tested across five dimensions:
 CPO does not jump straight to one answer. It explores multiple paths first.
 
 | Path | What it means |
-|---|---|
+|:---|:---|
 | Bold | Highest upside, highest risk |
 | Balanced | Strong upside with bounded downside |
 | Conservative | Protect focus, preserve runway, buy learning |
@@ -266,7 +266,7 @@ So each decision starts with more context than the last one.
 ## What CPO helps you do
 
 | Use case | What CPO does |
-|---|---|
+|:---|:---|
 | New product bets | Sizes the opportunity, surfaces assumptions, frames paths |
 | Go / no-go decisions | Tests whether to proceed, pause, re-scope, or kill |
 | Roadmap prioritization | Compares strategic and economic tradeoffs |
@@ -425,7 +425,7 @@ CPO supports 20 core modes. Invoke them with natural language — CPO routes aut
 ★ = most-used starting points
 
 | Mode | Invoke with | What it does | Best for |
-|---|---|---|---|
+|:---|:---|:---|:---|
 | ★ Opportunity Scan (`blue-ocean`) | `/cpo what should we build` | Maps uncontested opportunity spaces, ranks bets, sequences what to do first | New bets, growth ideas, product direction |
 | ★ Go / No-Go (`ceo`) | `/cpo should we do this` | Verdict: proceed, pause, re-scope, or kill — with Three Paths and kill criteria | High-stakes decisions |
 | ★ Investor Simulation (`investor-roundtable`) | `/cpo simulate an investor meeting` | Live 5-round investor debate, 5 archetypes, distinct voices, verdict per archetype | Fundraising meetings |
@@ -454,7 +454,7 @@ CPO supports 20 core modes. Invoke them with natural language — CPO routes aut
 CPO supports 22 flags for shaping how it reasons and communicates.
 
 | Flag | Example | What it does |
-|---|---|---|
+|:---|:---|:---|
 | `--go` | `/cpo --go should we raise now` | Skip menus. Route directly. Get the answer immediately. Also skips simulation gate. |
 | `--deep` | `/cpo --deep should we pivot` | Full 10-section structured output. All Five Truths assessed. |
 | `--quick` | `/cpo --quick is freemium right for us` | One paragraph. Dominant Truth only. |
@@ -487,7 +487,7 @@ CPO supports 22 flags for shaping how it reasons and communicates.
 CPO uses shared local state so it can compound context over time. Everything lives in `~/.cpo/` — shared between Claude Code and Cursor.
 
 | Path | What it stores | Why it matters |
-|---|---|---|
+|:---|:---|:---|
 | `~/.cpo/context.md` | Company profile — stage, model, constraint, priorities | Keeps answers grounded in your actual company. Loads every session. |
 | `~/.cpo/decisions/` | Decision journal — one YAML per major analysis | Builds a searchable strategic history. Foundation for `--brief`, `--trail`, `--since`. |
 | `~/.cpo/simulations/` | Boardroom and investor roundtable transcripts | Preserves full simulation sessions |
@@ -555,7 +555,7 @@ The pattern is simple:
 ### Example handoffs
 
 | If CPO helps you decide… | Then hand off to… |
-|---|---|
+|:---|:---|
 | what opportunity to pursue | discovery, market research, user research skills |
 | whether to proceed with a bet | planning, scoping, PRD, roadmap, execution skills |
 | how to position the bet | strategy, GTM, launch, messaging skills |
@@ -566,7 +566,7 @@ The pattern is simple:
 ### Recommended handoff stack
 
 | Tool | When | What it does |
-|---|---|---|
+|:---|:---|:---|
 | [gstack](https://github.com/garrytan/gstack) `/plan-eng-review` | After `/cpo` → need implementation plan | Architecture, data flow, edge cases |
 | [gstack](https://github.com/garrytan/gstack) `/plan-ceo-review` | After `/cpo` → need product / brand review | 10-star product thinking, reframe |
 | [gstack](https://github.com/garrytan/gstack) `/review` | After `eng-brief` → need code review | Bugs that pass CI, completeness gaps |
