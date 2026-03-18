@@ -184,7 +184,7 @@ Execute immediately. No confirmation.
 >
 > Works for solo founders, PMs making the case upward, and teams preparing for high-stakes meetings.
 >
-> **What this does not do:** PRDs, OKRs, sprint plans.
+> **What this does not do:** PRDs, OKRs, sprint plans — for those → [pm-skills](https://github.com/phuryn/pm-skills). For implementation planning, code review, and QA → [gstack](https://github.com/garrytan/gstack)
 >
 > ---
 >
@@ -722,15 +722,16 @@ PRODUCT STACK
   Strategy       cpo                    ✓ active
   Roadmap        --roadmap              ✓ built-in
   Sell-up        --sell-up              ✓ built-in
-  Plan           [check your tools]     ?
-  Review         [check your tools]     ?
-  Ship           [check your tools]     ?
-  QA             [check your tools]     ?
-  Retro          [check your tools]     ?
+  Plan (eng)     /plan-eng-review       gstack
+  Plan (product) /plan-ceo-review       gstack
+  Review         /review                gstack
+  Ship           /ship                  gstack
+  QA             /qa                    gstack
+  Retro          /retro                 gstack
   Outcome        --outcome              ✓ built-in
 ```
 
-Note any gaps. Suggest checking for complementary tools for uncovered stages.
+[gstack](https://github.com/garrytan/gstack) covers the implementation side of the stack. If gstack skills aren't active in your Cursor session, load `@~/.claude/skills/gstack/CURSOR.md` alongside this file.
 
 ---
 

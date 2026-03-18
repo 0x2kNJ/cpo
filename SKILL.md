@@ -194,7 +194,7 @@ Max 4 options. Always include the escape hatch.
 >
 > Works for solo founders, PMs making the case upward, and teams preparing for high-stakes meetings.
 >
-> **What `/cpo` does not do:** PRDs, OKRs, sprint plans — for those → [pm-skills](https://github.com/phuryn/pm-skills)
+> **What `/cpo` does not do:** PRDs, OKRs, sprint plans — for those → [pm-skills](https://github.com/phuryn/pm-skills). For implementation planning, code review, and QA → [gstack](https://github.com/garrytan/gstack)
 >
 > ---
 >

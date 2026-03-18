@@ -1,264 +1,504 @@
 # CPO — The Product Operating System
 
-**The product framework that sits between "we have an idea" and "the engineering team is building it."**
+**The operating system for product decisions before execution.**
 
-Every decision a founder, PM, or senior executive needs to make across the product lifecycle before committing to execution. Opportunity assessment, go/no-go decision, roadmap prioritization, investor and board feedback simulations, pitch-building and a decision log that builds context over time.
+`/cpo` helps founders, PMs, and executives decide **what to build, whether to build it, how to communicate it, and when to kill it** — before the team commits time, headcount, or capital.
+
+It sits between **"we have an idea"** and **"engineering is building it."**
+Opportunity assessment, go / no-go decisions, roadmap prioritization, investor and board simulations, sell-up narratives, and a decision log that compounds context over time.
+
+If this helps you make better product decisions, ⭐ the repo.
 
 ---
 
 ## Start here
 
-```
-New idea — where's the opportunity?       → /cpo what should we build
-Need a go/no-go?                          → /cpo should we do this
-Heading into a raise?                     → /cpo simulate an investor meeting
-Preparing for board?                      → /cpo simulate the board meeting
-Building the case upward?                 → /cpo --sell-up CEO
-Weekly kill-criteria check?               → /cpo --brief
-First time here?                          → /cpo ?
-```
+New idea — where's the opportunity?
+→ `/cpo what should we build`
 
-If this helps you ship better decisions, ⭐ the repo.
+Need a go / no-go?
+→ `/cpo should we do this`
 
----
+Heading into a raise?
+→ `/cpo simulate an investor meeting`
 
-## Why it exists
+Preparing for a board meeting?
+→ `/cpo simulate the board`
 
-Generic AI gives you text. `/cpo` gives you structure.
+Need to build the case upward?
+→ `/cpo --sell-up CEO`
 
-You're about to make a $500K decision — a pivot, a raise, a new market, a platform bet — and you have no one to pressure-test it with. `/cpo` is that person.
+Want a weekly strategic digest?
+→ `/cpo --brief`
 
-It runs Five Truths against every decision (User · Strategic · Economic · Macro-Political · Execution), always gives you Three Paths before a recommendation (Bold · Balanced · Conservative), labels every claim as *fact / assumption / inference / judgment*, and names kill criteria upfront — before you commit. It remembers your company context across sessions, logs every major decision in a journal, and can simulate an investor panel or board meeting live.
-
-The decision log is the sleeper feature. Every major decision is timestamped, reasoned, and searchable. Run `/cpo --brief` for a weekly intelligence digest — kills criteria approaching, patterns in your decision-making, unresolved decisions that need follow-up. One year in, you'll have a searchable library of every strategic decision your company made, the reasoning at the time, and what actually happened.
-
-Twenty modes. Eighteen flags. One command.
+First time here?
+→ `/cpo ?`
 
 ---
 
-## Install — takes 30 seconds
+## Why I built this
 
-**Requirements:** Claude Code, Git
+We are moving into a world where the ability to build is becoming widely accessible.
+
+More people can now operate like engineers. Teams can prototype, ship, automate, and iterate with a speed that used to require much larger organizations. That changes the game.
+
+But it also raises the stakes on a different question:
+
+**What should we build in the first place?**
+
+When execution becomes abundant, judgment becomes scarce.
+When shipping gets easier, deciding well becomes more valuable.
+When everyone can build, the teams that win are the ones that know **where to point that power**.
+
+I built CPO because I believe that knowing what to build is now one of the most important skills in modern product work — and one of the most underserved.
+
+Over many years leading strategy and building products across financial services and web3, I found that the hardest problems were rarely about execution alone. They were upstream decision problems:
+
+- Which opportunity is actually worth pursuing?
+- Which assumptions matter most?
+- What is the right path for this stage of company?
+- How do you communicate the decision clearly enough that others can align behind it?
+- And how do you know when to stop?
+
+I also noticed a persistent gap in the tooling.
+
+Most AI skill sets today are weighted toward execution. They help teams write faster, code faster, ship faster, and automate faster once a direction has already been chosen. That matters. But far fewer tools help teams make the decision itself with rigor.
+
+That gap matters more now, not less.
+
+Because bad strategy plus great execution is still failure.
+Because faster teams can still waste years.
+Because more output does not automatically create more value.
+
+CPO is my attempt to encode a way of working I developed under real product and strategy pressure: a way to think clearly, test tradeoffs honestly, pressure-test bets before they become expensive, communicate decisions in a way others can align behind, and iterate quickly without losing the plot.
+
+This is not a replacement for execution-focused skills. It is the missing layer that should sit before them and alongside them.
+
+My hope is that CPO helps push the ecosystem toward better product judgment as a first-class capability — not just better output. If more people now have the power to build, then more people also need better tools for deciding what deserves to be built.
+
+That is the movement I want to contribute to.
+
+If that resonates with you, you are exactly who I built this for.
+
+---
+
+## Why CPO exists
+
+`/cpo` gives you **decision structure** and turns strategic thinking into **clear, defensible communication**.
+
+Most product decisions are expensive long before they reach code:
+- entering a new market
+- funding a new bet
+- hiring against a roadmap
+- raising capital around a narrative
+- choosing whether to pivot, double down, or kill something
+
+`/cpo` is built for those moments.
+
+It pressure-tests every decision across **Five Truths**:
+- **User**
+- **Strategic**
+- **Economic**
+- **Macro-Political**
+- **Execution**
+
+Before making a recommendation, it explores **Three Paths**:
+- **Bold**
+- **Balanced**
+- **Conservative**
+
+It also:
+- labels claims as **fact / assumption / inference / judgment**
+- defines **kill criteria upfront**
+- remembers company context across sessions
+- logs major decisions in a searchable journal
+- simulates investor and board conversations in real time
+
+The sleeper feature is the decision log.
+
+Every major decision is timestamped, reasoned, and searchable. Over time, `/cpo` becomes a living record of how your company thinks: what you believed, what you chose, what happened, and which patterns keep repeating.
+
+Run `/cpo --brief` for a weekly intelligence digest:
+- kill criteria approaching
+- unresolved decisions needing follow-up
+- patterns in decision quality
+- strategic drift across bets
+
+A year in, you do not just have outputs. You have **institutional memory**.
+
+---
+
+## Quick start: your first 5 minutes
+
+### 1) Install for Claude Code
+
+Requirements: Claude Code, Git
 
 ```bash
 git clone https://github.com/0x2kNJ/CPO.git ~/.claude/skills/cpo
 ```
 
-Then add to your `CLAUDE.md`:
+Then add this to your `CLAUDE.md`:
 
-```markdown
+```md
 ## cpo
 Available skill: /cpo
 ```
 
 Invoke with `/cpo` in any Claude Code session. No build step. No dependencies.
 
-**For Cursor:** `@CURSOR.md` at the start of any conversation, or add to `.cursorrules` for always-on:
+### 2) Install for Cursor
+
+Use `@CURSOR.md` at the start of a conversation, or add this to `.cursorrules` for always-on usage:
 
 ```
-# .cursorrules
 @~/.claude/skills/cpo/CURSOR.md
 ```
 
-The same `~/.cpo/` state is shared between Claude Code and Cursor — decision journal, context, exports, all of it.
+CPO uses the same shared `~/.cpo/` state across Claude Code and Cursor.
 
----
+### 3) Run your first decision
 
-## Who this is for
-
-- **Solo founders** deciding whether to pivot, raise, hire, or kill a bet with incomplete information
-- **PMs and Heads of Product** building the case upward to leadership or lateral to eng
-- **Scaling teams** preparing for investor meetings, board meetings, or post-mortems
-- **Anyone** who needs a smart, opinionated co-thinker to pressure-test a $500K+ decision
-
----
-
-## Works best when...
-
-- You have a specific decision to make, not a vague question ("should we pivot?" vs "is our burn acceptable?")
-- You can name your stage (seed / post-PMF / Series B / etc) — `/cpo` adapts doctrine to stage
-- You're willing to debate all three paths, not just looking for validation of a path you've already chosen
-- You're ready to be surprised — `/cpo` doesn't tell you what you want to hear
-
----
-
-## See it work
+Try one of these:
 
 ```
-/cpo simulate my Series B board meeting. Lead VC is skeptical of our burn rate.
+/cpo what should we build for onboarding activation in our B2B SaaS?
 ```
 
-> *Setting up the room. Lead VC: skeptical. Financial VC: neutral. Independent Director: neutral.*
->
-> **Lead VC:** "Before we get to the deck — I pulled your bank statement this morning. You told this board in January that burn efficiency would improve in Q2. It's March. Walk me through what changed, and why we should believe the Q3 forecast."
-
-You respond in real time. The Lead VC goes off-agenda. The Financial VC challenges a different number. The Independent Director raises a governance question. The simulation ends with a debrief: what you committed to, where you lost the room, what to fix before the real meeting.
-
----
-
 ```
-/cpo should we kill our enterprise motion and go full PLG
+/cpo should we do this
 ```
-
-> *Reading context: post-PMF B2B SaaS — optimizing for NRR and expansion.*
->
-> **Dominant Truth:** Economic. Enterprise ACV is funding PLG runway — killing it now would cut 60% of revenue before PLG can fill the gap.
->
-> **Three Paths:**
-> **Bold** — Kill enterprise in Q3, move entire GTM to PLG. Requires 18 months runway. Burn rises before it falls.
-> **Balanced** — Freeze new enterprise logos. Expand only from existing accounts. Build PLG lane in parallel, flip when it hits 40% of pipeline.
-> **Conservative** — Keep enterprise motion unchanged. Build PLG as a separate SKU, validate conversion rate before any reallocation.
->
-> **Recommendation:** Balanced. Kill criteria: if enterprise expansion ARR drops below $80K/month, stop the hold and re-evaluate.
-
-One decision. Three paths. Kill criteria named before you commit.
-
----
 
 ```
 /cpo --brief
 ```
 
-> *Weekly brief — 3 items need your attention:*
->
-> **Kill criterion approaching:** CAC/LTV ratio at 1:2.8 — target was 1:4 by Q2. [context, 2026-01-14]
-> **Decision pending close:** Enterprise pause (2026-02-11) — outcome never logged. Run `/cpo --outcome enterprise` to close the loop.
-> **Pattern warning:** 3 of your last 4 decisions chose the Balanced path. You may be systematically avoiding the Bold call.
+### 4) Stop there
+
+If the output feels sharper than your usual brainstorming doc, this is probably for you.
 
 ---
 
-## What it does
+## Who this is for
 
-| Capability | Commands |
+### Solo founders
+Deciding what to build, how to build it, whether to pivot or kill a bet under uncertainty, and when — and how — to raise or hire.
+
+### PMs and Heads of Product
+Building the case upward to leadership and laterally across engineering, design, GTM, and finance.
+
+### Product-minded execs
+Using structured reasoning to pressure-test strategy before it becomes roadmap, spend, or narrative.
+
+### Teams preparing for high-stakes conversations
+Investor meetings, board meetings, roadmap reviews, strategic offsites, and post-mortems.
+
+---
+
+## Works best when…
+
+- you have a real decision, not a vague topic
+- you can name your company stage: pre-seed, seed, post-PMF, Series A/B, scale-up
+- you are willing to compare multiple paths, not just seek validation
+- you want an opinionated sparring partner, not a note-taker
+- you want a decision record, not just one-off outputs
+
+---
+
+## How CPO works
+
+### 1) Five Truths
+
+Every decision is tested across five dimensions:
+
+| Truth | What it asks |
 |---|---|
-| **Opportunity analysis** | Where's the opportunity? What should we build? What are our riskiest assumptions? |
-| **Go/no-go decisions** | Should we do this? Build vs buy? Red-team the plan. Pre-mortem before we commit. |
-| **Roadmap & prioritization** | `--roadmap` — comparative scoring across bets, dependency map, ranked stack with kill criteria |
-| **Investor & board simulations** | Live 5-round investor debate · Live board meeting — archetypes push back, disagree, surface governance dynamics |
-| **Pitch-building** | `--sell-up [CEO/board/eng]` — narrative spine, objection map, explicit ask. For any audience. |
-| **Decision journal** | `--brief` weekly intelligence · `--trail` 90-day diary · `--since` temporal delta · `--outcome` close the loop |
+| User | Does this solve a real pain or unlock real demand? |
+| Strategic | Does this fit where the company is actually going? |
+| Economic | Can this become a meaningful return on time, capital, or focus? |
+| Macro-Political | What external conditions make this easier or harder now? |
+| Execution | Can this team actually pull it off from here? |
+
+### 2) Three Paths
+
+CPO does not jump straight to one answer. It explores multiple paths first.
+
+| Path | What it means |
+|---|---|
+| Bold | Highest upside, highest risk |
+| Balanced | Strong upside with bounded downside |
+| Conservative | Protect focus, preserve runway, buy learning |
+
+### 3) Decision hygiene
+
+Every output distinguishes between:
+- **Fact**
+- **Assumption**
+- **Inference**
+- **Judgment**
+
+That makes the reasoning auditable instead of persuasive-by-default.
+
+### 4) Kill criteria
+
+Before recommending a path, CPO defines what would make the bet fail. That means you know:
+- what must be true
+- what to monitor
+- what would trigger re-scope
+- when to stop
+
+### 5) Persistent memory
+
+CPO maintains shared state across sessions, including:
+- company context
+- decision journal
+- simulations
+- exports
+
+So each decision starts with more context than the last one.
 
 ---
 
-## The team
+## What CPO helps you do
 
-| Mode | Your specialist | What they do |
+| Use case | What CPO does |
+|---|---|
+| New product bets | Sizes the opportunity, surfaces assumptions, frames paths |
+| Go / no-go decisions | Tests whether to proceed, pause, re-scope, or kill |
+| Roadmap prioritization | Compares strategic and economic tradeoffs |
+| Investor prep | Simulates pushback, weak spots, and narrative gaps |
+| Board prep | Stress-tests the plan and likely questions |
+| Executive alignment | Builds the case upward with structured reasoning |
+
+---
+
+## See it work
+
+Here are four short examples that show how teams use CPO in practice: to develop a product idea, reach a go / no-go decision, run a weekly brief, and prepare for a board meeting.
+
+### 1) Developing a product idea
+
+**Prompt**
+```
+/cpo what should we build to improve activation for new users in our B2B SaaS product?
+```
+
+**What CPO returned**
+- framed the activation problem across the **Five Truths**
+- identified the most likely opportunity as reducing time-to-value in the first session
+- proposed **Three Paths**:
+  - **Bold** — redesign onboarding around a guided setup flow
+  - **Balanced** — add templates, checklists, and milestone nudges
+  - **Conservative** — improve existing onboarding copy and instrumentation first
+- surfaced key assumptions, risks, and kill criteria for each path
+- recommended a **Balanced** path to increase activation without a full rebuild
+
+**Why it mattered**
+The team did not just get ideas. They got a structured product direction, a clear recommendation, and a sharper view of what had to be true before investing more.
+
+---
+
+### 2) Reaching a go / no-go decision
+
+**Prompt**
+```
+/cpo should we launch a collaboration feature for mid-market teams this quarter?
+```
+
+**What CPO returned**
+- pressure-tested the opportunity across user demand, strategic fit, economics, timing, and execution risk
+- showed **Three Paths**:
+  - **Bold** — launch broadly this quarter
+  - **Balanced** — run a narrow beta with 5–10 target accounts
+  - **Conservative** — delay and focus on core retention first
+- labeled major claims as **fact / assumption / inference / judgment**
+- identified kill criteria, including weak pull from current customers and high execution drag on the roadmap
+- recommended **go, but only as a constrained beta**, not a full launch
+
+**Why it mattered**
+Instead of arguing in circles, the team got to a decision they could defend: proceed, but with clear scope, clear risks, and clear conditions for stopping.
+
+---
+
+### 3) Weekly brief
+
+**Prompt**
+```
+/cpo --brief
+```
+
+**What CPO returned**
+- summarized active decisions and unresolved follow-ups
+- highlighted kill criteria that were getting close
+- surfaced repeated patterns in decision-making, including overcommitting before validating demand
+- flagged strategic drift between current roadmap work and stated company priorities
+- turned the week's decision history into a concise executive brief
+
+**Why it mattered**
+The weekly brief helped leadership step back from day-to-day motion and see where focus was slipping, where bets were aging, and which decisions needed attention before they became expensive.
+
+---
+
+### 4) Board meeting simulation
+
+**Prompt**
+```
+/cpo simulate the board
+```
+
+**What CPO returned**
+- ran a live multi-turn board simulation with speaking archetypes (Lead VC, Financial VC, Independent Director)
+- went off-agenda — the Lead VC challenged burn assumptions not on the slide
+- stress-tested the company's current narrative and exposed weak spots in the Q3 forecast
+- ended with a post-meeting debrief: what was committed to, where the room was lost, what to fix before the real meeting
+
+**Why it mattered**
+The team went into the board meeting better prepared for pushback, with stronger answers, clearer logic, and a more coherent story about where the company was going and why.
+
+---
+
+## Install
+
+### Claude Code
+
+```bash
+git clone https://github.com/0x2kNJ/CPO.git ~/.claude/skills/cpo
+```
+
+Add to `CLAUDE.md`:
+
+```md
+## cpo
+Available skill: /cpo
+```
+
+### Cursor
+
+Use `@CURSOR.md` at the start of a conversation, or add this to `.cursorrules`:
+
+```
+@~/.claude/skills/cpo/CURSOR.md
+```
+
+### Shared state
+
+CPO shares the same `~/.cpo/` state across Claude Code and Cursor:
+- decision journal
+- company context
+- simulation transcripts
+- exports
+
+---
+
+## Command model
+
+CPO is designed around one command:
+
+```
+/cpo
+```
+
+You invoke it with natural language, mode selectors, or flags.
+
+```
+/cpo what should we build
+/cpo should we do this
+/cpo simulate an investor meeting
+/cpo simulate the board
+/cpo --sell-up CEO
+/cpo --brief
+/cpo ?
+```
+
+---
+
+## Advanced
+
+### Modes
+
+CPO supports 20 core modes. Invoke them with natural language — CPO routes automatically. The internal mode name is shown in parentheses for direct invocation.
+
+★ = most-used starting points
+
+| Mode | Invoke with | What it does | Best for |
+|---|---|---|---|
+| ★ Opportunity Scan (`blue-ocean`) | `/cpo what should we build` | Maps uncontested opportunity spaces, ranks bets, sequences what to do first | New bets, growth ideas, product direction |
+| ★ Go / No-Go (`ceo`) | `/cpo should we do this` | Verdict: proceed, pause, re-scope, or kill — with Three Paths and kill criteria | High-stakes decisions |
+| ★ Investor Simulation (`investor-roundtable`) | `/cpo simulate an investor meeting` | Live 5-round investor debate, 5 archetypes, distinct voices, verdict per archetype | Fundraising meetings |
+| ★ Board Simulation (`boardroom`) | `/cpo simulate the board` | Live multi-turn board meeting with speaking archetypes + post-meeting debrief | Board prep |
+| ★ Weekly Brief (`--brief`) | `/cpo --brief` | Summarizes active decisions, kill criteria, risks, and strategic drift | Weekly leadership cadence |
+| Prioritization (`sequence`) | `/cpo what should we prioritize` | Orders the roadmap by leverage, reversibility, and strategic unlock | Roadmaps, portfolio choices |
+| Assumption Audit (`discovery`) | `/cpo what are our riskiest assumptions` | Surfaces bets most likely to be wrong before you commit | Discovery planning, diligence |
+| GTM Design (`gtm`) | `/cpo how do we go to market` | ICP, channels, growth loop, retention — full go-to-market design | Launch planning, GTM motion |
+| Positioning (`narrative`) | `/cpo how do we position this` | Category design, 1-sentence claim, narrative spine, objection map | Positioning, category creation |
+| Launch Planning (`launch-os`) | `/cpo plan our launch` | 8-phase launch plan, owner map, launch narrative, success metrics | Launch sequencing |
+| Raise Prep (`investor-story`) | `/cpo help me prep for a raise` | Narrative spine, objection map, proof point gaps for the raise | Fundraising prep |
+| Risk Review (`red-team`) | `/cpo what could go wrong` | Top 5 failure vectors ranked by probability × impact, mitigation per vector | Pre-commit risk review |
+| Pre-mortem (`premortem`) | `/cpo assume this failed — why` | Failure scenario, root cause chain, pre-emptive actions ranked | Pre-commitment risk sim |
+| Retrospective (`postmortem`) | `/cpo why did this fail` | Timeline reconstruction, root cause, what to change, system fix | Post-mortems |
+| Team Structure (`org-design`) | `/cpo how should we structure the team` | Team shape, reporting lines, transition plan, failure modes | Org planning |
+| Board Update (`board-memo`) | `/cpo write a board update` | Board memo: Context → Highlights → Lowlights → Key Decisions → Ask | Board communication |
+| Board Deck (`board-story`) | `/cpo help me prepare board materials` | Board deck narrative spine, 9-slide structure, pre-emptive Q&A by archetype | Board deck prep |
+| Eng Handoff (`eng-brief`) | `/cpo brief the engineering team` | PR/FAQ-style brief: Problem · Solution · Non-goals · Metrics · Open questions | Engineering handoff |
+| Tech Decoder (`eng-translate`) | `/cpo decode what engineering said` | Translates technical constraints into product implications and decisions | Eng ↔ product alignment |
+| Sell-Up Narrative (`upward-pitch`) | `/cpo help me convince my CEO` | Decision-maker profile, argument, evidence architecture, objection map, explicit ask | Internal advocacy |
+
+---
+
+### Flags
+
+CPO supports 22 flags for shaping how it reasons and communicates.
+
+| Flag | Example | What it does |
 |---|---|---|
-| `ceo` | Strategic Advisor | Go/no-go on any decision. Three Paths, kill criteria, confidence level. |
-| `blue-ocean` | Opportunity Mapper | Map uncontested space, rank bets, sequence what to do first. |
-| `sequence` | Prioritization Lead | Order the roadmap by leverage, reversibility, and strategic unlock. |
-| `discovery` | Assumption Hunter | Surface the bets most likely to be wrong before you commit. |
-| `gtm` | GTM Designer | ICP, channels, growth loop, retention. Full go-to-market. |
-| `narrative` | Positioning Lead | Category design, story, differentiation. |
-| `launch-os` | Launch Planner | Readiness score, sequencing, failure modes, launch protocol. |
-| `investor-story` | Pitch Builder | Narrative spine, objection map, proof point gaps for your raise. |
-| `red-team` | Attacker | Find the plan's fatal flaw before your competitors or investors do. |
-| `premortem` | Risk Simulator | Assume it failed — reconstruct why, rank causes by probability. |
-| `postmortem` | Retrospective Lead | What actually happened, what the pattern means, what to change. |
-| `org-design` | Structure Advisor | Team shape, reporting lines, hiring sequence for your stage. |
-| `board-memo` | Board Writer | Shareable written board update — principled, printable, complete. |
-| `board-story` | Board Presenter | Board deck narrative, talking points, pre-read materials. |
-| `eng-brief` | Eng Translator | Turn strategy into an engineering spec the team can build from. |
-| `eng-translate` | Tech Decoder | Decode what engineering is actually telling you. |
-| `advisory-roundtable` | Expert Panel | Structured expert debate — product, growth, market archetypes. |
-| `boardroom` | Live Board Simulation | Multi-turn board meeting. Archetypes push back. You respond. Debrief at end. |
-| `investor-roundtable` | Live Investor Debate | 5-round investor panel — 5 archetypes, distinct voices, per-archetype verdict. |
-| `upward-pitch` | Internal Pitch Builder | Build the case to convince your CEO, board, or cross-functional peers. |
+| `--go` | `/cpo --go should we raise now` | Skip menus. Route directly. Get the answer immediately. Also skips simulation gate. |
+| `--deep` | `/cpo --deep should we pivot` | Full 10-section structured output. All Five Truths assessed. |
+| `--quick` | `/cpo --quick is freemium right for us` | One paragraph. Dominant Truth only. |
+| `--memo` | `/cpo --memo should we enter healthcare` | Formats output as a printable decision memo. No headers. |
+| `--silent` | `/cpo --silent should we kill this` | No calibration questions. Proceeds with stated assumptions. Flags every inference. |
+| `--compare` | `/cpo --compare option-a vs option-b` | Runs two approaches side-by-side on the same input. |
+| `--roadmap` | `/cpo --roadmap 4 bets` | Comparative prioritization across N bets — Five Truths per bet, ASCII timeline, kill criteria per bet. |
+| `--sell-up` | `/cpo --sell-up CEO` | Reframes any decision as an internal pitch. 1-min + 5-min version, objection pre-emption, explicit ask. |
+| `--save-context` | `/cpo --save-context` | Saves company context — stage, model, constraint, priorities. Loads automatically every session. |
+| `--context` | `/cpo --context series-a` | Loads a named context from `~/.cpo/contexts/[name].md`. For consultants or multi-company use. |
+| `--no-context` | `/cpo --no-context` | Ignores saved context. Reasons from the current prompt only. |
+| `--focus` | `/cpo --focus burn-rate` | Simulation modes only — jumps directly to targeted pressure on one topic. |
+| `--since` | `/cpo --since last-time` | Temporal delta — leads with what changed since a prior baseline. Pulls from decision journal. |
+| `--brief` | `/cpo --brief` | Proactive weekly intelligence brief. Kill criteria alerts, unresolved decisions, pattern warnings. |
+| `--trail` | `/cpo --trail` | 90-day strategic diary — all journal entries, one page. |
+| `--history` | `/cpo --history enterprise` | Full decision journal. Optional keyword filter. |
+| `--outcome` | `/cpo --outcome enterprise-pause` | Closes the loop on a prior decision. Records what happened. Detects path patterns over time. |
+| `--export` | `/cpo --export` | Writes output to `~/.cpo/exports/YYYY-MM-DD-[slug].md` — shareable with co-founders, boards, investors. |
+| `--schedule-brief` | `/cpo --schedule-brief` | Sets up a recurring weekly brief that runs automatically on a schedule you define — no manual trigger needed. Uses `anthropic-skills:schedule`. |
+| `--setup-integrations` | `/cpo --setup-integrations` | Detects MCP data sources and configures live data enrichment for Five Truths assessments. |
+| `--stack` | `/cpo --stack` | Shows the full product workflow with coverage status. Detects installed complementary skills. |
+| `--update` | `/cpo --update` | Outputs update instructions: `cd ~/.claude/skills/cpo && git pull`. |
+
+> Natural language should still be the default. Flags are best when you want format control, audience control, or repeatable workflows.
 
 ---
 
-## All flags
+### Persistent layers
 
-| Flag | Effect |
-|---|---|
-| `--go` | Skip menus. Route directly. Get the answer. Also skips simulation gate. |
-| `--deep` | Full 10-section structured output. All Five Truths assessed. |
-| `--quick` | One paragraph. Dominant Truth only. |
-| `--memo` | Output as a printable decision memo. No headers. |
-| `--silent` | No calibration questions. Proceed with stated assumptions. Flags every inference. |
-| `--compare` | Run two approaches side-by-side on the same input. |
-| `--roadmap [N bets]` | Comparative prioritization — compressed Five Truths per bet, ASCII timeline, kill criteria per bet. |
-| `--sell-up [audience]` | Reframe any decision as an internal pitch. 1-min + 5-min version, objection pre-emption, explicit ask. |
-| `--save-context` | Save company context — loads automatically every session. |
-| `--context [name]` | Load a named context. For consultants or multi-company use. |
-| `--no-context` | Ignore saved context. Reason from prompt only. |
-| `--focus [topic]` | Simulation modes only — jump directly to targeted pressure on one topic. |
-| `--since [date]` | Temporal delta — what changed since a prior baseline. |
-| `--brief` | Proactive weekly intelligence brief. Kill criteria alerts, unresolved decisions, pattern warnings. |
-| `--trail` | 90-day strategic diary — all journal entries, one page. |
-| `--history [keyword]` | Full decision journal. Optional keyword filter. |
-| `--outcome [topic]` | Close the loop on a prior decision. Detect Bold/Balanced/Conservative patterns over time. |
-| `--export` | Write output to `~/.cpo/exports/YYYY-MM-DD-[slug].md` — shareable with co-founders, boards, investors. |
-| `--schedule-brief` | Set up a recurring weekly brief. Auto-runs `/cpo --brief` without you having to remember. |
-| `--setup-integrations` | Detect MCP data sources and configure live data enrichment for Five Truths. |
-| `--stack` | Show the full product workflow with coverage status. Detects installed complementary skills. |
-| `--update` | Pull the latest version from GitHub. |
+CPO uses shared local state so it can compound context over time. Everything lives in `~/.cpo/` — shared between Claude Code and Cursor.
+
+| Path | What it stores | Why it matters |
+|---|---|---|
+| `~/.cpo/context.md` | Company profile — stage, model, constraint, priorities | Keeps answers grounded in your actual company. Loads every session. |
+| `~/.cpo/decisions/` | Decision journal — one YAML per major analysis | Builds a searchable strategic history. Foundation for `--brief`, `--trail`, `--since`. |
+| `~/.cpo/simulations/` | Boardroom and investor roundtable transcripts | Preserves full simulation sessions |
+| `~/.cpo/exports/` | Exported memos and analyses — dated and slugged | Makes outputs portable and shareable |
+| `~/.cpo/integrations.md` | Live data source config — injected into Five Truths | Enriches assessments with real company data |
+| `~/.cpo/.version` | Version tracking | Surfaces mismatches between skill and saved state |
+| `~/.cpo/contexts/` | Named contexts for multi-company use | Supports `--context [name]` switching |
 
 ---
 
-## Persistent layers
-
-Everything lives in `~/.cpo/` — shared between Claude Code and Cursor.
-
-| Path | What it stores |
-|---|---|
-| `~/.cpo/context.md` | Company profile — stage, model, constraint, priorities. Loads every session. |
-| `~/.cpo/decisions/` | Decision journal — one YAML per major analysis. Foundation for `--brief`, `--trail`, `--since`. |
-| `~/.cpo/simulations/` | Boardroom and investor roundtable transcripts. Full session saved. |
-| `~/.cpo/exports/` | Shareable Markdown files — one per `--export`. Dated and slugged. |
-| `~/.cpo/integrations.md` | Live data source config — injected into Five Truths assessments. |
-| `~/.cpo/.version` | Version tracking — surfaces mismatches between skill and saved state. |
-| `~/.cpo/contexts/` | Named contexts for multi-company use (`--context [name]`). |
-
----
-
-## Know your stack
-
-Run `/cpo --stack` to see what's installed alongside `/cpo`. It detects:
-- `gstack` skills: `/plan-eng-review`, `/plan-ceo-review`, `/review`, `/ship`, `/qa`
-- `pm-skills`: execution toolkit for PRDs, OKRs, roadmaps, retros
-- Any other complementary skills
-
-If a skill is missing, `--stack` surfaces the gap and suggests next steps. This is how you know your coverage is complete.
-
----
-
-## Works with gstack
-
-`/cpo` covers strategy and decision. [gstack](https://github.com/garrytan/gstack) covers implementation and QA. They hand off cleanly:
-
-| After `/cpo`... | → Next step |
-|---|---|
-| Decision made → need implementation plan | `/plan-eng-review` |
-| Decision made → need product / brand review | `/plan-ceo-review` |
-| `eng-brief` written → need code review | `/review` |
-| `postmortem` or `red-team` done → need QA plan | `/qa` |
-| Decision shipped → need retrospective | `/retro` |
-
-For execution artifacts — PRDs, OKRs, sprint plans, user stories, release notes → [pm-skills](https://github.com/phuryn/pm-skills).
-
----
-
-## Works in Cursor
-
-`CURSOR.md` is the full Cursor-compatible version of `/cpo`:
-- Same bash blocks, same `~/.cpo/` state
-- `cat`-based mode loading instead of `Read` tool
-- Plain question format instead of `AskUserQuestion`
-- Shared decision journal with Claude Code — decisions logged in one place, visible in both
-
-Activate per-conversation: `@CURSOR.md`
-Always-on: copy contents to `.cursorrules`
-
-Command format: `cpo ?`, `cpo --help`, `cpo should we do this` (no `/` prefix in Cursor)
-
----
-
-## Structure
+### Structure
 
 ```
 cpo/
-├── SKILL.md                    # Claude Code skill (~500 lines)
+├── SKILL.md                    # Claude Code skill
 ├── CURSOR.md                   # Cursor-compatible version
 ├── CHANGELOG.md                # Version history
 ├── README.md                   # This file
@@ -284,12 +524,127 @@ cpo/
 
 ---
 
-## Version
+## Works with other skills
 
-Current: **v1.0.0** — [view changelog](CHANGELOG.md) for full release history.
+CPO is best used as the **decision layer before execution**.
+
+It helps you decide:
+- what to build
+- why it matters
+- which path to take
+- how to defend the choice
+- what would make you stop
+
+Then it hands off cleanly into the rest of your skill stack.
+
+### Dynamic handoff model
+
+The pattern is simple:
+
+1. **CPO frames the decision** — opportunity · tradeoffs · assumptions · recommendation · kill criteria
+2. **CPO sharpens the narrative** — board-ready · investor-ready · CEO / leadership framing · rationale that can travel across teams
+3. **Other skills operationalize the decision** — discovery · research · PRDs · planning · execution · launch · measurement
+4. **CPO returns to evaluate** — weekly brief · follow-up go / no-go · board review · decision journal review
+
+**CPO decides. Other skills operationalize. CPO returns to evaluate.**
+
+### Example handoffs
+
+| If CPO helps you decide… | Then hand off to… |
+|---|---|
+| what opportunity to pursue | discovery, market research, user research skills |
+| whether to proceed with a bet | planning, scoping, PRD, roadmap, execution skills |
+| how to position the bet | strategy, GTM, launch, messaging skills |
+| what success looks like | metrics, analytics, experimentation skills |
+| how to defend the choice | board, investor, CEO, and leadership communication workflows |
+| when to stop | review, retro, and decision follow-up workflows |
+
+### Recommended handoff stack
+
+| Tool | When | What it does |
+|---|---|---|
+| [gstack](https://github.com/garrytan/gstack) `/plan-eng-review` | After `/cpo` → need implementation plan | Architecture, data flow, edge cases |
+| [gstack](https://github.com/garrytan/gstack) `/plan-ceo-review` | After `/cpo` → need product / brand review | 10-star product thinking, reframe |
+| [gstack](https://github.com/garrytan/gstack) `/review` | After `eng-brief` → need code review | Bugs that pass CI, completeness gaps |
+| [gstack](https://github.com/garrytan/gstack) `/qa` | After `postmortem` or `red-team` → need QA plan | Real browser, real clicks, regression tests |
+| [gstack](https://github.com/garrytan/gstack) `/retro` | After decision shipped → team retrospective | Per-person breakdown, shipping streaks |
+| [pm-skills](https://github.com/phuryn/pm-skills) | After strategy is set → execution artifacts | PRDs, OKRs, sprint plans, user stories |
+| [notebooklm-py](https://github.com/teng-lin/notebooklm-py) | Before `/cpo` → enrich with research docs | Inject competitor intel, interviews, and market data into Five Truths |
+| [notebooklm-py](https://github.com/teng-lin/notebooklm-py) | After `--export` → distribute the decision | Generate a podcast brief, board slide deck, or team study guide from the memo |
 
 ---
 
-## License
+## Complementary skill ecosystems
+
+### PM Skills
+
+[pm-skills](https://github.com/phuryn/pm-skills) covers a wide PM workflow surface area — discovery, strategy, execution, launch, and growth.
+
+Use **CPO** when you need:
+- a high-stakes product decision
+- strategic framing before execution
+- a go / no-go call
+- board or investor pressure-testing
+- a decision journal and persistent reasoning
+
+Use **pm-skills** when you need:
+- product discovery workflows
+- assumption testing
+- PRDs
+- launch planning
+- market research
+- analytics and growth workflows
+- broader PM execution support
+
+A strong combined motion: use **CPO** to decide whether the bet is worth making → use **pm-skills** to discover, define, validate, scope, and launch it → return to **CPO** to review the bet over time and decide whether to double down, adapt, or kill it.
+
+### gstack
+
+[gstack](https://github.com/garrytan/gstack) covers execution with an opinionated set of role-based skills: CEO review, engineering review, QA, release, and delivery workflows.
+
+Use **CPO** when the question is: what should we do? should we do this now? how do we defend the decision? what are the risks and kill criteria?
+
+Use **gstack** when the question becomes: how do we execute this with discipline? how do we review, document, QA, and ship?
+
+A strong combined motion: use **CPO** to frame the strategic decision → use **gstack** to move the chosen plan through execution, review, and delivery → return to **CPO** for weekly briefings and decision follow-up.
+
+---
+
+## Design principles
+
+CPO is opinionated. It assumes:
+- strategy should be explicit
+- tradeoffs should be named
+- claims should be typed
+- recommendations should be compared against alternatives
+- kill criteria should exist before commitment
+- decisions should leave a record
+
+That is the whole point.
+
+---
+
+## FAQ
+
+**Is this for founders only?**
+No. It is especially useful for solo founders, PMs, Heads of Product, chiefs of staff, and product-minded execs making high-stakes product and company decisions.
+
+**Is this a PRD generator?**
+No. CPO sits upstream of PRDs. It helps you decide whether the thing is worth doing, how to frame it, and what must be true before execution.
+
+**Does it replace discovery or execution workflows?**
+No. It complements them. CPO is the strategic decision layer before execution, and the review layer after execution starts.
+
+**Does it work in Cursor?**
+Yes. Use `@CURSOR.md` at the start of a conversation, or add it to `.cursorrules`. It shares the same `~/.cpo/` state as Claude Code.
+
+**Does it remember my company context?**
+Yes. CPO compounds context over time through its shared local state and decision journal.
+
+---
+
+## Version · License
+
+Current: **v1.0.0** — [view changelog](CHANGELOG.md)
 
 MIT. Free forever. Go make better product decisions.
