@@ -177,7 +177,17 @@ Try one of these:
 /cpo --brief
 ```
 
-### 4) Stop there
+### 4) Save your company context (one-time)
+
+Run this once so CPO knows your stage and business model — it will never ask again:
+
+```
+/cpo --save-context
+```
+
+CPO will ask 5 quick questions and save the answers to `~/.cpo/context.md`. Every future session loads this automatically. Without it, CPO will ask one calibration question at the start of GTM, roadmap, and strategy prompts.
+
+### 5) Stop there
 
 If the output feels sharper than your usual brainstorming doc, this is probably for you.
 
