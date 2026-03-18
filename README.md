@@ -1,4 +1,4 @@
-# /cpo — Strategic Product Advisor
+# /cpo — The Product Operating System
 
 > The hard conversation you need before you commit.
 
@@ -175,4 +175,4 @@ PRDs, OKRs, sprint plans, user stories, backlogs, retros. For execution artifact
 
 ## Version
 
-Current: **v4.0.0** — see [CHANGELOG.md](CHANGELOG.md) for full history.
+Current: **v1.0.0** — see [CHANGELOG.md](CHANGELOG.md) for full history.
