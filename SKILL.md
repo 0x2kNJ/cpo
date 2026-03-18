@@ -4,7 +4,7 @@ version: 1.0.0
 last_updated: 2026-03-17
 argument-hint: "[problem or question] [--go] [--deep]"
 description: >-
-  The operating system for product decisions before execution.
+  The operating system for product decisions — what to build, whether to build it, how to communicate it, and when to kill it — before your team commits time, headcount, or capital.
 allowed-tools:
   - Bash
   - Read
