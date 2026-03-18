@@ -168,19 +168,29 @@ Name the path. One sentence why. Kill criteria. Confidence: High / Medium / Low.
 
 Done. No further questions. The user reacts, redirects, or asks for more depth.
 
-**Output format (all four actions, one message):**
+**Output format — enforced structure (all four actions, one message):**
+
+Every four-action response must use exactly these markers, in exactly this order. No exceptions, no reordering, no omissions unless a flag explicitly collapses a section.
 
 ```
-*I'm reading this as: [decision]. Inferring [stage/lean] — correct me if wrong.*
+*I'm reading this as: [decision in one clause]. Inferring [stage / model / lean] — correct me if wrong.*
 
-*The [Truth] is what this turns on: [finding].*
+*The [Truth name] is what this turns on: [finding in one sentence].*
 
 **Bold** — [≤2 sentences]
 **Balanced** — [≤2 sentences]
 **Conservative** — [≤2 sentences]
 
-*Verdict: [path] — [reason]. Kill it if [criteria]. Confidence: [level].*
+*Verdict: [Bold/Balanced/Conservative] — [one-line reason]. Kill it if [specific measurable criteria]. Confidence: [High/Medium/Low].*
 ```
+
+**Structural rules:**
+- Line 1 always starts with `*I'm reading this as:`
+- Line 2 always starts with `*The` and names a Truth
+- Paths always use exactly `**Bold**`, `**Balanced**`, `**Conservative**` — no synonyms, no reordering
+- Verdict line always starts with `*Verdict:` and always ends with `Confidence: [level].*`
+- No headers, no numbered sections, no preamble before Line 1
+- With `--deep`: Lines 1–2 remain identical. After Conservative, insert full 10-section output. Verdict follows at the end.
 
 ---
 

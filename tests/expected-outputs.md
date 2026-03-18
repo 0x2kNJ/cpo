@@ -6,7 +6,7 @@ Each test has: **Input**, **Expected behavior**, **Pass criteria**, **Fail signa
 
 ---
 
-## Test 1: Direct question auto-routes without menu
+## Test 1: Direct prompt — four-action output
 
 **Input:**
 ```
@@ -15,20 +15,23 @@ Each test has: **Input**, **Expected behavior**, **Pass criteria**, **Fail signa
 
 **Expected behavior:**
 - Does NOT show a menu (A/B/C options)
-- Immediately routes to `ceo` mode
-- Leads with a verdict (Go / No-Go / Conditional)
-- Includes Three Paths (Bold / Balanced / Conservative)
-- Includes kill criteria
+- Runs all four actions in one response: Frame → Assess → Paths → Verdict
+- Line 1 starts with `*I'm reading this as:`
+- Line 2 starts with `*The` and names a specific Truth
+- Paths use exactly `**Bold**`, `**Balanced**`, `**Conservative**`
+- Verdict line starts with `*Verdict:` and ends with `Confidence: [level].*`
 
 **Pass criteria:**
-- First line of output contains a verdict or "Running:" prefix
-- Output contains "Three Paths" or Bold/Balanced/Conservative structure
-- Output contains kill criteria
+- All four structural markers present in correct order
+- No menu (A/B/C) before output
+- No questions before output
+- Verdict names one of the three paths
 
 **Fail signals:**
-- Output shows "A) ... B) ... C) ..." menu before giving verdict
-- Output asks "What would you like to do?" or similar
-- Output is more than ~400 words without `--deep`
+- Output shows `A) ... B) ... C) ...` menu
+- Output asks a question before delivering Frame
+- Verdict does not name Bold/Balanced/Conservative explicitly
+- Structural markers out of order or missing
 
 ---
 
@@ -40,16 +43,17 @@ Each test has: **Input**, **Expected behavior**, **Pass criteria**, **Fail signa
 ```
 
 **Expected behavior:**
-- Returns exactly: "What's the problem or decision? I'll show you the options."
-- Nothing else
+- Returns exactly one question: "What are we deciding?"
+- Nothing else — no options list, no capability explanation
 
 **Pass criteria:**
-- Output is one sentence or very close to it
+- Output is one sentence
 - No mode list, no capability explanation, no "here's what I can do"
 
 **Fail signals:**
 - Output lists modes or capabilities
 - Output is more than 2 sentences
+- Output shows "I'll show you the options" or similar
 
 ---
 
@@ -76,7 +80,7 @@ Each test has: **Input**, **Expected behavior**, **Pass criteria**, **Fail signa
 
 ---
 
-## Test 4: Ambiguous prompt shows options menu
+## Test 4: Ambiguous prompt — four-action with visible inference
 
 **Input:**
 ```
@@ -84,19 +88,22 @@ Each test has: **Input**, **Expected behavior**, **Pass criteria**, **Fail signa
 ```
 
 **Expected behavior:**
-- Shows 2–4 lettered options (A/B/C/D)
-- Options are in plain English, no internal mode names visible
-- Includes escape hatch: "Or describe what you need and I'll route it"
+- Runs four-action flow, does NOT show A/B/C options menu
+- Frame states the inferred decision and flags uncertainty inline
+- Assess identifies the Dominant Truth for this specific decision
+- Paths are tailored to "paid API" decision, not generic
+- All four structural markers present
 
 **Pass criteria:**
-- Output contains lettered options
-- No mode names (ceo, blue-ocean, red-team, etc.) appear in output
-- Options are specific to the prompt, not a generic capability list
+- Line 1 starts with `*I'm reading this as:`
+- Frame flags what's being inferred (e.g., stage, whether this is build vs. pricing vs. GTM)
+- No A/B/C menu appears
+- No internal mode names visible
 
 **Fail signals:**
-- Mode names appear (e.g., "A) ceo mode", "B) blue-ocean analysis")
-- Options are generic instead of specific to "paid API for a product"
-- Only one option shown
+- Output shows `A) ... B) ... C) ...` menu
+- Frame states decision confidently without flagging uncertainty
+- Paths are generic, not specific to API monetization decision
 
 ---
 
@@ -247,11 +254,121 @@ Each test has: **Input**, **Expected behavior**, **Pass criteria**, **Fail signa
 
 ---
 
+## Test 11: Four-action structure — all markers enforced
+
+**Input:**
+```
+/cpo what GTM motion should we use for our developer tool
+```
+
+**Expected behavior:**
+- All four structural markers appear in correct order in one response
+- No questions, no menu, no preamble before Line 1
+
+**Pass criteria:**
+- Line 1: starts with `*I'm reading this as:`
+- Line 2: starts with `*The` + Truth name + `is what this turns on:`
+- Lines 3–5: `**Bold**`, `**Balanced**`, `**Conservative**` in that order
+- Final line: starts with `*Verdict:` and ends with `Confidence: [High/Medium/Low].*`
+- All in one response
+
+**Fail signals:**
+- Any structural marker missing
+- Markers out of order
+- Any question before Line 1
+- "Assessment:", "Framing:", "Paths:" headers used instead of the enforced markers
+- Verdict does not end with `Confidence: [level].*`
+
+---
+
+## Test 12: Correction loop — re-run from Assess
+
+**Turn 1 input:**
+```
+/cpo should we expand to enterprise
+```
+CPO infers post-PMF in the Frame line.
+
+**Turn 2 input:**
+```
+actually we're pre-PMF, $200k ARR
+```
+
+**Expected behavior:**
+- CPO acknowledges the correction in one line: `*Got it — re-running with pre-PMF, $200k ARR.*`
+- Immediately re-runs from Action 2 (Assess) with updated assumption
+- Does NOT repeat the Frame line
+- New Paths are materially different from the post-PMF version (pre-PMF paths should be more conservative / learning-oriented)
+- New Verdict reflects pre-PMF doctrine
+
+**Pass criteria:**
+- Acknowledgment line is one sentence starting with `*Got it`
+- Action 1 (Frame) is NOT repeated
+- Paths and Verdict change meaningfully between Turn 1 and Turn 2
+
+**Fail signals:**
+- CPO asks a clarifying question instead of re-running
+- Frame line is repeated in Turn 2 response
+- Paths in Turn 2 are identical to Turn 1
+
+---
+
+## Test 13: --go skips Frame and Assess
+
+**Input:**
+```
+/cpo --go should we raise now
+```
+
+**Expected behavior:**
+- One-line prefix: `*Running: go/no-go on raising now.*` or similar
+- Immediately delivers Paths + Verdict
+- No Frame line (`*I'm reading this as:`)
+- No Assess line (`*The [Truth] is what this turns on:`)
+
+**Pass criteria:**
+- `*Running:` prefix appears
+- No `*I'm reading this as:` line
+- No `*The ... is what this turns on:` line
+- Bold/Balanced/Conservative + Verdict present
+
+**Fail signals:**
+- Frame line appears despite `--go`
+- Assess line appears despite `--go`
+- A question is asked before output
+
+---
+
+## Test 14: --quick delivers Verdict only
+
+**Input:**
+```
+/cpo --quick should we kill the mobile app
+```
+
+**Expected behavior:**
+- One paragraph only
+- No Frame line, no Assess line, no Paths structure
+- Verdict is embedded in prose: names a path, gives a reason, names kill criteria
+
+**Pass criteria:**
+- Output is one paragraph (3–5 sentences)
+- No `**Bold**`, `**Balanced**`, `**Conservative**` labels
+- Verdict is clearly stated (path + reason + kill criteria)
+- No questions
+
+**Fail signals:**
+- Full four-action structure appears
+- Three Paths labels appear
+- Output is more than one paragraph without `--deep`
+
+---
+
 ## Running these tests
 
 These are behavioral tests — run them manually by invoking `/cpo` with the specified inputs and checking the output against pass criteria.
 
 For automated testing: the expected output patterns can be used as assertions in an LLM eval harness (e.g., checking for presence/absence of specific phrases in the output).
 
-Version: 3.7.0
-Last updated: 2026-03-17
+Version: 4.0.0
+Last updated: 2026-03-18
