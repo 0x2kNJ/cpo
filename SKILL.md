@@ -166,6 +166,8 @@ Max 4 options. Always include the escape hatch.
 
 > **The product operating system that sits between "we have an idea" and "the engineering team is building it."**
 >
+> `/cpo` covers every decision a founder, PM, or senior executive needs to make across the product lifecycle — before committing to execution. It runs on your company context, labels evidence, and always gives you Three Paths before a recommendation.
+>
 > **Opportunity analysis:**
 > - **"Where's the opportunity?"** / **"What should we build?"** — map uncontested space, rank bets, sequence what to do first
 > - **"What are our riskiest assumptions?"** — surface the bets most likely to be wrong before you commit
@@ -193,6 +195,23 @@ Max 4 options. Always include the escape hatch.
 > Works for solo founders, PMs making the case upward, and teams preparing for high-stakes meetings.
 >
 > **What `/cpo` does not do:** PRDs, OKRs, sprint plans — for those → [pm-skills](https://github.com/phuryn/pm-skills)
+>
+> ---
+>
+> **Full manual — quick navigation:**
+>
+> **Core flow:** Intake & routing → Five Truths (User · Strategic · Economic · Macro-Political · Execution) → Three Paths (Bold · Balanced · Conservative) → Recommendation + kill criteria
+>
+> **Flags:**
+> `--go` skip menu · `--deep` full output · `--quick` one paragraph · `--memo` printable · `--silent` no questions · `--compare` side-by-side · `--roadmap` prioritize bets · `--sell-up [audience]` internal pitch · `--brief` weekly intelligence · `--trail` 90-day diary · `--history` full journal · `--since` temporal delta · `--outcome` close the loop · `--export` save to file · `--stack` show workflow · `--save-context` update company profile · `--setup-integrations` connect live data · `--schedule-brief` auto weekly brief · `--update` upgrade skill
+>
+> **20 modes:**
+> `blue-ocean` opportunity mapping · `ceo` go/no-go decisions · `sequence` roadmap ordering · `gtm` go-to-market · `discovery` assumption validation · `narrative` positioning · `launch-os` launch planning · `investor-story` pitch prep · `red-team` attack the plan · `premortem` pre-commitment failure sim · `postmortem` retrospective · `org-design` team structure · `board-memo` written board update · `board-story` board presentation · `eng-brief` engineering spec · `eng-translate` decode tech constraints · `advisory-roundtable` expert debate · `boardroom` live board simulation · `investor-roundtable` live investor debate · `upward-pitch` build the internal case
+>
+> **Persistent layers (`~/.cpo/`):**
+> `context.md` — company profile, loads every session · `decisions/` — decision journal · `simulations/` — boardroom & investor transcripts · `exports/` — shareable Markdown · `integrations.md` — live data sources · `.version` — version tracking
+>
+> *Want to dive into any specific section? Ask about any flag, mode, or layer.*
 
 ---
 
