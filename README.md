@@ -519,7 +519,7 @@ CPO supports 20 core modes. Invoke them with natural language — CPO routes aut
 | Team Structure (`org-design`) | `/cpo how should we structure the team` | Team shape, reporting lines, transition plan, failure modes | Org planning |
 | Board Update (`board-memo`) | `/cpo write a board update` | Board memo: Context → Highlights → Lowlights → Key Decisions → Ask | Board communication |
 | Board Deck (`board-story`) | `/cpo help me prepare board materials` | Board deck narrative spine, 9-slide structure, pre-emptive Q&A by archetype | Board deck prep |
-| Eng Handoff (`eng-brief`) | `/cpo brief the engineering team` | PR/FAQ-style brief: Problem · Solution · Non-goals · Metrics · Open questions | Engineering handoff |
+| Eng Handoff (`eng-brief`) | `/cpo brief the engineering team` | PR/FAQ-style brief: Problem · Solution · Non-goals · Metrics · Open questions — saved to `~/.cpo/briefs/` | Engineering handoff |
 | Tech Decoder (`eng-translate`) | `/cpo decode what engineering said` | Translates technical constraints into product implications and decisions | Eng ↔ product alignment |
 | Sell-Up Narrative (`upward-pitch`) | `/cpo help me convince my CEO` | Decision-maker profile, argument, evidence architecture, objection map, explicit ask | Internal advocacy |
 
