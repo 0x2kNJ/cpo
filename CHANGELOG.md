@@ -4,6 +4,19 @@ All notable changes documented here. Follows [Keep a Changelog](https://keepacha
 
 ---
 
+## [1.8.9] — 2026-03-19
+
+Patch: Exhaustive trigger→output→gate table; gate exception scope rule; CURSOR.md vs SKILL.md environment compatibility guardrail.
+
+### Fixed
+
+- **Exhaustive trigger→output→gate table added to Critical Output Rules:** The ONE RESPONSE PER TURN rule previously stated the principle but did not enumerate every legal trigger. A model could reason its way into an unlisted exception (e.g., treating `STRATEGY_FILES_FOUND` as collapsing GATE 2 as well as GATE 1). Replaced the prose rule with an exhaustive table: Initial `/cpo` call (standard) → Frame + Assess + grounding question → GATE 1; Initial `/cpo` call + `STRATEGY_FILES_FOUND` → Frame + Assess + Paths + 1/2/3 block → GATE 2; User replies with grounding → Paths + 1/2/3 block → GATE 2; User replies with path or pre-commitment → Verdict + D–M menu → None; User picks D–M option → That one option + re-surface remaining → None; `--go`/`--quick` → Single condensed response → None. The table is explicitly marked exhaustive.
+- **Gate exception scope rule added:** Codified that an exception collapsing GATE N does NOT automatically collapse GATE N+1. `STRATEGY_FILES_FOUND` collapses GATE 1 only. `--go`/`--quick` collapse all gates. No other exceptions exist in CURSOR.md. Added inline to the trigger table and cross-referenced from the `STRATEGY_FILES_FOUND` bullet.
+- **CURSOR.md vs SKILL.md environment compatibility rule added:** Added a guardrail for future editors: before adding any gate exception to CURSOR.md, the editor must ask "Does a mechanical pause enforce this gate (e.g., AskUserQuestion modal)?" If not, the exception is unsafe and belongs in SKILL.md only. This rule is co-located with the Conditional Grounding disabled note to create a single authoritative location for CURSOR.md exception policy.
+- **Critical Output Rules version tag updated:** v1.8.8 → v1.8.9.
+
+---
+
 ## [1.8.8] — 2026-03-19
 
 Patch: Conditional Grounding disabled in CURSOR.md; Verdict anti-hallucination rules added to Critical Output Rules.

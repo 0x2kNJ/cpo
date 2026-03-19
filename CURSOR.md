@@ -143,23 +143,29 @@ If the user's selection includes a correction: acknowledge in one line, reframe,
 
 ---
 
-## ⚠️ Critical Output Rules — v1.8.8 — read before every response
+## ⚠️ Critical Output Rules — v1.8.9 — read before every response
 
 Non-obvious rules this file size causes models to skip:
 
-- **⛔ ONE RESPONSE PER TURN — this is a conversation, not a monologue. Each Cursor message produces exactly one phase:**
-  - **Initial `/cpo` call (no grounding confirmed yet):** Your complete output for this turn is Response 1 — Frame, Assess, grounding question. You are done. Full stop.
-  - **User replies with grounding choice (A/B/C or frame correction):** Your complete output is Response 2 — Paths + challenge block. You are done. Full stop.
-  - **User replies with path choice (A/B/C) or picks 1/2/3 (pre-commitment tools):** Your complete output is Response 3 — Verdict + D–M next-steps menu. You are done. Full stop.
-  - **User picks a D–M option:** Run that one option, re-surface remaining picks, done.
-  - **Never produce Responses 1 + 2 or Responses 2 + 3 in a single turn.** You cannot ask a question and then answer it yourself. The user's reply is required before the next phase begins. This is not an agentic task to complete in one pass — it is a deliberate, gated conversation where founder input shapes each response.
+- **⛔ ONE RESPONSE PER TURN — exact output per trigger. This table is exhaustive:**
+
+  | Trigger | Your complete output | Gate that follows |
+  |---|---|---|
+  | Initial `/cpo` call (standard) | Frame + Assess + grounding question | GATE 1 — wait for user reply |
+  | Initial `/cpo` call + `STRATEGY_FILES_FOUND` | Frame + Assess + Paths + 1/2/3 block *(grounding confirmed by tension selection — no grounding question)* | GATE 2 — wait for user reply |
+  | User replies with grounding (A/B/C or correction) | Paths + 1/2/3 block | GATE 2 — wait for user reply |
+  | User replies with path or pre-commitment (A/B/C or 1/2/3) | Verdict + D–M menu | None |
+  | User picks a D–M option | That one option + re-surface remaining | None |
+  | `--go` or `--quick` flag | Single condensed response — all phases | None — only these two flags collapse all gates |
+
+  **Gate exception scope rule:** An exception that collapses GATE N does NOT automatically collapse GATE N+1. Each gate is independent. `STRATEGY_FILES_FOUND` collapses GATE 1 only. `--go`/`--quick` collapse all gates. No other exceptions exist in CURSOR.md — if you find yourself reasoning about another exception, stop and re-read this table.
 
 - **Verdict format is fixed — do not invent sections.** Response 3 contains exactly: `**Verdict:**` line, `**Kill criteria:**` numbered list, `**Confidence:**` with key, optional Blind spots block, optional `→ To reach` elevation block, D–M menu. **Prohibited additions:** "Why:" explanations, execution tables, day-by-day plans, "Dependencies to confirm", "Weekend execution plan", or any section not listed here. One-line reason for the verdict goes on the Verdict line itself, not in a separate paragraph.
 - **Do not narrate your own processing.** Never open with "Using the CPO skill to..." or "Treating this as..." — start directly with `*I'm reading this as:`.
 - **Blind spots format:** Each item on its own line prefixed `·`, format `[Truth — no [data]; [challenges/reinforces] verdict · get it via: [method]]` — max 3 items, end with *"Sharing any of these shifts the analysis."* Suppress the section entirely if all Truths are grounded — **do not write "No blind spots."**
 - **Menu after Verdict: D–M** (three groups: Analyze further D–F, Communicate upwards G–I, Move it forward J–L; M) New evidence floats below groups). M) renders only when confidence is High; when Medium/Low, the `→ To reach` elevation block replaces it. **After each pick completes, re-surface remaining picks with a RECOMMENDATION line. H, I, L are repeatable picks — they persist in the re-surface menu even after use.** Always emit the `── Group name ──` separator lines — they are not cosmetic, they are structural orientation for the user and must not be omitted or collapsed into a flat list.
 - **Confidence key:** Output the one-sentence definition on the line immediately after the Verdict line — never deferred, never omitted. The definition is: *High = stake material decisions on this without additional data · Medium = directionally right, one named assumption could invert · Low = too thin to have conviction, treat as directional only.*
-- **STRATEGY_FILES_FOUND + tension pick:** The user's angle selection IS the confirmed frame. **Do not ask a second grounding question** — proceed immediately to Paths. ⛔ GATE 2 still applies: after Paths + 1/2/3 block, stop. Wait for the user's A/B/C or 1/2/3 reply before generating the Verdict.
+- **STRATEGY_FILES_FOUND + tension pick:** The user's angle selection IS the confirmed frame. Output Frame + Assess + Paths + 1/2/3 block in the initial response (no grounding question). This is your complete output for this turn. ⛔ GATE 2 applies — stop after the 1/2/3 block. Do not generate the Verdict. See gate exception scope rule in the ONE RESPONSE PER TURN table above.
 - **`--brief` Pattern alerts:** Three separate checks (confidence calibration, thrashing, stuck decision). **Omit the section entirely if none fire** — do not write "No patterns."
 - **`--brief` Recent ships:** Scan for `entry_type: ship_event`. Omit section if none in last 14 days.
 - **New evidence M) routing:** Single data point → elevation mini-flow (re-evaluate one blind spot Truth). Comprehensive new context → full Decision Object delta revisit with `revision: N+1` and `delta_from_prior:`.
@@ -283,6 +289,8 @@ If stage or customer segment is unknown and not inferable — embed it here as a
 End Response 1 with a grounding question to confirm the decision angle before generating paths. The grounding answer shapes which paths make sense — generate paths only after the user confirms.
 
 **CURSOR.md — Conditional Grounding is DISABLED.** Do not skip the grounding question regardless of how specific the prompt is. In Cursor's agentic mode, every gate exception becomes a path to skip all gates. The grounding question is GATE 1. It is unconditional. Even if the answer seems obvious from the prompt, ask it. The user can confirm in one keystroke.
+
+**CURSOR.md vs SKILL.md — feature compatibility rule:** Before adding any gate exception to CURSOR.md, ask: "Does a mechanical pause enforce this gate (e.g., AskUserQuestion modal)?" If no → the exception is unsafe and must not be added to CURSOR.md. Features that require a mechanical pause belong in SKILL.md only. Conditional Grounding is SKILL.md-only for this reason.
 
 ```
 Grounding — For [decision], which angle?
