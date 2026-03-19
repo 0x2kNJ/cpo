@@ -33,7 +33,7 @@ allowed-tools:
 ```bash
 # Version check
 _INSTALLED_VERSION=$(cat ~/.cpo/.version 2>/dev/null || echo "unknown")
-_SKILL_VERSION="1.7.0"
+_SKILL_VERSION="1.8.0"
 if [ "$_INSTALLED_VERSION" != "$_SKILL_VERSION" ] && [ "$_INSTALLED_VERSION" != "unknown" ]; then
   echo "VERSION_MISMATCH: installed=$_INSTALLED_VERSION skill=$_SKILL_VERSION"
 fi
@@ -150,7 +150,7 @@ Every AskUserQuestion must:
 2. **Recommend:** `RECOMMENDATION: [option] because [one-line reason]`
 3. **Options:** Lettered — `A) ... B) ... C) ...`
 
-**Exception — initial next-steps menu (Action 4):** Omit the RECOMMENDATION line on the first D–L menu after the Verdict. On re-surfaced menus (after a pick completes), include `RECOMMENDATION:` — see next-steps re-surfacing rules.
+**Exception — initial next-steps menu (Action 4):** Omit the RECOMMENDATION line on the first D–M menu after the Verdict. On re-surfaced menus (after a pick completes), include `RECOMMENDATION:` — see next-steps re-surfacing rules.
 
 One question per call. Never batch. If AskUserQuestion unavailable: ask as numbered list and wait.
 
@@ -421,10 +421,10 @@ A criterion missing any of these is vague and must be rewritten before the Verdi
 Immediately follow with an AskUserQuestion offering next steps.
 - Re-ground: *"Verdict confirmed — [one-clause summary]. Pick a next step, or type a few letters to stack more."*
 - No RECOMMENDATION on initial menu (see AskUserQuestion Format exception above).
-- Options (three tiers):
-  - **Validate:** D) Stress test — challenge the verdict before committing · E) Deep analysis — product, market, execution, and risk breakdown · F) Reality check — [inferred audience] reacts to the chosen path *(post-verdict variant: reacts to the chosen path and verdict, not all three paths)*
-  - **Communicate:** G) Sell-up — reframe for leadership · H) Board simulation — pressure-test in the boardroom · I) Investor simulation — run the pitch
-  - **Execute:** J) Roadmap — stack against other bets · K) Hand off — pass to next tool · L) Something else — one sentence · [M) New evidence — share what you found, I'll show what shifts] *(M) renders only when confidence is High; suppress when elevation `→` block fires)*
+- Options (three groups — headers direct orientation, letters directly typeable):
+  - **Analyze further:** D) Stress test — challenge the verdict before committing · E) Deep analysis — product, market, execution, and risk breakdown · F) Reality check — [inferred audience] reacts to the chosen path *(post-verdict variant: reacts to the chosen path and verdict, not all three paths)*
+  - **Communicate upwards:** G) Sell-up — reframe for leadership · H) Board simulation — pressure-test in the boardroom · I) Investor simulation — run the pitch
+  - **Move it forward:** J) Roadmap — stack against other bets · K) Eng brief — translate the decision for engineering · L) Hand off — pass decision context to the next tool · [M) New evidence — share what you found, I'll show what shifts] *(M) renders only when confidence is High; suppress when elevation `→` block fires)*
 
 **Note on F) Reality check — two contexts, same letter:**
 - **Pre-path (Response 2):** F) Reality check reacts to all three paths to help the user choose. Audience = inferred stakeholders.
@@ -433,15 +433,15 @@ Immediately follow with an AskUserQuestion offering next steps.
 **Progressive disclosure:** On the user's first decision (no prior journal entries ever (preamble returned `NO_DECISIONS`)), show only D–G in the initial menu with a "More →" option:
 ```
 Next steps (pick any):
-── Validate ──
+── Analyze further ──
 D) Stress test    — challenge the verdict before committing
 E) Deep analysis  — product, market, execution, and risk breakdown
 F) Reality check  — [inferred audience] reacts to the chosen path
-── Communicate ──
+── Communicate upwards ──
 G) Sell-up        — reframe for leadership
-→ More: H) Board sim · I) Investor sim · J) Roadmap · K) Hand off · L) Something else [M) New evidence]
+→ More: H) Board sim · I) Investor sim · J) Roadmap · K) Eng brief · L) Hand off [M) New evidence]
 ```
-On subsequent decisions (journal has entries), show the full D–M menu with tier headers. AskUserQuestion format follows the same rule — show D–G + "More" for first-time, all options for returning users.
+On subsequent decisions (journal has entries), show the full D–M menu with group headers. AskUserQuestion format follows the same rule — show D–G + "More" for first-time, all options for returning users.
 
 The overlay captures one selection. If the user wants multiple next steps, they can type additional letters in their reply (e.g., "D and G") — honor each one in sequence.
 
@@ -449,20 +449,20 @@ If AskUserQuestion unavailable, output:
 ```
 Next steps (pick any):
 
-── Validate ──
+── Analyze further ──
 D) Stress test    — challenge the verdict before committing
 E) Deep analysis  — product, market, execution, and risk breakdown
 F) Reality check  — [inferred audience] reacts to the chosen path
 
-── Communicate ──
+── Communicate upwards ──
 G) Sell-up        — reframe for leadership
 H) Board sim      — pressure-test live in the boardroom
 I) Investor sim   — run the pitch, field the hard questions
 
-── Execute ──
+── Move it forward ──
 J) Roadmap        — stack against other bets
-K) Hand off       — pass decision context to the next tool
-L) Something else — one sentence
+K) Eng brief      — translate the decision for engineering
+L) Hand off       — pass decision context to the next tool
 [M) New evidence  — share what you found, I'll show what shifts]
 
 Reply with a letter (or several). Skip to move on.
@@ -473,27 +473,27 @@ M) renders only when confidence is High (no elevation `→` block competing). Wh
 **Next-steps re-surfacing:** After completing any D–M pick, re-offer the remaining unused picks via AskUserQuestion (or plain text fallback). Format:
 
 AskUserQuestion re-ground: *"Done. What next?"*
-Options: [remaining letters — drop completed non-repeatable picks; always retain H, I, K]
+Options: [remaining letters — drop completed non-repeatable picks; always retain H, I, L]
 RECOMMENDATION: [letter] — [one-sentence reason based on current decision state]
 
 Plain text fallback:
 ```
 Done. Remaining next steps:
-[list remaining letters — drop completed non-repeatable picks; H, I, K always remain]
+[list remaining letters — drop completed non-repeatable picks; H, I, L always remain]
 RECOMMENDATION: [letter] — [one-sentence reason based on current decision state]
 
 Reply with a letter (or several). Skip to move on.
 ```
 
 Rules:
-- **Non-repeatable picks (D, E, F, G, J, L):** Remove from list after completion — never re-offer.
-- **Repeatable picks (H, I, K, M):** Persist in the re-surface menu even after use — simulations and handoffs can run multiple times as the decision iterates.
+- **Non-repeatable picks (D, E, F, G, J, K):** Remove from list after completion — never re-offer.
+- **Repeatable picks (H, I, L, M):** Persist in the re-surface menu even after use — simulations and handoffs can run multiple times as the decision iterates.
 - `RECOMMENDATION:` names the single most valuable remaining pick. **Simulation-informed RECOMMENDATION:** after H or I completes, name what was challenged and map to the pick that addresses it (board challenged unit economics → recommend E: Deep analysis; investors challenged narrative → recommend D: Stress test; either challenged go-to-market → recommend J: Roadmap).
 - If only one pick remains, still show it with the RECOMMENDATION line.
-- If all non-repeatable picks are exhausted, offer H/I/K with RECOMMENDATION. When truly all exhausted: *"All next steps covered. Type a new decision or follow-up."*
+- If all non-repeatable picks are exhausted, offer H/I/L with RECOMMENDATION. When truly all exhausted: *"All next steps covered. Type a new decision or follow-up."*
 - The re-surface loop continues until picks are exhausted or the user skips/starts a new decision.
 
-If user picks L: respond to their one sentence, stay in the current decision context. If user skips: proceed with their follow-up naturally.
+If user skips: proceed with their follow-up naturally.
 
 **If user picks F (post-verdict Reality check):** Run the Reality check anchored to the **chosen path and current Verdict** — not all three paths. Identify the most likely objection from the inferred audience (team, leadership, customers, or board depending on context), surface it as a sharp challenge in 2–3 sentences, then name what would need to be true to override it. This is a commitment validator, not a comparison tool. After completing, re-surface the D–M menu with a RECOMMENDATION.
 
@@ -501,10 +501,12 @@ If user picks L: respond to their one sentence, stay in the current decision con
 
 **If user picks I (Investor simulation):** Trigger `--investor-roundtable` mode inline — run the full investor simulation (Tier 1: Company Builder · Category Maker · Numbers Analyst · User Validator · Contrarian) anchored to the current decision. After simulation completes, re-surface the D–M menu with a simulation-informed RECOMMENDATION based on what was challenged.
 
-**If user picks K (Hand off):** Run silent discovery, then present sub-menu immediately:
+**If user picks K (Eng brief):** Trigger `/cpo --mode eng-brief` inline — translate the current decision for engineering. Output: decision summary in engineering terms, key constraints and assumptions the team must know, success criteria mapped to measurable eng outcomes, and the top three risks from an implementation perspective. K is non-repeatable — remove from re-surface menu after use.
+
+**If user picks L (Hand off):** Run silent discovery, then present sub-menu immediately:
 
 ```bash
-# Discovery (silent, instant — runs on J pick)
+# Discovery (silent, instant — runs on L pick)
 which ship 2>/dev/null           # gstack: push branch, open PR
 which qa 2>/dev/null             # gstack: systematic QA
 which review 2>/dev/null         # gstack: staff engineer review
@@ -544,7 +546,7 @@ Kill criteria:
 Confidence: [High/Medium/Low]
 ```
 
-K is repeatable — stays in the re-surface menu after use. Hand off to multiple tools or return to handoff after iterating.
+L is repeatable — stays in the re-surface menu after use. Hand off to multiple tools or return to handoff after iterating.
 
 If user picks M): extract the data point(s) shared. **Single data point** → run elevation mini-flow: re-evaluate the one blind spot Truth with the new data locked in, state in one sentence how it shifts (or doesn't shift) the Verdict, and output an updated blind spots line. **Comprehensive new context** → treat as a Decision Object revisit: re-run Assess as a delta (which Truths shifted, which held), deliver an updated Verdict with updated blind spots line, and write a journal entry with `revision: N+1` and `delta_from_prior:` capturing what data changed what. Either path ends with the D–M menu again — the loop continues as many times as the user wants, each pass tightening confidence.
 
@@ -574,7 +576,7 @@ C) **[Situational label]** — [≤2 sentences]
 
 [→ AskUserQuestion: path selection (see Action 3)]
 
-Want to dig deeper before committing?
+── Validate before committing ──
 D) Stress test    — challenge the top path before committing
 E) Deep analysis  — evaluate all paths across product, market, execution, and risk
 F) Reality check  — [inferred audience] reacts to each path — quick takes before you commit
@@ -606,20 +608,20 @@ F) Reality check  — [inferred audience] reacts to each path — quick takes be
 
 Next steps (pick any):
 
-── Validate ──
+── Analyze further ──
 D) Stress test    — challenge the verdict before committing
 E) Deep analysis  — product, market, execution, and risk breakdown
 F) Reality check  — [inferred audience] reacts to the chosen path
 
-── Communicate ──
+── Communicate upwards ──
 G) Sell-up        — reframe for leadership
 H) Board sim      — pressure-test in the boardroom
 I) Investor sim   — run the pitch, field the hard questions
 
-── Execute ──
+── Move it forward ──
 J) Roadmap        — stack against other bets
-K) Hand off       — pass decision context to the next tool
-L) Something else — one sentence
+K) Eng brief      — translate the decision for engineering
+L) Hand off       — pass decision context to the next tool
 [M) New evidence  — share what you found, I'll show what shifts]
 
 Reply with a letter (or several). Skip to move on.
@@ -656,7 +658,7 @@ Reply with a letter (or several). Skip to move on.
 - Response 3 includes a Blind spots block immediately after Confidence key when ≥1 Truth was inferred without stated data — one item per line prefixed with `·`, format `[Truth — no [data type]; [challenges/reinforces] this verdict · get it via: [collection method]]`, max 3 items, ends with "Sharing any of these shifts the analysis." Suppress entirely if all Truths were grounded.
 - Response 3 always ends with AskUserQuestion offering next steps D–M; falls back to plain text list if unavailable
 - **Universal terminal rule:** Every response that completes a flow — main Response 3, elevation mini-flow, inline simulation (H/I picks), standalone boardroom/investor-roundtable, and utility/intelligence flags (`--brief`, `--trail`, `--history`, `--outcome`, `--patterns`, `--drift`) — MUST end with a user action prompt: (a) the D-M menu (AskUserQuestion or plain text fallback) for decision and simulation flows, or (b) a contextual next-step prompt for utility/intelligence flows and execution-artifact modes (eng-brief, eng-translate): *"What next? Type a new decision, run `/cpo [topic]` to revisit anything flagged, or ask a follow-up."* No CPO response is complete without a user action prompt.
-- **Final check (applies in every mode, every environment):** Before delivering any response, verify the last substantive element is a user action prompt (AskUserQuestion, D-L menu, or contextual next-step). If it is not, append the appropriate prompt before delivering. This check fires on every response without exception.
+- **Final check (applies in every mode, every environment):** Before delivering any response, verify the last substantive element is a user action prompt (AskUserQuestion, D-M menu, or contextual next-step). If it is not, append the appropriate prompt before delivering. This check fires on every response without exception.
 - No headers, no numbered sections, no preamble before Line 1 of Response 1 **except:** if `STRATEGY_FILES_FOUND` with a question-reframing tension, 2-sentence posture + tension-as-grounding-options may precede Line 1 — the user's angle pick IS the confirmation; no separate "is this right?" step. If no tension: posture folds silently into Line 1.
 - With `--deep`: Response 1 Lines 1–2 unchanged. After paths in Response 2, insert full 10-section output before the path-selection AskUserQuestion. Challenge block still renders after the AskUserQuestion. Response 3 Verdict unchanged.
 - With `--go`: bypass the three-response flow — deliver all four actions in one response (no AskUserQuestion, no text footer, no challenge block). Paths use `A) B) C)` format. Mark recommended path with `← recommended`. Append plain text next-steps list D–M at the end.
@@ -699,7 +701,7 @@ C) [label] — [one sentence]
 **Kill criterion:** [one measurable threshold].
 **Confidence:** [High/Medium/Low] — [one-sentence key].
 
-Next steps (pick any): D) Stress test E) Deep analysis F) Reality check G) Sell-up H) Board sim I) Investor sim J) Roadmap K) Hand off L) Something else [M) New evidence]
+Next steps (pick any): D) Stress test E) Deep analysis F) Reality check G) Sell-up H) Board sim I) Investor sim J) Roadmap K) Eng brief L) Hand off [M) New evidence]
 
 Rules for `--quick`:
 - No grounding question — infer the frame
@@ -1190,7 +1192,7 @@ Full templates in `references/modes/[mode].md` — load with Read when needed.
 **Board member inversion:** If user signals they are a board member → invert. Collect what management is presenting + user's board role + concerns. Output: 5 high-quality questions for that archetype. Single-turn output, not a live simulation.
 **Pre-loaded posture:** Accept per-member sentiment: `supportive / neutral / skeptical / hostile`. A hostile Lead VC opens with a direct challenge, not procedural framing.
 **Escalation:** If simulation reveals core strategy is broken → recommend go/no-go review first. If governance violations surface → flag explicitly, recommend legal review.
-**Transcript:** After the debrief, write the full simulation transcript (all turns + debrief) to `~/.cpo/simulations/YYYY-MM-DD-boardroom-[ts].md`. Confirm with one line: *"Transcript saved — review before the real meeting."* Immediately follow with: *"What next? Type a new decision, run `/cpo [topic]` to revisit anything the board raised, or pick from your remaining D–L options if this was an H) pick."*
+**Transcript:** After the debrief, write the full simulation transcript (all turns + debrief) to `~/.cpo/simulations/YYYY-MM-DD-boardroom-[ts].md`. Confirm with one line: *"Transcript saved — review before the real meeting."* Immediately follow with: *"What next? Type a new decision, run `/cpo [topic]` to revisit anything the board raised, or pick from your remaining D–M options if this was an H) pick."*
 **Load:** `Read references/modes/boardroom.md`
 
 ### `board-story`
@@ -1215,7 +1217,7 @@ Full templates in `references/modes/[mode].md` — load with Read when needed.
 **Output:** Live 5-round debate + consensus view + divergence map + First 10/100 + 90/10 product cut + fundraising readiness + verdict per archetype
 **Kill criteria:** If round size and use of funds aren't defined → flag as explicit open question
 **M&A framing:** If user is in acquisition talks → flag at start: *"You're in acquisition territory, not a fundraise. Adjusting panel and agenda for a strategic buyer conversation."*
-**Transcript:** After the final round and verdicts, write the full debate transcript to `~/.cpo/simulations/YYYY-MM-DD-investor-roundtable-[ts].md`. Confirm with one line: *"Transcript saved — shareable with your co-founder or advisor."* Immediately follow with: *"What next? Type a new decision, run `/cpo [topic]` to revisit anything investors challenged, or pick from your remaining D–L options if this was an I) pick."*
+**Transcript:** After the final round and verdicts, write the full debate transcript to `~/.cpo/simulations/YYYY-MM-DD-investor-roundtable-[ts].md`. Confirm with one line: *"Transcript saved — shareable with your co-founder or advisor."* Immediately follow with: *"What next? Type a new decision, run `/cpo [topic]` to revisit anything investors challenged, or pick from your remaining D–M options if this was an I) pick."*
 **Load:** `Read references/modes/investor-roundtable.md`
 
 ---

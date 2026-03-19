@@ -4,6 +4,39 @@ All notable changes documented here. Follows [Keep a Changelog](https://keepacha
 
 ---
 
+## [1.8.0] — 2026-03-19
+
+Menu grouping redesign and Eng brief promotion. Three semantic groups replace the v1.7.0 tier labels. Reviewed and approved by panel (Gary Tan, Mike Krieger, Boris Cherny).
+
+### Changed
+
+- **Post-verdict menu groups renamed and restructured:** Three groups with orientation headers replace the v1.7.0 tier names. Headers are visual labels — letters remain directly typeable, no two-step interaction required.
+  - **Analyze further (D–F):** D) Stress test · E) Deep analysis · F) Reality check
+  - **Communicate upwards (G–I):** G) Sell-up · H) Board simulation · I) Investor simulation
+  - **Move it forward (J–L):** J) Roadmap · K) Eng brief *(promoted from sub-option)* · L) Hand off · [M) New evidence *(ungrouped, conditional)*]
+
+- **K) Eng brief promoted to first-class letter:** Previously buried inside the K) Hand off sub-menu as `→ eng-brief`. Now a standalone pick at K — triggers `/cpo --mode eng-brief` inline, translating the decision for engineering with constraints, success criteria, and implementation risks. K is non-repeatable (one-shot translation per decision).
+
+- **L) Hand off (was K):** Shifted from K to L. Behavior unchanged — silent discovery + context-aware sub-menu. L is repeatable.
+
+- **L) Something else removed:** Three semantic groups provide full coverage; the escape-hatch letter removed. Free-text input still works for anything not covered by D–L.
+
+- **Non-repeatable/repeatable picks updated:** Non-repeatable: D, E, F, G, J, K (was D, E, F, G, J, L). Repeatable: H, I, L, M (was H, I, K, M). Re-surfacing always-retain letters updated from H/I/K to H/I/L.
+
+- **Pre-path challenge block header updated:** `Want to dig deeper before committing?` → `── Validate before committing ──` in Response 2, creating consistent visual language with the post-verdict group headers across the full flow.
+
+- **Progressive disclosure updated:** "More →" line now shows `K) Eng brief · L) Hand off` instead of `K) Hand off · L) Something else`. Group headers in "More" preview updated to Analyze further / Communicate upwards.
+
+- **`--quick` format line updated:** K) Eng brief, L) Hand off, Something else removed.
+
+- **If user picks K handler added:** Mirrors H/I pattern — runs eng-brief inline, then re-surfaces D–M menu.
+
+- **If user picks L handler renamed:** K → L throughout (Hand off handler, discovery block, "L is repeatable" note).
+
+- **D–L references updated to D–M** in structural rules, final check rule, boardroom/investor transcript prompts.
+
+---
+
 ## [1.7.0] — 2026-03-19
 
 Three systemic flow fixes identified from live output screenshots — path selection gate, confidence-elevation loop gating, and post-verdict menu restructure. All three approved by panel (Gary Tan, Mike Krieger, Boris Cherny).
