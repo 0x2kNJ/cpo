@@ -345,7 +345,7 @@ Confidence: [High/Medium/Low]
 - Paths use `A) **[Label]**`, `B) **[Label]**`, `C) **[Label]**` format
 - Exactly one path carries `<- recommended` marker
 - Response 2 ends with path-selection AskUserQuestion + 1/2/3 challenge block (never D-M letters)
-- Response 3 uses structured format: `**Verdict:**`, `**Kill criteria:**`, `**Confidence:**`, `**Blind spots:**` (conditional), `-> To reach` (conditional)
+- Response 3 uses structured format: `**Verdict:**`, `**Stop if** *(conditions that would change this bet):*`, `**Confidence:**`, `**Blind spots:**` (conditional), `-> To reach` (conditional)
 - Response 3 always ends with D-M menu
 - **Universal terminal rule:** Every response must end with a user action prompt.
 - No headers, no numbered sections, no preamble before Line 1 of Response 1

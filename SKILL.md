@@ -218,7 +218,7 @@ or A, B, or C to commit to a path
 **Verdict:** [chosen path] — [one-line reason].
 *Path [letter] locked. If you want to pressure-test before acting, start with F) Reality check below.*
 
-**Kill criteria:**
+**Stop if** *(conditions that would change this bet):*
 1. [metric + threshold + timeframe]
 2. [metric + threshold + timeframe]
 3. [metric + threshold + timeframe]
@@ -240,19 +240,29 @@ or A, B, or C to commit to a path
 Next steps (pick any):
 
 ── Analyze further ──
+
 D) Stress test    — challenge the verdict before committing
+
 E) Deep analysis  — product, market, execution, and risk breakdown
+
 F) Reality check  — [inferred audience] reacts to the chosen path
 
 ── Communicate upwards ──
+
 G) Sell-up        — reframe for leadership
+
 H) Board sim      — pressure-test in the boardroom
+
 I) Investor sim   — run the pitch, field the hard questions
 
 ── Move it forward ──
+
 J) Roadmap        — stack against other bets
+
 K) Eng brief      — translate the decision for engineering
+
 L) Hand off       — select skill or agent
+
 [M) New evidence  — share what you found, I'll show what shifts]
 
 Reply with a letter (or several). Skip to move on.
@@ -294,7 +304,7 @@ B) **[Label]** — [≤2 sentences]  ← recommended
 C) **[Label]** — [≤2 sentences]
 
 **Verdict:** [recommended path] — [one-line reason].
-**Kill criteria:** 1. [m+t+t]  2. [m+t+t]  3. [m+t+t]
+**Stop if** *(conditions that would change this bet):* 1. [m+t+t]  2. [m+t+t]  3. [m+t+t]
 **Confidence:** [H/M/L] — [key].
 [D-M menu]
 ```
