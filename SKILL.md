@@ -1197,6 +1197,7 @@ Full templates in `references/modes/[mode].md` — load with Read when needed.
 
 **Trigger:** `/cpo --decide` — inbound handoff from another skill.
 **Load:** `Read references/flags/decide.md` — follow all instructions there.
+Fallback if unreadable: parse the `CPO Handoff Request` block → run discovery bash → recommend best available skill → never leave stranded.
 
 ---
 

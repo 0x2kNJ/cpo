@@ -8,6 +8,8 @@
 
 Load all journal entries from `~/.cpo/decisions/*.yaml`. If fewer than 3 entries exist, output: *"Not enough decisions logged yet — run `/cpo --patterns` again after logging at least 3 decisions via `--outcome`."*
 
+*Note: 3 entries is the technical gate; meaningful patterns emerge at 8–10 entries. Flag this to the user if N < 8: "Early signal — [N] decisions logged. Patterns strengthen at 8–10."*
+
 ## Analysis Dimensions
 
 ### 1. Truth Weighting Bias
