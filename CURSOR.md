@@ -150,7 +150,7 @@ Non-obvious rules this file size causes models to skip:
 - **⛔ ONE RESPONSE PER TURN — this is a conversation, not a monologue. Each Cursor message produces exactly one phase:**
   - **Initial `/cpo` call (no grounding confirmed yet):** Your complete output for this turn is Response 1 — Frame, Assess, grounding question. You are done. Full stop.
   - **User replies with grounding choice (A/B/C or frame correction):** Your complete output is Response 2 — Paths + challenge block. You are done. Full stop.
-  - **User replies with path choice (A/B/C) or picks D/E/F:** Your complete output is Response 3 — Verdict + D–M next-steps menu. You are done. Full stop.
+  - **User replies with path choice (A/B/C) or picks 1/2/3 (pre-commitment tools):** Your complete output is Response 3 — Verdict + D–M next-steps menu. You are done. Full stop.
   - **User picks a D–M option:** Run that one option, re-surface remaining picks, done.
   - **Never produce Responses 1 + 2 or Responses 2 + 3 in a single turn.** You cannot ask a question and then answer it yourself. The user's reply is required before the next phase begins. This is not an agentic task to complete in one pass — it is a deliberate, gated conversation where founder input shapes each response.
 
@@ -327,25 +327,25 @@ End Response 2 with the pre-commitment challenge block FIRST, then the commit pr
 
 ```
 Not ready to commit? Dig deeper first:
-D) Stress test    — challenge the top path
-E) Deep analysis  — all paths across product, market, execution, and risk
-F) Reality check  — [inferred audience] reacts to each path
+1) Stress test    — challenge the top path
+2) Deep analysis  — all paths across product, market, execution, and risk
+3) Reality check  — [inferred audience] reacts to each path
 
-Reply A, B, or C to commit — or D/E/F to dig deeper first. Correct the Frame if it's off.
+Reply 1, 2, or 3 to dig deeper — or A, B, or C to commit now. Correct the Frame if it's off.
 ```
 
-**Layout rule:** The challenge block (D/E/F) always appears BEFORE the commit prompt — never appended after it. D/E/F are pre-commitment tools, not post-commitment options.
+**Layout rule:** The challenge block (1/2/3) always appears BEFORE the commit prompt — never appended after it. 1/2/3 are pre-commitment tools, not post-commitment options. Numbers are used (not letters) to avoid confusion with the A/B/C path labels.
 
-> ⛔ **Response 2 ends here — this is your complete output for this turn.** Do not generate the Verdict. The user must reply with a path choice (A/B/C) or a challenge pick (D/E/F) before Response 3 begins.
+> ⛔ **Response 2 ends here — this is your complete output for this turn.** Do not generate the Verdict. The user must reply with a path choice (A/B/C) or a pre-commitment pick (1/2/3) before Response 3 begins.
 
 **Pre-path challenge rules:**
 - Challenge options run against **all three paths**, not just the recommended one
 - When a challenge completes, re-surface the path-selection prompt (with challenge block) and continue
-- Challenge loop is capped at **2 rounds** — after the second challenge completes, do not re-offer D/E/F. Surface only the path-selection prompt with a note: *"You've stress-tested from two angles. Pick a path — or tell me what's still unresolved."*
+- Challenge loop is capped at **2 rounds** — after the second challenge completes, do not re-offer 1/2/3. Surface only the path-selection prompt with a note: *"You've stress-tested from two angles. Pick a path — or tell me what's still unresolved."*
 - After the user picks a path (A/B/C), proceed to Action 4 (Verdict); journal write happens after Verdict as usual
 - **G/H/I (Sell-up, Board simulation, Investor simulation) are post-verdict options only** — never render in the pre-path challenge block.
 
-**F) Reality check — inference rule:** Infer the intended audience from the product context (e.g., B2C consumer, developer, enterprise buyer, internal team). If unambiguous, name them and run the check. If ambiguous, ask one clarifying question: *"Who's the primary user — [option A] or [option B]?"* — then run the check. Output: 2–3 plain-language reactions per path from that audience's perspective. No framework jargon.
+**3) Reality check — inference rule (pre-commitment):** Infer the intended audience from the product context (e.g., B2C consumer, developer, enterprise buyer, internal team). If unambiguous, name them and run the check. If ambiguous, ask one clarifying question: *"Who's the primary user — [option A] or [option B]?"* — then run the check. Output: 2–3 plain-language reactions per path from that audience's perspective. No framework jargon.
 - **`--go` suppresses the challenge block entirely.** Do not render it when `--go` is present.
 - **`--quick` suppresses the challenge block entirely.**
 
@@ -531,12 +531,12 @@ A) **[Situational label]** — [≤2 sentences]
 B) **[Situational label]** — [≤2 sentences]  ← recommended
 C) **[Situational label]** — [≤2 sentences]
 
-Reply A, B, or C — or correct the Frame if it's off.
+Not ready to commit? Dig deeper first:
+1) Stress test    — challenge the top path
+2) Deep analysis  — all paths across product, market, execution, and risk
+3) Reality check  — [inferred audience] reacts to each path
 
-Want to dig deeper before committing?
-D) Stress test    — challenge the top path before committing
-E) Deep analysis  — evaluate all paths across product, market, execution, and risk
-F) Reality check  — [inferred audience] reacts to each path — quick takes before you commit
+Reply 1, 2, or 3 to dig deeper — or A, B, or C to commit now. Correct the Frame if it's off.
 ```
 
 **Response 3 — Verdict + next steps (delivered after user picks a path):**
@@ -599,12 +599,12 @@ Reply with a letter (or several). Skip to move on.
 - Driving assumption line renders only when an inference was made — suppress if all context was explicit
 - Response 1 always ends with grounding question (frame/angle options). Always include: *"Or correct the frame in a sentence — we'll re-run from Assess."*
 - **Self-check before ending Response 1:** Ask: *"Has the user replied with a grounding choice (A/B/C or a frame correction in this same message)?"* If no → this response ends here; do not generate paths. If yes → proceed to Response 2.
-- **Self-check before ending Response 2:** Ask: *"Has the user replied with a path choice (A/B/C) or a challenge pick (D/E/F) in this same message?"* If no → this response ends here; do not generate the Verdict. If yes → proceed to Response 3.
+- **Self-check before ending Response 2:** Ask: *"Has the user replied with a path choice (A/B/C) or a pre-commitment pick (1/2/3) in this same message?"* If no → this response ends here; do not generate the Verdict. If yes → proceed to Response 3.
 - Grounding options name specific decision angles (not Bold/Balanced/Conservative)
 - Response 2 opens with framing sentence anchored to confirmed frame, then paths
 - Paths use situational verb-phrase labels derived from the confirmed frame — A) B) C) format. **Never use Bold/Balanced/Conservative as labels.** Labels must name what the path bets on, not how risky it is.
 - Exactly one path carries `← recommended` marker
-- Response 2 always ends with path-selection prompt followed by plain-text challenge block (D/E/F). Challenge block suppressed when `--go` or `--quick` is present.
+- Response 2 always ends with plain-text challenge block (1/2/3) followed by the commit CTA. Challenge block suppressed when `--go` or `--quick` is present.
 - Response 3 uses structured format: `**Verdict:**` line, `**Kill criteria:**` numbered list, `**Confidence:**` with key, `**Blind spots:**` block (conditional), `→ To reach` elevation block (conditional, Medium/Low only). Never run these together as one dense paragraph.
 - Response 3 includes a Blind spots block immediately after Confidence key when ≥1 Truth was inferred without stated data — one item per line prefixed with `·`, format `[Truth — no [data type]; [challenges/reinforces] this verdict · get it via: [collection method]]`, max 3 items, ends with "Sharing any of these shifts the analysis." Suppress entirely if all Truths were grounded.
 - Response 3 always includes the next-steps menu D–M (when elevation gate is not active)

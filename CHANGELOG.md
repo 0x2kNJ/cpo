@@ -4,6 +4,21 @@ All notable changes documented here. Follows [Keep a Changelog](https://keepacha
 
 ---
 
+## [1.8.6] — 2026-03-19
+
+Patch: pre-commitment challenge tools renamed 1/2/3 (was D/E/F); explicit skip path added to CTA.
+
+### Fixed
+
+- **Pre-commitment challenge block relabeled 1/2/3 (both files):** D/E/F labels on the pre-commitment challenge block were logically after C in the alphabet, implying post-commitment sequence. Renamed to 1/2/3 throughout — numbers carry no sequence implication relative to A/B/C. Post-verdict D–M menu is unaffected.
+- **Explicit skip path added to CTA:** "Reply A, B, or C" did not make clear that skipping the challenge block was an option. CTA now reads: "Reply 1, 2, or 3 to dig deeper — or A, B, or C to commit now." Both branches visible on one line.
+- **Layout rule annotation updated:** explains why numbers are used instead of letters.
+- **All pre-commitment references updated (CURSOR.md):** Critical Output Rules preamble, self-check assertions, structural rules, example template, pre-path challenge rules, inference rule label.
+- **All pre-commitment references updated (SKILL.md):** Main spec block, AskUserQuestion unavailable fallback, pre-path challenge rules, 3) Reality check inference rule, "Note on Reality check — two contexts" updated to clarify 3) pre-path vs F) post-verdict.
+- **Stale example templates fixed (both files):** Secondary full-example code blocks still had old D/E/F labels — updated to 1/2/3.
+
+---
+
 ## [1.8.5] — 2026-03-19
 
 Patch: challenge block UX fix — D/E/F reordered above commit prompt, call-to-action updated.

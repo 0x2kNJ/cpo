@@ -344,33 +344,33 @@ End Response 2 with an AskUserQuestion for path selection. No Verdict yet — th
 - RECOMMENDATION: [letter of recommended path] because [one-line reason from the Dominant Truth].
 - Options: A) [path label in ≤1 line] · B) [path label in ≤1 line] · C) [path label in ≤1 line]
 
-After the AskUserQuestion overlay, append a plain-text block (never inside the overlay). The challenge block always comes BEFORE the commit prompt — D/E/F are pre-commitment tools:
+After the AskUserQuestion overlay, append a plain-text block (never inside the overlay). The challenge block always comes BEFORE the commit CTA — 1/2/3 are pre-commitment tools (numbered, not lettered, to avoid confusion with A/B/C path labels):
 ```
 Not ready to commit? Dig deeper first:
-D) Stress test    — challenge the top path
-E) Deep analysis  — all paths across product, market, execution, and risk
-F) Reality check  — [inferred audience] reacts to each path
+1) Stress test    — challenge the top path
+2) Deep analysis  — all paths across product, market, execution, and risk
+3) Reality check  — [inferred audience] reacts to each path
 
-Reply A, B, or C to commit — or D/E/F to dig deeper first.
+Reply 1, 2, or 3 to dig deeper — or A, B, or C to commit now.
 ```
 
 **Pre-path challenge rules:**
 - Challenge options run against **all three paths**, not just the recommended one
 - When a challenge completes, re-surface the path-selection AskUserQuestion (with challenge block) and continue
-- Challenge loop is capped at **2 rounds** — after the second challenge completes, do not re-offer D/E/F. Surface only the path-selection AskUserQuestion with a note: *"You've stress-tested from two angles. Pick a path — or tell me what's still unresolved."*
+- Challenge loop is capped at **2 rounds** — after the second challenge completes, do not re-offer 1/2/3. Surface only the path-selection AskUserQuestion with a note: *"You've stress-tested from two angles. Pick a path — or tell me what's still unresolved."*
 - After the user picks a path (A/B/C), proceed to Action 4 (Verdict) normally; journal write happens after Verdict as usual
 - **`--go` suppresses the challenge block entirely** — not partially, entirely. Do not render it when `--go` is present.
 - **`--quick` suppresses the challenge block entirely.**
 - **G/H/I (Sell-up, Board simulation, Investor simulation) are post-verdict options only** — never render in the pre-path challenge block.
 
-**F) Reality check — inference rule:** Infer the intended audience from the product context (e.g., B2C consumer, developer, enterprise buyer, internal team). If unambiguous, name them and run the check. If ambiguous, ask one clarifying question: *"Who's the primary user — [option A] or [option B]?"* — then run the check. Output: 2–3 plain-language reactions per path from that audience's perspective. No framework jargon.
+**3) Reality check — inference rule (pre-commitment):** Infer the intended audience from the product context (e.g., B2C consumer, developer, enterprise buyer, internal team). If unambiguous, name them and run the check. If ambiguous, ask one clarifying question: *"Who's the primary user — [option A] or [option B]?"* — then run the check. Output: 2–3 plain-language reactions per path from that audience's perspective. No framework jargon.
 
 If AskUserQuestion unavailable: end Response 2 with:
 ```
 Not ready to commit? Dig deeper first:
-D) Stress test · E) Deep analysis · F) Reality check
+1) Stress test · 2) Deep analysis · 3) Reality check
 
-Reply A, B, or C to commit — or D/E/F to dig deeper first. Correct the Frame if it's off.
+Reply 1, 2, or 3 to dig deeper — or A, B, or C to commit now. Correct the Frame if it's off.
 ```
 
 **Action 4 — Verdict**
@@ -430,9 +430,9 @@ Immediately follow with an AskUserQuestion offering next steps.
 
 **AskUserQuestion group header rendering:** AskUserQuestion overlays in Claude Code and Cursor render options as a flat list — `── Group ──` separator lines are dropped or mangled. Compensate: prepend the group name as a non-selectable label to the **first option of each group** using `[Group name] →` prefix. Example: first option reads `[Analyze further] → D) Stress test…`, next group first reads `[Communicate upwards] → G) Sell-up…`, third group first reads `[Move it forward] → J) Roadmap…`. Remaining options within each group have no prefix. The plain-text fallback (outside AskUserQuestion) always uses full `── Group ──` separator lines.
 
-**Note on F) Reality check — two contexts, same letter:**
-- **Pre-path (Response 2):** F) Reality check reacts to all three paths to help the user choose. Audience = inferred stakeholders.
-- **Post-verdict (Response 3 onward):** F) Reality check reacts to the **chosen path and verdict** to validate commitment. Different function — targeted pressure on the decision already made, not a comparison. Both use the same letter; context determines which variant fires.
+**Note on Reality check — two contexts, different labels:**
+- **Pre-path (Response 2):** labeled **3) Reality check** — reacts to all three paths to help the user choose. Audience = inferred stakeholders. Uses a number (not a letter) to avoid confusion with A/B/C path labels.
+- **Post-verdict (Response 3 onward):** labeled **F) Reality check** — reacts to the **chosen path and verdict** to validate commitment. Different function — targeted pressure on the decision already made, not a comparison. Letter label is part of the D–M post-verdict alphabet sequence.
 
 **Progressive disclosure:** On the user's first decision (no prior journal entries ever (preamble returned `NO_DECISIONS`)), show only D–G in the initial menu with a "More →" option:
 ```
@@ -579,10 +579,12 @@ C) **[Situational label]** — [≤2 sentences]
 
 [→ AskUserQuestion: path selection (see Action 3)]
 
-── Validate before committing ──
-D) Stress test    — challenge the top path before committing
-E) Deep analysis  — evaluate all paths across product, market, execution, and risk
-F) Reality check  — [inferred audience] reacts to each path — quick takes before you commit
+Not ready to commit? Dig deeper first:
+1) Stress test    — challenge the top path
+2) Deep analysis  — all paths across product, market, execution, and risk
+3) Reality check  — [inferred audience] reacts to each path
+
+Reply 1, 2, or 3 to dig deeper — or A, B, or C to commit now. Correct the Frame if it's off.
 ```
 
 **Response 3 — Verdict + next steps (delivered after user picks a path):**
