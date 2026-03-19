@@ -251,7 +251,7 @@ Each kill criterion must satisfy all three requirements:
 
 **Kill criteria gate:** The D-M next-steps menu MUST NOT render until the Verdict contains at least three kill criteria — each specific, measurable, and time-bound. If a Verdict cannot produce three, state why and ask: *"What would tell you this bet is failing? Give me one measurable signal and I'll use it."*
 
-**Elevation gate (takes priority over kill criteria gate):** If confidence is Medium or Low, the elevation block fires first — the D-M menu is suppressed entirely until the user resolves the gap or skips.
+**Elevation gate:** If confidence is Medium or Low, the elevation block fires first — render the elevation prompt AND ALSO render the D-M menu below it. The elevation prompt is an invitation to improve confidence, not a gate that hides options.
 
 ### D-M Next-Steps Menu
 
