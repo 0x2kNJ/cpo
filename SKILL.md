@@ -1,6 +1,6 @@
 ---
 name: cpo
-version: 2.0.0
+version: 2.0.1
 last_updated: 2026-03-19
 argument-hint: "[problem or question] [--go] [--deep]"
 description: >-
@@ -29,7 +29,7 @@ allowed-tools:
 ```bash
 # Version check
 _INSTALLED_VERSION=$(cat ~/.cpo/.version 2>/dev/null || echo "unknown")
-_SKILL_VERSION="2.0.0"
+_SKILL_VERSION="2.0.1"
 if [ "$_INSTALLED_VERSION" != "$_SKILL_VERSION" ] && [ "$_INSTALLED_VERSION" != "unknown" ]; then
   echo "VERSION_MISMATCH: installed=$_INSTALLED_VERSION skill=$_SKILL_VERSION"
 fi
@@ -116,7 +116,21 @@ In compact mode: identify the **Dominant Truth** and reason from it. In `--deep`
 
 ## Three-Response Flow
 
-**For detailed generation rules:** `Read references/four-actions.md`
+**Loading rule:** Before generating Response 1 in the normal interactive flow, `Read references/four-actions.md`. If unavailable, apply these inline fallbacks. **Exception:** `--go` and `--quick` bypass the interactive flow — do NOT load `four-actions.md` for those modes; the inline rules below are sufficient.
+
+**Inline fallbacks (always in context):**
+- Grounding options: must represent structural angles (scope, segment, channel, sequencing), NEVER risk tolerances. Self-check: "Could I relabel these Bold/Balanced/Conservative?" If yes → rewrite.
+- Path labels: situational verb phrases derived from the framing sentence. NEVER use Bold/Balanced/Conservative.
+- Kill criteria: metric + threshold + timeframe, minimum 3. Example: "weekly active users drop >20% MoM in 60 days post-launch."
+- D-M menu: always render after verdict (even when elevation prompt is present).
+- Evidence tags: *[fact / assumption / inference / judgment]* on every claim about user's situation, market, or competitors. Paths (hypotheticals) exempt.
+- Compact by default: ≤300 words unless `--deep` or auto-escalation.
+
+> ❌ Wrong grounding options: A) Go all-in now, B) Try a hybrid approach, C) Keep growing free users first
+> ✅ Right: A) Gate on the feature most tied to activation, B) Gate on usage volume not feature access, C) Gate on a separate Pro tier with no change to free
+
+> ❌ Wrong path labels: A) **Bold** B) **Balanced** C) **Conservative**
+> ✅ Right: A) **Sequence by capability** B) **Sequence by signal** C) **Time-box the decision**
 
 ```
 Action 1 — Frame    → State the decision. Inferences visible inline.
@@ -367,14 +381,14 @@ If user's context signals a specific vertical, load the overlay:
 
 ## Self-Check Assertions
 
-Enforce at each step before proceeding:
-- `context_state` FRESH → no calibration questions asked
-- `options_are_risk_tolerances` must be `false` → re-generate grounding options if true
-- `path_count` must be `3` → re-generate paths if not
-- `has_placeholders` must be `false` → re-run journal write if true
-- `path_was_selected_by_user` must be `true` before Verdict renders (exception: `--go`/`--quick`)
-- `kill_criteria_count` ≥ 3 before D-M menu renders
-- `kill_criteria_are_measurable` (metric + threshold + timeframe per criterion)
+Enforce at each step before proceeding. Each check is self-contained — no external file needed:
+- **No unnecessary questions:** If context was loaded (FRESH/STALE/MINIMAL), did you ask calibration questions? If yes → remove them.
+- **Grounding options are structural:** Could you relabel your A/B/C options as Bold/Balanced/Conservative? If yes → rewrite around scope, segment, channel, or sequencing.
+- **Exactly 3 paths:** Count your paths. If not 3 → re-generate.
+- **No placeholders in journal:** Does the journal YAML contain any `REPLACE_WITH_*` text? If yes → re-run with actual values.
+- **User selected the path:** Did the user explicitly pick A/B/C before you wrote the Verdict? If no → STOP (exception: `--go`/`--quick` auto-select the recommended path).
+- **≥3 measurable kill criteria:** Does each criterion have a named metric + specific threshold + timeframe? If not → rewrite before rendering D-M menu.
+- **Path labels are not risk labels:** Do your labels describe what the path *bets on*, or just how risky it is? If risk only → rewrite.
 
 ---
 

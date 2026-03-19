@@ -218,7 +218,7 @@ Delivered in Response 3, after the user selects a path (A, B, or C). Name the ch
 
 Fires only when Verdict confidence is Medium or Low AND the verdict names a specific gap. Append one sentence: *"To reach High: [restate the named gap exactly]. Provide it and I'll re-run the paths with that assumption locked — or reply **'skip'** to proceed at current confidence."*
 
-**When this block renders, suppress the entire D-M next-steps menu.** The D-M menu unlocks only after: (a) the user provides the missing input and confidence re-evaluates, OR (b) the user explicitly replies "skip" or equivalent.
+**When this block renders, also render the D-M next-steps menu below it.** The elevation prompt is an invitation to improve confidence, not a gate that hides options. The user should always see their next-step options regardless of confidence level.
 
 Loop exits when:
 - Confidence reaches High
