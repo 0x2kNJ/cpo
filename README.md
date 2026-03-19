@@ -473,7 +473,7 @@ CPO supports 20 core modes. Invoke them with natural language — CPO routes aut
 
 ### Flags
 
-CPO supports 26 flags for shaping how it reasons and communicates.
+CPO supports 27 flags for shaping how it reasons and communicates.
 
 | Flag | Example | What it does |
 |:---|:---|:---|
@@ -496,6 +496,7 @@ CPO supports 26 flags for shaping how it reasons and communicates.
 | `--outcome` | `/cpo --outcome enterprise-pause` | Closes the loop on a prior decision. Records what happened. Detects path patterns over time. |
 | `--patterns` | `/cpo --patterns` | Decision DNA — scans the journal for Truth weighting bias, path preference, kill criteria hit rate, reversal rate, and confidence calibration. Surfaces behavioral patterns. |
 | `--invalidate` | `/cpo --invalidate #pricing` | Marks a past decision as retired. Annotates with date and reason. Future context loads skip it; `--history` always shows it. |
+| `--invalidate-all` | `/cpo --invalidate-all` | Bulk invalidation — mark all active journal entries as invalidated. Optional `#name` filter to scope to one decision. Requires YES confirmation. Add `--hard` to permanently delete YAML files (irreversible). |
 | `--drift` | `/cpo --drift` | Logic drift detection — scans the last 10 decisions for structural contradictions: unacknowledged Truth fingerprint shifts, verdict reversals, or kill criteria degradation. |
 | `--decide` | `/cpo --decide` | Inbound handoff from another skill. CPO reads the situation, scans your installed toolchain, and routes to the best next action — with install suggestion + fallback if the ideal skill isn't present. |
 | `--export` | `/cpo --export` | Writes output to `~/.cpo/exports/YYYY-MM-DD-[slug].md` — shareable with co-founders, boards, investors. |
@@ -721,6 +722,6 @@ Logic drift is when a series of individually reasonable decisions quietly moves 
 
 ## Version · License
 
-Current: **v1.4.5** — [view changelog](CHANGELOG.md)
+Current: **v1.4.6** — [view changelog](CHANGELOG.md)
 
 MIT. Free forever. Go make better product decisions.

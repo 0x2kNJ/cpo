@@ -174,7 +174,7 @@ Flags that accept `#name` for exact lookup (instead of keyword search): `--since
 
 ### Default mode: Four Actions
 
-**`/cpo` and `/cpo [any prompt]` both use the four-action flow by default.** The only exceptions are `--go` (full bypass), `--quick` (single-response condensed), and utility flags (`--brief`, `--trail`, `--history`, `--outcome`, `--export`, `--stack`, `--roadmap`, `--sell-up`, `--schedule-brief`, `--save-context`, `--setup-integrations`, `--update`, `--import-context`, `--decide`, `--patterns`, `--invalidate`, `--drift`) — those execute immediately. **Exception: `--scan-strategy` alone executes immediately (Path A); `--scan-strategy [question]` enters the four-action flow with strategy-anchored grounding (Path B).**
+**`/cpo` and `/cpo [any prompt]` both use the four-action flow by default.** The only exceptions are `--go` (full bypass), `--quick` (single-response condensed), and utility flags (`--brief`, `--trail`, `--history`, `--outcome`, `--export`, `--stack`, `--roadmap`, `--sell-up`, `--schedule-brief`, `--save-context`, `--setup-integrations`, `--update`, `--import-context`, `--decide`, `--patterns`, `--invalidate`, `--invalidate-all`, `--drift`) — those execute immediately. **Exception: `--scan-strategy` alone executes immediately (Path A); `--scan-strategy [question]` enters the four-action flow with strategy-anchored grounding (Path B).**
 
 The four actions run across **three responses**. Response 1 delivers Frame + Assess and ends with a grounding question to confirm the decision angle. Response 2 delivers Paths tailored to the confirmed frame and ends with a path-selection prompt. Response 3 delivers the Verdict + next-steps menu. No exchanges before value — the user sees analysis immediately; grounding and paths both land before any commitment.
 
@@ -695,7 +695,7 @@ If role is influencer AND prompt contains a decision question — state in Actio
 >
 > ---
 >
-> **Flags:** `--go` · `--deep` · `--quick` · `--memo` · `--silent` · `--roadmap` · `--sell-up [audience]` · `--brief` · `--trail` · `--history` · `--since` · `--outcome` · `--export` · `--stack` · `--save-context` · `--setup-integrations` · `--schedule-brief` · `--import-context [path]` · `--scan-strategy` · `--update` · `--invalidate [topic or #id]` · `--drift`
+> **Flags:** `--go` · `--deep` · `--quick` · `--memo` · `--silent` · `--roadmap` · `--sell-up [audience]` · `--brief` · `--trail` · `--history` · `--since` · `--outcome` · `--export` · `--stack` · `--save-context` · `--setup-integrations` · `--schedule-brief` · `--import-context [path]` · `--scan-strategy` · `--update` · `--invalidate [topic or #id]` · `--invalidate-all` · `--drift`
 >
 > **20 modes:** `blue-ocean` · `ceo` · `sequence` · `gtm` · `discovery` · `narrative` · `launch-os` · `investor-story` · `red-team` · `premortem` · `postmortem` · `org-design` · `board-memo` · `board-story` · `eng-brief` · `eng-translate` · `advisory-roundtable` · `boardroom` · `investor-roundtable` · `upward-pitch`
 >
@@ -879,6 +879,7 @@ Every prompt runs Frame → Assess → Paths → Verdict in that order, across t
 | `--outcome [topic]` | Close the loop on a prior decision. Find the most recent journal entry on the topic, surface the original verdict and kill criteria, record what actually happened, detect patterns across path outcomes over time. |
 | `--patterns` | Analyze the decision journal for personal decision-making tendencies: Truth weighting biases, path preferences, kill criteria hit rate, decision reversal frequency. Surfaces your decision DNA. |
 | `--invalidate [topic or #id]` | Mark a past decision as invalidated. Annotates with date + reason. Future context loads skip invalidated entries; `--history` always shows them. |
+| `--invalidate-all` | Bulk invalidation — mark all active journal entries as invalidated in one operation. Optional `#name` filter to scope to one decision object. Requires explicit confirmation with entry count. Hard-delete variant: `--invalidate-all --hard` permanently removes YAML files (irreversible). |
 | `--drift` | On-demand logic drift detection. Cross-references Truth fingerprints + verdict directions across recent decisions. Surfaces only structural contradictions — not semantic similarity. |
 | `--schedule-brief` | Set up a recurring weekly strategic brief using `anthropic-skills:schedule`. Runs `/cpo --brief` automatically — kill criteria alerts, unresolved decisions, pattern warnings — without the founder having to remember to ask. |
 | `--setup-integrations` | Detect available MCP data sources and configure live data enrichment for Five Truths assessments. Falls back to manual entry if no MCP tools found. Saves config to `~/.cpo/integrations.md`. |

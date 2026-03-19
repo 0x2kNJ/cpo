@@ -4,6 +4,21 @@ All notable changes documented here. Follows [Keep a Changelog](https://keepacha
 
 ---
 
+## [1.4.6] — 2026-03-18
+
+Bulk journal management. `--invalidate-all` marks all active entries as invalidated in one operation. Optional `#name` filter to scope to a single decision object. Optional `--hard` modifier for permanent file deletion (irreversible).
+
+### Added
+
+- **`--invalidate-all`:** Bulk invalidation — marks all active journal entries as invalidated with a single YES-confirmed command. Optional `#name` filter to scope to one decision object. `--hard` variant permanently deletes YAML files from disk. Always shows entry count before confirmation; reason optional (defaults to "bulk invalidation").
+
+### Changed
+
+- **Flag count:** 26 → 27.
+- **`references/flags/invalidate.md`:** Added `--invalidate-all` section with full spec, steps, and rules.
+
+---
+
 ## [1.4.5] — 2026-03-18
 
 Journal override and logic drift detection. Three additions: `--invalidate` to retire superseded decisions, passive drift surface on journal writes, and `--drift` for on-demand structural contradiction detection.

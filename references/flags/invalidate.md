@@ -38,6 +38,27 @@
 - **If no entry found:** *"No active journal entry found for '[topic]'. Check `--history` for the full list — it includes invalidated entries."*
 - **Invalidated entries do not count toward `--patterns` analysis** — they're excluded from trend detection.
 
+## `--invalidate-all`
+
+Bulk variant — marks all active journal entries as invalidated in one operation.
+
+**Trigger:** `/cpo --invalidate-all` (all entries) or `/cpo --invalidate-all #name` (scoped to one decision object) or `/cpo --invalidate-all --hard` (permanent file deletion).
+
+**Steps:**
+1. Count active (non-invalidated) entries. If `#name` provided, count only that `decision_id`.
+2. Display: *"Found N active journal entries [for #name]. This will mark all of them as invalidated."*
+3. If `--hard` passed: *"⚠️ `--hard` will permanently delete the YAML files. `--history` will no longer show them. This cannot be undone."*
+4. Require explicit YES confirmation — accept optional reason before YES.
+5. Execute: write `status: invalidated`, `invalidated_date: YYYY-MM-DD`, `invalidated_reason: [reason or "bulk invalidation"]` to each matching file. If `--hard`: delete the YAML files instead.
+6. Confirm: *"Done — N entries invalidated [and removed from disk]. Context loads start clean."*
+
+**Rules:**
+- Always show count before confirming — never silent execution.
+- Standard (no `--hard`): audit trail preserved, `--history` always shows them.
+- `--hard`: permanent deletion. Cannot be recovered. Use only for a true clean-slate reset.
+- `#name` filter: scopes to that `decision_id` only — other entries untouched.
+- If no active entries: *"No active journal entries found. Nothing to invalidate."*
+
 ## Effect on Other Flags
 
 | Flag | Behavior with invalidated entries |

@@ -186,7 +186,7 @@ Flags that accept `#name` for exact lookup (instead of keyword search): `--since
 
 ### Default mode: Four Actions
 
-**All prompts use the four-action flow by default.** Exceptions: `--go` (escape hatch), `--quick` (single-response condensed), and utility flags (`--brief`, `--trail`, `--history`, `--outcome`, `--export`, `--stack`, `--roadmap`, `--sell-up`, `--schedule-brief`, `--save-context`, `--setup-integrations`, `--update`, `--import-context`, `--decide`, `--patterns`, `--invalidate`, `--drift`) execute immediately. **Exception: `--scan-strategy` alone executes immediately (Path A); `--scan-strategy [question]` enters the four-action flow with strategy-anchored grounding (Path B).**
+**All prompts use the four-action flow by default.** Exceptions: `--go` (escape hatch), `--quick` (single-response condensed), and utility flags (`--brief`, `--trail`, `--history`, `--outcome`, `--export`, `--stack`, `--roadmap`, `--sell-up`, `--schedule-brief`, `--save-context`, `--setup-integrations`, `--update`, `--import-context`, `--decide`, `--patterns`, `--invalidate`, `--invalidate-all`, `--drift`) execute immediately. **Exception: `--scan-strategy` alone executes immediately (Path A); `--scan-strategy [question]` enters the four-action flow with strategy-anchored grounding (Path B).**
 
 The four actions run across **three responses**. Response 1 delivers Frame + Assess and ends with a grounding question to confirm the decision angle. Response 2 delivers Paths tailored to the confirmed frame and ends with a path-selection prompt. Response 3 delivers the Verdict + next-steps menu. No exchanges before value — the user sees analysis immediately; grounding and paths both land before any commitment.
 
@@ -868,6 +868,7 @@ In compact mode: identify the **Dominant Truth** and reason from it. In `--deep`
 | `--decide` | Inbound handoff from another skill. CPO receives structured context, discovers available skills, and recommends the best next action — with install suggestion + fallback if the ideal skill isn't present. |
 | `--patterns` | Analyze the decision journal for personal decision-making tendencies: Truth weighting biases, path preferences, kill criteria hit rate, decision reversal frequency. Surfaces your decision DNA. |
 | `--invalidate [topic or #id]` | Mark a past decision as invalidated. Annotates with date + reason. Future context loads skip invalidated entries; `--history` always shows them. |
+| `--invalidate-all` | Bulk invalidation — mark all active journal entries as invalidated. Optional `#name` filter. Requires confirmation with entry count. `--invalidate-all --hard` permanently deletes YAML files (irreversible). |
 | `--drift` | On-demand logic drift detection. Cross-references Truth fingerprints + verdict directions across recent decisions. Surfaces only structural contradictions — not semantic similarity. |
 
 ### Calibration Protocol
@@ -1099,6 +1100,29 @@ Full templates at `~/.claude/skills/cpo/references/modes/[mode].md` — load wit
 **Output:** Live 5-round debate + consensus + divergence map + fundraising readiness + verdict per archetype
 **Transcript:** Write to `~/.cpo/simulations/YYYY-MM-DD-investor-roundtable-[ts].md`. Confirm: *"Transcript saved."*
 **Load:** `cat ~/.claude/skills/cpo/references/modes/investor-roundtable.md`
+
+---
+
+## `--invalidate-all` Flag
+
+**Trigger:** `--invalidate-all` — bulk invalidation of all active journal entries. Optional `#name` filter to scope to one decision object. Optional `--hard` modifier for permanent file deletion.
+
+**Execute immediately** — no four-action flow.
+
+**Steps:**
+1. Count active (non-invalidated) entries in `~/.cpo/decisions/`. If `#name` filter given, count only entries for that `decision_id`.
+2. Display summary: *"Found N active journal entries [for #name]. This will mark all of them as invalidated."*
+3. If `--hard` was also passed, add a warning line: *"⚠️ `--hard` will permanently delete the YAML files. This cannot be undone. `--history` will no longer show them."*
+4. Require explicit confirmation (plain text): *"Reply YES to confirm, or provide a reason before YES (e.g. 'starting fresh YES'). Reply cancel to abort."*
+5. On YES: mark all matching entries `status: invalidated`, `invalidated_date: YYYY-MM-DD`, `invalidated_reason: [reason or "bulk invalidation"]`. If `--hard`: delete the YAML files instead.
+6. Confirm: *"Done — N entries invalidated [and removed from disk]. Context loads start clean."*
+
+**Rules:**
+- **Always require YES confirmation** — never execute silently. Show the count before confirming.
+- **Standard (no `--hard`):** Marks as invalidated. Audit trail preserved in `--history`.
+- **`--hard` variant:** Permanently deletes YAML files. Cannot be undone. `--history` will not show deleted entries. Use only when a truly clean slate is needed.
+- **`#name` filter:** Scopes to entries with matching `decision_id` only — use for clearing a specific decision object without affecting others.
+- **If no active entries found:** *"No active journal entries found [for #name]. Nothing to invalidate."*
 
 ---
 
