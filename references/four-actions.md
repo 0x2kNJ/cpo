@@ -195,7 +195,8 @@ Before committing to a path, consider to stress test, analyze, or reality check 
 2) Deep analysis  — all paths across product, market, execution, and risk
 3) Reality check  — [inferred audience] reacts to each path
 
-Reply 1, 2, or 3 to dig deeper — or A, B, or C to commit now.
+Pick 1, 2, or 3 to dig deeper first
+or A, B, or C to commit to a path
 ```
 
 **Pre-path challenge rules:**

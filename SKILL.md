@@ -191,7 +191,8 @@ Before committing to a path, consider to stress test, analyze, or reality check 
 2) Deep analysis  — all paths across product, market, execution, and risk
 3) Reality check  — [inferred audience] reacts to each path
 
-Pick A, B, or C to commit. Or pick 1, 2, or 3 to dig deeper first.
+Pick 1, 2, or 3 to dig deeper first
+or A, B, or C to commit to a path
 ```
 
 **This is the exact output for Response 2.** Do not add your own path-selection question. Do not rephrase the 1/2/3 block. The template above IS the complete response — output it as written, then stop.
