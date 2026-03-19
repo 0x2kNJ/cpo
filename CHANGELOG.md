@@ -4,9 +4,28 @@ All notable changes documented here. Follows [Keep a Changelog](https://keepacha
 
 ---
 
+## [1.4.9] — 2026-03-19
+
+Universal terminal rule — no CPO response ends without a user action prompt. Every flow endpoint (main Response 3, elevation mini-flow, simulations, utility flags, execution-artifact modes) now has an explicit next-step prompt. Boardroom and investor-roundtable standalone invocations get a "what next?" line after transcript save. Final check rule added to structural rules in both SKILL.md and CURSOR.md: model must verify the last element is an action prompt before delivering any response. Label change: "CEO/board" → "c-suite" in G) Leadership reaction across all files.
+
+### Added
+
+- **Universal terminal rule:** Every response endpoint — main flow, elevation mini-flow, inline simulation (H/I picks), standalone boardroom/investor-roundtable, utility flags (`--brief`, `--trail`, `--history`, `--outcome`, `--patterns`, `--drift`), execution-artifact modes (eng-brief, eng-translate) — must end with either the D-L menu (decision flows) or a contextual next-step prompt (utility/intelligence flows).
+- **Final check enforcement anchor:** Structural rules now include a pre-delivery check: "verify the last substantive element is a user action prompt; if not, append the appropriate prompt before delivering." Fires on every response in every mode without exception.
+- **Elevation mini-flow step 6 (SKILL.md):** Explicit step 6 added: "Render the D-L next-steps menu — same AskUserQuestion format and rules as Response 3." Previously the elevation success path had no D-L instruction.
+- **Boardroom post-transcript prompt:** After "Transcript saved," outputs "What next? Type a new decision, run `/cpo [topic]` to revisit anything the board raised, or pick from your remaining D–L options if this was an H) pick."
+- **Investor-roundtable post-transcript prompt:** Same pattern — "What next? Type a new decision, run `/cpo [topic]` to revisit anything investors challenged, or pick from your remaining D–L options if this was an I) pick."
+
+### Changed
+
+- **G) Leadership reaction label:** "how does each path land with your CEO/board?" → "how does each path land with your c-suite?" in SKILL.md, CURSOR.md, and CHANGELOG.md.
+- **`_SKILL_VERSION`:** 1.4.8 → 1.4.9 in both SKILL.md and CURSOR.md.
+
+---
+
 ## [1.4.8] — 2026-03-19
 
-G) Leadership reaction added to the pre-path challenge block. Asks "how does each path land with your CEO/board?" before committing — frames all three paths for the target audience, not just the recommended one. Distinct from the post-verdict G) sell-up, which packages a committed decision.
+G) Leadership reaction added to the pre-path challenge block. Asks "how does each path land with your c-suite?" before committing — frames all three paths for the target audience, not just the recommended one. Distinct from the post-verdict G) sell-up, which packages a committed decision.
 
 ### Added
 

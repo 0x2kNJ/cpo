@@ -33,7 +33,7 @@ allowed-tools:
 ```bash
 # Version check
 _INSTALLED_VERSION=$(cat ~/.cpo/.version 2>/dev/null || echo "unknown")
-_SKILL_VERSION="1.4.8"
+_SKILL_VERSION="1.4.9"
 if [ "$_INSTALLED_VERSION" != "$_SKILL_VERSION" ] && [ "$_INSTALLED_VERSION" != "unknown" ]; then
   echo "VERSION_MISMATCH: installed=$_INSTALLED_VERSION skill=$_SKILL_VERSION"
 fi
@@ -349,7 +349,7 @@ After the AskUserQuestion overlay, append a plain-text challenge block (never in
 Challenge before committing:
 D) Pre-mortem — assume the top path fails, why?
 E) Deep dive — full Five Truths across all paths
-G) Leadership reaction — how does each path land with your CEO/board?
+G) Leadership reaction — how does each path land with your c-suite?
 H) Board simulation — how would the board react?
 I) Investor simulation — run the paths past investors
 ```
@@ -399,6 +399,7 @@ After receiving elevation input, deliver **one consolidated response** (not the 
 3. Deliver the Verdict line immediately after the paths — using the user's **previously selected path letter** as the starting point, unless the locked assumption **changes the top-ranked path OR upgrades confidence by one full grade** (Low→Medium or Medium→High on the recommendation path). If neither condition is met, the prior selected path stands — state the confirmation in one line before the Verdict. If the recommendation shifts, lead with: *"With this data, I'm updating the recommendation to [new path]:"* before the Verdict line.
 4. **Do not re-ask the path-selection AskUserQuestion.** The user's prior selection stands unless the recommendation shifts, in which case state the shift explicitly.
 5. Write a journal entry with `revision: N+1` and `delta_from_prior` capturing the elevation input (not `na`).
+6. Render the D-L next-steps menu — same AskUserQuestion format and rules as Response 3. The elevation mini-flow does not suppress the menu.
 
 This is **one response**, not two. The elevation loop does not restart the three-response flow.
 
@@ -554,7 +555,7 @@ C) **[Situational label]** — [≤2 sentences]
 Challenge before committing:
 D) Pre-mortem — assume the top path fails, why?
 E) Deep dive — full Five Truths across all paths
-G) Leadership reaction — how does each path land with your CEO/board?
+G) Leadership reaction — how does each path land with your c-suite?
 H) Board simulation — how would the board react?
 I) Investor simulation — run the paths past investors
 ```
@@ -627,6 +628,8 @@ Reply with a letter (or several). Skip to move on.
 - Response 3 uses structured format: `**Verdict:**` line, `**Kill criteria:**` numbered list, `**Confidence:**` with key, `**Blind spots:**` block (conditional), `→ To reach` elevation block (conditional, Medium/Low only). Never run these together as one dense paragraph.
 - Response 3 includes a Blind spots block immediately after Confidence key when ≥1 Truth was inferred without stated data — one item per line prefixed with `·`, format `[Truth — no [data type]; [challenges/reinforces] this verdict · get it via: [collection method]]`, max 3 items, ends with "Sharing any of these shifts the analysis." Suppress entirely if all Truths were grounded.
 - Response 3 always ends with AskUserQuestion offering next steps D–L; falls back to plain text list if unavailable
+- **Universal terminal rule:** Every response that completes a flow — main Response 3, elevation mini-flow, inline simulation (H/I picks), standalone boardroom/investor-roundtable, and utility/intelligence flags (`--brief`, `--trail`, `--history`, `--outcome`, `--patterns`, `--drift`) — MUST end with a user action prompt: (a) the D-L menu (AskUserQuestion or plain text fallback) for decision and simulation flows, or (b) a contextual next-step prompt for utility/intelligence flows and execution-artifact modes (eng-brief, eng-translate): *"What next? Type a new decision, run `/cpo [topic]` to revisit anything flagged, or ask a follow-up."* No CPO response is complete without a user action prompt.
+- **Final check (applies in every mode, every environment):** Before delivering any response, verify the last substantive element is a user action prompt (AskUserQuestion, D-L menu, or contextual next-step). If it is not, append the appropriate prompt before delivering. This check fires on every response without exception.
 - No headers, no numbered sections, no preamble before Line 1 of Response 1 **except:** if `STRATEGY_FILES_FOUND` with a question-reframing tension, 2-sentence posture + tension-as-grounding-options may precede Line 1 — the user's angle pick IS the confirmation; no separate "is this right?" step. If no tension: posture folds silently into Line 1.
 - With `--deep`: Response 1 Lines 1–2 unchanged. After paths in Response 2, insert full 10-section output before the path-selection AskUserQuestion. Challenge block still renders after the AskUserQuestion. Response 3 Verdict unchanged.
 - With `--go`: bypass the three-response flow — deliver all four actions in one response (no AskUserQuestion, no text footer, no challenge block). Paths use `A) B) C)` format. Mark recommended path with `← recommended`. Append plain text next-steps list D–L at the end.
@@ -1160,7 +1163,7 @@ Full templates in `references/modes/[mode].md` — load with Read when needed.
 **Board member inversion:** If user signals they are a board member → invert. Collect what management is presenting + user's board role + concerns. Output: 5 high-quality questions for that archetype. Single-turn output, not a live simulation.
 **Pre-loaded posture:** Accept per-member sentiment: `supportive / neutral / skeptical / hostile`. A hostile Lead VC opens with a direct challenge, not procedural framing.
 **Escalation:** If simulation reveals core strategy is broken → recommend go/no-go review first. If governance violations surface → flag explicitly, recommend legal review.
-**Transcript:** After the debrief, write the full simulation transcript (all turns + debrief) to `~/.cpo/simulations/YYYY-MM-DD-boardroom-[ts].md`. Confirm with one line: *"Transcript saved — review before the real meeting."*
+**Transcript:** After the debrief, write the full simulation transcript (all turns + debrief) to `~/.cpo/simulations/YYYY-MM-DD-boardroom-[ts].md`. Confirm with one line: *"Transcript saved — review before the real meeting."* Immediately follow with: *"What next? Type a new decision, run `/cpo [topic]` to revisit anything the board raised, or pick from your remaining D–L options if this was an H) pick."*
 **Load:** `Read references/modes/boardroom.md`
 
 ### `board-story`
@@ -1185,7 +1188,7 @@ Full templates in `references/modes/[mode].md` — load with Read when needed.
 **Output:** Live 5-round debate + consensus view + divergence map + First 10/100 + 90/10 product cut + fundraising readiness + verdict per archetype
 **Kill criteria:** If round size and use of funds aren't defined → flag as explicit open question
 **M&A framing:** If user is in acquisition talks → flag at start: *"You're in acquisition territory, not a fundraise. Adjusting panel and agenda for a strategic buyer conversation."*
-**Transcript:** After the final round and verdicts, write the full debate transcript to `~/.cpo/simulations/YYYY-MM-DD-investor-roundtable-[ts].md`. Confirm with one line: *"Transcript saved — shareable with your co-founder or advisor."*
+**Transcript:** After the final round and verdicts, write the full debate transcript to `~/.cpo/simulations/YYYY-MM-DD-investor-roundtable-[ts].md`. Confirm with one line: *"Transcript saved — shareable with your co-founder or advisor."* Immediately follow with: *"What next? Type a new decision, run `/cpo [topic]` to revisit anything investors challenged, or pick from your remaining D–L options if this was an I) pick."*
 **Load:** `Read references/modes/investor-roundtable.md`
 
 ---

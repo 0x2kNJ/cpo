@@ -34,7 +34,7 @@ Type `cpo help` or `cpo ?` to see a full overview of what it can do.
 ```bash
 # Version check
 _INSTALLED_VERSION=$(cat ~/.cpo/.version 2>/dev/null || echo "unknown")
-_SKILL_VERSION="1.4.8"
+_SKILL_VERSION="1.4.9"
 if [ "$_INSTALLED_VERSION" != "$_SKILL_VERSION" ] && [ "$_INSTALLED_VERSION" != "unknown" ]; then
   echo "VERSION_MISMATCH: installed=$_INSTALLED_VERSION skill=$_SKILL_VERSION"
 fi
@@ -323,7 +323,7 @@ After the path-selection line, append a plain-text challenge block:
 Challenge before committing:
 D) Pre-mortem — assume the top path fails, why?
 E) Deep dive — full Five Truths across all paths
-G) Leadership reaction — how does each path land with your CEO/board?
+G) Leadership reaction — how does each path land with your c-suite?
 H) Board simulation — how would the board react?
 I) Investor simulation — run the paths past investors
 ```
@@ -512,7 +512,7 @@ Reply A, B, or C. Or correct the Frame if it's off.
 Challenge before committing:
 D) Pre-mortem — assume the top path fails, why?
 E) Deep dive — full Five Truths across all paths
-G) Leadership reaction — how does each path land with your CEO/board?
+G) Leadership reaction — how does each path land with your c-suite?
 H) Board simulation — how would the board react?
 I) Investor simulation — run the paths past investors
 ```
@@ -577,6 +577,8 @@ Reply with a letter (or several). Skip to move on.
 - Response 3 includes a Blind spots block immediately after Confidence key when ≥1 Truth was inferred without stated data — one item per line prefixed with `·`, format `[Truth — no [data type]; [challenges/reinforces] this verdict · get it via: [collection method]]`, max 3 items, ends with "Sharing any of these shifts the analysis." Suppress entirely if all Truths were grounded.
 - Response 3 always includes the next-steps menu D–L
 - **Progressive disclosure:** On the user's first decision (preamble returned `NO_DECISIONS`), show only D–G in the initial menu with a "More →" option: `D) Pre-mortem E) Deep dive F) Roadmap G) Sell-up → More: H) Board sim · I) Investor sim · J) Hand off · K) Something else [L) New evidence]`. Returning users (any prior journal entries) see the full D–L menu.
+- **Universal terminal rule:** Every response that completes a flow — main Response 3, elevation mini-flow, inline simulation (H/I picks), standalone boardroom/investor-roundtable, and utility/intelligence flags (`--brief`, `--trail`, `--history`, `--outcome`, `--patterns`, `--drift`) — MUST end with a user action prompt: (a) the D-L menu (plain text) for decision and simulation flows, or (b) a contextual next-step prompt for utility/intelligence flows and execution-artifact modes (eng-brief, eng-translate): *"What next? Type a new decision, run `/cpo [topic]` to revisit anything flagged, or ask a follow-up."* No CPO response is complete without a user action prompt.
+- **Final check (Cursor — fires before every response):** Before delivering any response, verify the last substantive element is a user action prompt (D-L menu or contextual next-step). If it is not, append the appropriate prompt before delivering. This check fires on every response in every mode without exception.
 - No headers, no numbered sections, no preamble before Line 1 of Response 1 **except:** if `STRATEGY_FILES_FOUND` with a question-reframing tension, 2-sentence posture + tension-as-grounding-options precede Line 1 — the user's angle pick IS the confirmation; no separate "is this right?" gate. If no tension found: posture folds silently into Line 1.
 - With `--deep`: Response 1 Lines 1–2 unchanged. After paths in Response 2, insert full 10-section output before the path-selection prompt. Challenge block still renders after the path-selection prompt. Response 3 Verdict unchanged.
 - With `--go`: bypass the three-response flow — deliver all four actions in one response (no grounding question, no text footer, no challenge block). Paths use `A) B) C)` format. Mark recommended path with `← recommended`. Append plain text next-steps list D–L at the end.
@@ -1105,7 +1107,7 @@ Full templates at `~/.claude/skills/cpo/references/modes/[mode].md` — load wit
 **Trigger:** "Simulate the board meeting" / "prepare me for the board"
 **Output:** Live multi-turn simulation + post-meeting debrief
 **Board member inversion:** If user is a board member → output 5 high-quality questions for their archetype.
-**Transcript:** Write to `~/.cpo/simulations/YYYY-MM-DD-boardroom-[ts].md`. Confirm: *"Transcript saved."*
+**Transcript:** Write to `~/.cpo/simulations/YYYY-MM-DD-boardroom-[ts].md`. Confirm: *"Transcript saved."* Immediately follow with: *"What next? Type a new decision, run `/cpo [topic]` to revisit anything the board raised, or pick from your remaining D–L options if this was an H) pick."*
 **Load:** `cat ~/.claude/skills/cpo/references/modes/boardroom.md`
 
 ### `board-story`
@@ -1122,7 +1124,7 @@ Full templates at `~/.claude/skills/cpo/references/modes/[mode].md` — load wit
 **Trigger:** "Talk to investors" / "is this venture-backable?"
 **Panel:** Company Builder · Category Maker · Numbers Analyst · User Validator · Contrarian + optional vertical specialists
 **Output:** Live 5-round debate + consensus + divergence map + fundraising readiness + verdict per archetype
-**Transcript:** Write to `~/.cpo/simulations/YYYY-MM-DD-investor-roundtable-[ts].md`. Confirm: *"Transcript saved."*
+**Transcript:** Write to `~/.cpo/simulations/YYYY-MM-DD-investor-roundtable-[ts].md`. Confirm: *"Transcript saved."* Immediately follow with: *"What next? Type a new decision, run `/cpo [topic]` to revisit anything investors challenged, or pick from your remaining D–L options if this was an I) pick."*
 **Load:** `cat ~/.claude/skills/cpo/references/modes/investor-roundtable.md`
 
 ---
