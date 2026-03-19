@@ -107,7 +107,7 @@ fi
 - **1–2 decisions:** Flag thin journal. Run abbreviated synthesis: anchor red line on the single decision with lowest confidence or nearest kill criterion. Append to output: *"Limited journal — make more `/cpo` decisions to improve status accuracy."*
 - **3+ decisions:** Run full synthesis below.
 
-**Full synthesis — 7 steps:**
+**Full synthesis — 8 steps (with sub-steps):**
 
 **Step 1 — Intent trajectory**
 What is the founder trying to achieve across all decisions? Not each decision in isolation — the arc. Extract the theory of the case: what are they building, for whom, and by what mechanism?
@@ -220,6 +220,8 @@ Produce the standard output first, then append:
 4. Decision dependencies: [findings or INDEPENDENT]
 5. Ship-to-decision alignment: [gaps found or ALL_ALIGNED]
 6. Operating style: [declared/inferred bias + signal strength]
+   6b. Consequence check: [pending consequences found or NONE_DUE]
+   6c. Decision decay: [Degraded/Stale decisions or ALL_FRESH]
 7. Open question recurrence: [recurring questions or NONE]
 8. External signals:
    Git velocity: [commits_last_7d] vs [commits_prior_7d] → [accelerating/steady/declining] · merge freshness: [N days] · stale branches: [N]

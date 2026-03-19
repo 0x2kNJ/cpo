@@ -2,7 +2,7 @@
 
 **Trigger:** `/cpo --outcome [topic]` — e.g., `/cpo --outcome enterprise gtm`
 
-**What it does:** Closes the loop on a prior decision. Surfaces the original verdict and kill criteria, records what actually happened, and — after 3+ outcomes — detects patterns across Bold/Balanced/Conservative path performance.
+**What it does:** Closes the loop on a prior decision. Surfaces the original verdict and kill criteria, records what actually happened, and — after 3+ outcomes — detects patterns across path outcomes.
 
 Before running: extract topic keyword (same logic as `--since`).
 
@@ -43,8 +43,9 @@ Display as:
 > Kill criteria: [list from entry]
 > Paths considered: A) [path_a] · B) [path_b] · C) [path_c]
 > Chosen: [verdict/recommendation]
+> Predictions made: [list from consequences field — each marker and check_date. If no consequences: "None recorded"]
 >
-> **What you didn't know:** [list inferred Truths — these were blind spots at decision time]
+> **What you didn't know:** [list inferred Truths — these were blind spots at decision time. Also list any consequences with check_date now past that remain status: pending — predictions you never verified.]
 
 **Pre-v1.4 fallback:** If `truth_fingerprint` is missing from the matched entry, skip the Truth reconstruction lines (Dominant Truth, Grounded, Inferred, "What you didn't know") and note: *"Truth fingerprint unavailable for this entry (pre-v1.4). Showing available context only."* Still display open questions, kill criteria, paths considered, and the chosen verdict — those fields exist in all schema versions.
 
@@ -68,7 +69,31 @@ sed -i.bak \
 echo "Outcome recorded: $_OUTCOME_FILE"
 ```
 
+**Consequence status update:**
+After recording the outcome, check if the matched entry has `consequences:` with `status: pending`. For each pending consequence, ask the user: *"You predicted: '[marker]' — did this happen? (confirmed / disconfirmed / still pending)"*. Then update the consequence status in the YAML file:
+
+```bash
+# Update consequence status — run for each consequence that needs updating
+# CONSEQUENCE_INDEX is 0-based, STATUS is confirmed|disconfirmed
+sed -i.bak "/marker: MATCHED_MARKER/{n;n;s/status: pending/status: CONFIRMED_OR_DISCONFIRMED/;}" "$_OUTCOME_FILE" && rm -f "${_OUTCOME_FILE}.bak"
+```
+
+If the user says "still pending" or skips, leave the status unchanged. If the entry has no `consequences:` field or `consequences: []`, skip this step silently.
+
 Replace every `REPLACE_WITH_*` value with actual content before running. `_OUTCOME_FILE` = the matched file path from the prior bash block. `_OUTCOME_STATUS` = the outcome as stated by the user. `_OUTCOME_NOTES_VALUE` = a one-line summary of what happened.
+
+**Learning extraction:**
+After recording the outcome status and consequence updates, surface one learning prompt:
+> *"Knowing what you know now: what's the one thing you'd do differently? (This gets stored — it compounds into `/cpo --patterns` over time.)"*
+
+Record the user's answer as an additional field in the YAML:
+
+```bash
+# Append learning to the outcome entry
+echo "outcome_learning: \"REPLACE_WITH_USER_LEARNING\"" >> "$_OUTCOME_FILE"
+```
+
+If the user skips or says "nothing", write `outcome_learning: "none"`. This field is read by `--patterns` Dimension 5 (Confidence Calibration) to enrich the calibration analysis with qualitative learning, not just outcome status.
 
 After recording, run pattern detection if 3+ entries for this decision_id or topic have `outcome:` set to `validated` or `invalidated`. Surface: *"Pattern: [N] of [total] decisions in this area were [validated/invalidated]. [One-line insight about the pattern]."*
 

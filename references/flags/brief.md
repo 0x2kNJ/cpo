@@ -8,7 +8,7 @@
 
 ```bash
 # Load all decisions for brief
-ls -t ~/.cpo/decisions/*.yaml 2>/dev/null | xargs -I{} cat {} 2>/dev/null
+grep -l "status: active" ~/.cpo/decisions/*.yaml 2>/dev/null | xargs ls -t 2>/dev/null | while read -r _f; do cat "$_f"; echo "---"; done 2>/dev/null
 ```
 
 Then output:
@@ -38,7 +38,7 @@ Then output:
 > If no consequence checks are due: omit this section entirely.
 >
 > **Decision decay:**
-> [For each active decision, compute a decay score: `(days_since_decision / 30) × (number_of_inferred_truths / 5) × confidence_multiplier` where confidence_multiplier is 1.5 for Low, 1.0 for Medium, 0.5 for High. Classify: **Fresh** (<1.0) · **Aging** (1.0–2.0) · **Stale** (2.0–4.0) · **Degraded** (>4.0). Only surface Stale and Degraded decisions.]
+> [For each active decision, compute a decay score: `(days_since_decision / divisor) × (number_of_inferred_truths / 5) × confidence_multiplier` where divisor is the decision's `shelf_life` field if present, otherwise 30. Confidence_multiplier is 1.5 for Low, 1.0 for Medium, 0.5 for High. Classify: **Fresh** (<1.0) · **Aging** (1.0–2.0) · **Stale** (2.0–4.0) · **Degraded** (>4.0). Only surface Stale and Degraded decisions.]
 >
 > [List decisions classified as Stale or Degraded, ranked by score:]
 > "[decision_id/date] — [topic] — **[Stale/Degraded]** (aged [N] days, [M] inferred truths, confidence: [level]). Original assumptions may no longer hold."

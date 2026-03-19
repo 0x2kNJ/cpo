@@ -58,9 +58,9 @@ Bottleneck: #[decision_id] — [one sentence why this blocks the most]
   ↓ confidence: [H/M/L] · last touched: [date] · fan-out: [N]
 
 Dependencies:
-  #[id-A] → #[id-B] (A depends on B)
-  #[id-C] → #[id-B] (C depends on B)
-  #[id-D] → #[id-A] (D depends on A)
+  #[id-A] → #[id-B] [explicit] (A depends on B — referenced in recommendation)
+  #[id-C] → #[id-B] [explicit] (C depends on B — open question maps to B's verdict)
+  #[id-D] →? #[id-A] [inferred] (D may depend on A — topic overlap)
   [... all edges]
 
 Orphaned (no connections):
@@ -80,3 +80,5 @@ Critical path: Resolve #[bottleneck] → unblocks [N] decisions → next bottlen
 - If no dependencies found across all decisions: *"All [N] decisions appear independent — no dependency edges detected. This could mean decisions are well-isolated, or that cross-references aren't explicit enough in your prompts."*
 - Bottleneck identification always names one decision — even if the graph is sparse
 - After output, prompt: *"Want to dig into the bottleneck? Run `/cpo #[bottleneck-id]` to revisit it, or `/cpo --status` for the executive view."*
+- **`--graph --export` together:** Export the graph as a Markdown file using the same `--export` behavior. Slug: `graph-[date]`.
+- **Cross-reference with `--kills`:** If the bottleneck decision has a TRIGGERED or APPROACHING kill criterion, append to the bottleneck callout: *"⚠ This bottleneck also has an approaching kill criterion — compounding risk."*

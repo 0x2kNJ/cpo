@@ -36,9 +36,10 @@ three_paths:
   path_a: REPLACE_WITH_PATH_A_LABEL_AND_SUMMARY
   path_b: REPLACE_WITH_PATH_B_LABEL_AND_SUMMARY
   path_c: REPLACE_WITH_PATH_C_LABEL_AND_SUMMARY
+path_chosen: REPLACE_WITH_A_B_OR_C
 truth_fingerprint: "Dominant: REPLACE_WITH_DOMINANT_TRUTH . Grounded: REPLACE_WITH_GROUNDED_TRUTHS . Inferred: REPLACE_WITH_INFERRED_TRUTHS"
 delta_from_prior: REPLACE_WITH_WHAT_CHANGED_OR_NA
-shelf_life: REPLACE_WITH_DAYS_OR_EMPTY
+shelf_life: ${_SHELF_LIFE:-}
 open_questions:
   - REPLACE_WITH_OPEN_QUESTION
 consequences:
@@ -62,11 +63,13 @@ Replace every `REPLACE_WITH_*` value with the actual content from the output jus
 
 **`revision`:** For new decisions (or untagged decisions), write `1`. For returning decisions (`DECISION_OBJECT_LOADED`), count the existing entries for this `decision_id` and write `N+1`.
 
+**`path_chosen`:** The letter of the path the user selected (A, B, or C). This is the raw letter, not the situational label. Used by `--patterns` for path preference analysis. If the user didn't explicitly select a path (e.g., `--go` auto-selects the recommended path), write the recommended path letter.
+
 **`delta_from_prior`:** For returning decisions, write a one-line summary of what changed. For new decisions, write `na`.
 
-**`consequences`:** Auto-generated at decision time. Derive 2-3 consequences from the Verdict and kill criteria — each is a testable prediction about what should change if the recommended path succeeds. Each consequence must be falsifiable within the stated timeframe — if you can't tell whether it happened or not, it's not a valid consequence. Prefer measurable consequences over qualitative ones. `marker` is a one-sentence prediction (e.g., "If we ship the paywall, free-tier signups should drop 20-40%"). `check_date` is when to look for this effect (typically 30-90 days out). `status` is `pending`, `confirmed`, or `disconfirmed`. If no meaningful consequence can be inferred from the decision, write `consequences: []` — never write placeholder text. `--status` and `--brief` scan for consequences past their `check_date` that are still `pending` — surfacing them as "consequence check due."
+**`consequences`:** Auto-generated at decision time. Derive 2-3 consequences from the Verdict and kill criteria — each is a testable prediction about what should change if the recommended path succeeds. Each consequence must be falsifiable within the stated timeframe — if you can't tell whether it happened or not, it's not a valid consequence. Prefer measurable consequences over qualitative ones. `marker` is a one-sentence prediction (e.g., "If we ship the paywall, free-tier signups should drop 20-40%"). `check_date` is when to look for this effect. Derive from context: if the decision has kill criteria with explicit timeframes, align the consequence check_date to 50-75% of the shortest kill criterion timeframe (check before the kill deadline, not after). If no kill criteria timeframe exists, default to 60 days from the decision date. Format: YYYY-MM-DD. `status` is `pending`, `confirmed`, or `disconfirmed`. If no meaningful consequence can be inferred from the decision, write `consequences: []` — never write placeholder text. `--status` and `--brief` scan for consequences past their `check_date` that are still `pending` — surfacing them as "consequence check due."
 
-**`shelf_life`:** Optional. Number of days this decision is expected to remain valid (e.g., `180` for a 6-month strategic bet, `365` for an annual plan). If present, the Decision Decay Index uses this value instead of the default 30-day divisor: `(days_since_decision / shelf_life) × ...`. If absent or empty, the default 30-day divisor applies. Set this for long-horizon decisions (market positioning, annual strategy, platform bets) to prevent false decay alarms. Short-horizon decisions (sprint-level, launch timing) should omit this field.
+**`shelf_life`:** Optional. Number of days this decision is expected to remain valid (e.g., `180` for a 6-month strategic bet, `365` for an annual plan). If present, the Decision Decay Index uses this value instead of the default 30-day divisor: `(days_since_decision / shelf_life) × ...`. If absent or empty, the default 30-day divisor applies. Set this for long-horizon decisions (market positioning, annual strategy, platform bets) to prevent false decay alarms. Short-horizon decisions (sprint-level, launch timing) should omit this field. In the bash block, set `_SHELF_LIFE` to the number of days before running the write, or leave it unset to produce an empty value.
 
 **Consistency check:** If a new journal entry contradicts a recent one (same `decision_id` or same topic, opposite verdict), flag it inline: *"Note: last time we looked at [topic] ([date]), verdict was X. Today's context shifts that to Y because Z."*
 

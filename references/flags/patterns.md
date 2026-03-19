@@ -20,9 +20,11 @@ Output: Which Truth dominates your verdicts most often. Flag if one Truth is con
 
 ### 2. Path Preference
 
-Parse the `path_chosen:` field. Tally A/B/C frequency. Note: Path labels vary per decision — tally the letter, not the label.
+Parse the `path_chosen:` field from each journal entry. Tally A/B/C frequency.
 
-Output: Whether you systematically favor aggressive paths (A), recommended paths (B), or conservative paths (C). Flag reversals (path chosen ≠ recommended) and whether they correlated with better or worse outcomes.
+**Important:** Path letters are NOT fixed risk levels. A is not always "aggressive" and C is not always "conservative" — labels are situational per decision. The meaningful signal is: how often does the founder choose the recommended path (marked `← recommended` in the original output) vs. diverge from it?
+
+Output: Recommended-path adherence rate (% of times the founder chose the `← recommended` path). Flag reversals (path chosen ≠ recommended) and, for entries with `outcome:` set, whether reversals correlated with better or worse outcomes. If the journal doesn't record which path was recommended, fall back to raw A/B/C tallies with the caveat: *"Letter tallies only — no recommended-path tracking available in these entries."*
 
 ### 3. Kill Criteria Hit Rate
 
