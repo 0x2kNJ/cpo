@@ -4,6 +4,17 @@ All notable changes documented here. Follows [Keep a Changelog](https://keepacha
 
 ---
 
+## [1.8.11] — 2026-03-19
+
+Patch: CURSOR.md-excluded feature register added — closes Boris Cherny's last remaining spec gap.
+
+### Fixed
+
+- **CURSOR.md-excluded feature register added:** Co-located with the feature compatibility rule and Conditional Grounding disabled note. Provides an explicit enumerated list of SKILL.md features intentionally absent from CURSOR.md, with version and reason for each exclusion. Solves the re-invention risk: a future editor adding a CURSOR.md exception can now check this register to discover whether the feature was already tried and disabled. Current entry: Conditional Grounding (disabled v1.8.8; requires AskUserQuestion modal to enforce R2→R3 gate; SKILL.md-only). Register includes a `*(Add future exclusions here with version and reason.)*` placeholder to signal it is a live document.
+- **Critical Output Rules version tag updated:** v1.8.10 → v1.8.11.
+
+---
+
 ## [1.8.10] — 2026-03-19
 
 Patch: DECISION_OBJECT_LOADED added to trigger table; pre-response gate check; CURSOR gate verification test; STRATEGY_FILES_FOUND bullet trimmed.

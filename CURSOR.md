@@ -143,7 +143,7 @@ If the user's selection includes a correction: acknowledge in one line, reframe,
 
 ---
 
-## ⚠️ Critical Output Rules — v1.8.10 — read before every response
+## ⚠️ Critical Output Rules — v1.8.11 — read before every response
 
 Non-obvious rules this file size causes models to skip:
 
@@ -295,6 +295,10 @@ End Response 1 with a grounding question to confirm the decision angle before ge
 **CURSOR.md — Conditional Grounding is DISABLED.** Do not skip the grounding question regardless of how specific the prompt is. In Cursor's agentic mode, every gate exception becomes a path to skip all gates. The grounding question is GATE 1. It is unconditional. Even if the answer seems obvious from the prompt, ask it. The user can confirm in one keystroke.
 
 **CURSOR.md vs SKILL.md — feature compatibility rule:** Before adding any gate exception to CURSOR.md, ask: "Does a mechanical pause enforce this gate (e.g., AskUserQuestion modal)?" If no → the exception is unsafe and must not be added to CURSOR.md. Features that require a mechanical pause belong in SKILL.md only. Conditional Grounding is SKILL.md-only for this reason.
+
+**CURSOR.md-excluded feature register** — features intentionally absent from CURSOR.md due to the no-mechanical-pause constraint. Check here before adding anything that exists in SKILL.md but not here:
+- **Conditional Grounding** — disabled v1.8.8. Collapses R1+R2 when prompt meets 3 specificity conditions. Requires AskUserQuestion modal to enforce the R2→R3 gate; without it, models run R1+R2+R3 in one pass. SKILL.md-only.
+- *(Add future exclusions here with version and reason.)*
 
 ```
 Grounding — For [decision], which angle?
