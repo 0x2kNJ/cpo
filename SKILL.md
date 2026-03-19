@@ -195,7 +195,7 @@ C) **[Situational label]** — [≤2 sentences]
 
 Before committing to a path, consider to stress test, analyze, or reality check them:
 1) Stress test    — CPO challenges all three paths
-2) Deep analysis  — unpack all 3 paths across product, market, execution, and risk
+2) Deep dive      — unpack all 3 paths across product, market, execution, and risk
 3) Reality check  — [inferred audience] reacts to each path
 
 Pick 1, 2, or 3 to dig deeper first
@@ -219,7 +219,7 @@ or A, B, or C to commit to a path
 - Kill criteria: always ≥3 (except `--quick`: 1), each with metric + threshold + timeframe.
 - Blind spots: render only when ≥1 Truth was inferred; suppress if all grounded.
 - Truth fingerprint: always render.
-- **D-M pick fallbacks:** If user picks H → run `boardroom` inline. I → run `investor-roundtable` inline. K → run `eng-brief` inline. L → run skill discovery + handoff sub-menu. After any D-M pick completes, re-surface remaining unused picks with RECOMMENDATION.
+- **D-M pick fallbacks:** If user picks H → run `boardroom` inline. I → run `investor-roundtable` inline. K → run `eng-brief` inline, then save to `~/.cpo/briefs/YYYY-MM-DD-[slug].md` and confirm with one line: *"Brief saved to `~/.cpo/briefs/[filename]` — share with engineering."* L → run skill discovery + handoff sub-menu. After any D-M pick completes, re-surface remaining unused picks with RECOMMENDATION.
 
 ```
 **Verdict:** [chosen path] — [one-line reason].
@@ -250,7 +250,7 @@ Next steps (pick any):
 
 D) Stress test    — challenge the verdict before committing
 
-E) Deep analysis  — product, market, execution, and risk breakdown
+E) Deep dive      — product, market, execution, and risk breakdown
 
 F) Reality check  — [inferred audience] reacts to the chosen path
 

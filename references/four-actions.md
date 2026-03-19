@@ -192,7 +192,7 @@ After the AskUserQuestion overlay, append a plain-text block (never inside the o
 ```
 Before committing to a path, consider to stress test, analyze, or reality check them:
 1) Stress test    — CPO challenges all three paths
-2) Deep analysis  — unpack all 3 paths across product, market, execution, and risk
+2) Deep dive  — unpack all 3 paths across product, market, execution, and risk
 3) Reality check  — [inferred audience] reacts to each path
 
 Pick 1, 2, or 3 to dig deeper first
@@ -261,7 +261,7 @@ Immediately follow Verdict with an AskUserQuestion offering next steps.
 - Re-ground: *"Verdict confirmed — [one-clause summary]. Pick a next step, or type a few letters to stack more."*
 - No RECOMMENDATION on initial menu.
 - Options (three groups):
-  - **Analyze further:** D) Stress test · E) Deep analysis · F) Reality check — [inferred audience] reacts to the chosen path
+  - **Analyze further:** D) Stress test · E) Deep dive · F) Reality check — [inferred audience] reacts to the chosen path
   - **Communicate upwards:** G) Sell-up · H) Board simulation · I) Investor simulation
   - **Move it forward:** J) Roadmap · K) Eng brief · L) Hand off · [M) New evidence] *(M renders only when confidence is High)*
 
@@ -286,7 +286,18 @@ Immediately follow Verdict with an AskUserQuestion offering next steps.
 
 **If user picks I:** Trigger `--investor-roundtable` mode inline — run the full investor simulation anchored to the current decision.
 
-**If user picks K:** Trigger `/cpo --mode eng-brief` inline — translate the current decision for engineering.
+**If user picks K:** Trigger `/cpo --mode eng-brief` inline — translate the current decision for engineering. After generating the brief, save it to disk:
+```bash
+mkdir -p ~/.cpo/briefs
+_DATE=$(date +%Y-%m-%d)
+_TS=$(date +%s | tail -c 5)
+_SLUG=$(echo "[decision-slug]" | tr '[:upper:]' '[:lower:]' | tr ' ' '-' | tr -cd '[:alnum:]-' | cut -c1-40)
+cat > ~/.cpo/briefs/${_DATE}-${_SLUG}-${_TS}.md << 'EOF'
+[full eng brief content]
+EOF
+```
+Confirm with one line: *"Brief saved to `~/.cpo/briefs/[filename]` — share with engineering."*
+K is non-repeatable — remove from re-surface menu after use.
 
 **If user picks L:** Run silent discovery, then present sub-menu:
 
