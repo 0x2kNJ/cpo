@@ -33,7 +33,7 @@ allowed-tools:
 ```bash
 # Version check
 _INSTALLED_VERSION=$(cat ~/.cpo/.version 2>/dev/null || echo "unknown")
-_SKILL_VERSION="1.9.3"
+_SKILL_VERSION="1.9.4"
 if [ "$_INSTALLED_VERSION" != "$_SKILL_VERSION" ] && [ "$_INSTALLED_VERSION" != "unknown" ]; then
   echo "VERSION_MISMATCH: installed=$_INSTALLED_VERSION skill=$_SKILL_VERSION"
 fi
@@ -589,13 +589,15 @@ Before committing — stress test, analyze, or reality check:
 2) Deep analysis  — all paths across product, market, execution, and risk
 3) Reality check  — [inferred audience] reacts to each path
 
-Pick A, B, or C to commit. Pick 1, 2, or 3 to dig deeper first.
+Pick A, B, or C to commit. Or pick 1, 2, or 3 to dig deeper first.
 ```
+
+**This is the exact output for Response 2.** Do not add your own path-selection question. Do not rephrase the 1/2/3 block. Do not add a "which path?" prompt. The template above IS the complete response — output it as written, then stop.
 
 > ⛔ **GATE 2 — Response 2 ends here.** Do not generate the Verdict. Do not render D-M options. Do not write kill criteria. Wait for the user's reply.
 > **Self-check before continuing:** Has the user replied with a path choice (A/B/C) or a pre-commitment pick (1/2/3) in this same message? If no → STOP. This response is complete. If yes → A/B/C proceeds to Verdict (Response 3); 1/2/3 runs the challenge analysis then re-surfaces path selection with the 1/2/3 block again.
-> **MUST contain:** framing sentence, exactly 3 paths with situational labels, one path marked `← recommended`, the 1/2/3 challenge block (always — this is not optional).
-> **MUST NOT contain:** verdict, kill criteria, confidence rating, D-M menu (D through M letters), blind spots, truth fingerprint.
+> **MUST contain:** framing sentence, exactly 3 paths with situational labels, one path marked `← recommended`, the 1/2/3 challenge block (word for word from the template above).
+> **MUST NOT contain:** verdict, kill criteria, confidence rating, D-M menu (D through M letters), blind spots, truth fingerprint. Do not add custom path-selection prompts like "which path?" or "what do you pick?" — the template's last line IS the prompt.
 
 **Response 3 — Verdict + next steps (delivered after user picks a path):**
 
@@ -618,7 +620,7 @@ Pick A, B, or C to commit. Pick 1, 2, or 3 to dig deeper first.
 
 **Truth fingerprint:** Dominant: [Truth name] · Grounded: [Truth1, Truth2] · Inferred: [Truth3, Truth4]
 
-[→ **To reach [next level]:** [named gap]. Share it and I'll re-run with it locked — or reply **skip**.]
+[→ **To reach [next level]:** [named gap]. Share it and I'll re-run with it locked — or reply **skip** to see next steps.]
 
 ---
 
@@ -641,14 +643,16 @@ L) Hand off       — select skill or agent
 [M) New evidence  — share what you found, I'll show what shifts]
 
 Reply with a letter (or several). Skip to move on.
-
-[→ AskUserQuestion: next steps D–M (see Action 4)]
 ```
+
+**Response 3 rendering rules:**
+- **If confidence is High:** render the full D-M menu (everything from `---` down) immediately after the verdict block.
+- **If confidence is Medium or Low:** render the elevation prompt (`→ To reach [next level]:...`) AND ALSO render the D-M menu below it. The user should always see their next-step options. The elevation prompt is an invitation, not a gate that hides the menu.
 
 **Verdict format rules:**
 - **Structured, not paragraph.** Use bold headers (`**Verdict:**`, `**Kill criteria:**`, `**Confidence:**`, `**Blind spots:**`). Never run these together as one dense paragraph.
 - Kill criteria are always a numbered list — never inline prose.
-- The `→ To reach` elevation block renders only when confidence is Medium or Low. It appears AFTER blind spots and BEFORE the `---` separator. When this block renders, suppress the entire D–M menu (the elevation prompt IS the data intake; menu unlocks only after the user resolves the gap or skips).
+- The `→ To reach` elevation block renders only when confidence is Medium or Low. It appears AFTER blind spots and BEFORE the `---` separator. **Always render the D-M menu below the elevation prompt** — the user must always see their next-step options regardless of confidence level. The elevation prompt is an invitation to improve confidence, not a gate that hides the menu.
 - M) renders only when confidence is High (no elevation prompt competing). Label: `M) New evidence — share what you found, I'll show what shifts`.
 - **Truth fingerprint renders after blind spots, before elevation block.** Format: `**Truth fingerprint:** Dominant: [name] · Grounded: [list] · Inferred: [list]`. Always render (even if all grounded — state "All grounded"). Dominant = the Truth that most determined the Verdict (matches the `*The [Truth name] is what this turns on` line from Response 1). Grounded = Truths with stated data in the conversation. Inferred = Truths CPO had to infer (matches blind spots). Written to journal as `truth_fingerprint:` field.
 - **Letter continuation:** Next-steps letters are always **D–M** (continuing from A/B/C paths). NEVER restart at A. **After each pick completes, re-surface remaining picks with a RECOMMENDATION line.**
