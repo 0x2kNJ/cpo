@@ -225,13 +225,15 @@ or A, B, or C to commit to a path
 **Verdict:** [chosen path] — [one-line reason].
 *Path [letter] locked. If you want to pressure-test before acting, start with F) Reality check below.*
 
+**Confidence:** [High/Medium/Low]
+*[One-sentence key: what this level means for this decision.]*
+
+[→ **To reach [next level]:** [named gap]. Share it and I'll re-run with it locked — or reply **skip** to see next steps.]
+
 **Stop if** *(conditions that would change this bet):*
 1. [metric + threshold + timeframe]
 2. [metric + threshold + timeframe]
 3. [metric + threshold + timeframe]
-
-**Confidence:** [High/Medium/Low]
-*[One-sentence key: what this level means for this decision.]*
 
 [**Blind spots:**
 · [Truth — no [data]; [challenges/reinforces] · get it via: [method]]
@@ -239,8 +241,6 @@ or A, B, or C to commit to a path
 *Sharing any of these shifts the analysis.*]
 
 **Truth fingerprint:** Dominant: [Truth name] · Grounded: [Truth1, Truth2] · Inferred: [Truth3, Truth4]
-
-[→ **To reach [next level]:** [named gap]. Share it and I'll re-run with it locked — or reply **skip** to see next steps.]
 
 ---
 
@@ -311,8 +311,8 @@ B) **[Label]** — [≤2 sentences]  ← recommended
 C) **[Label]** — [≤2 sentences]
 
 **Verdict:** [recommended path] — [one-line reason].
-**Stop if** *(conditions that would change this bet):* 1. [m+t+t]  2. [m+t+t]  3. [m+t+t]
 **Confidence:** [H/M/L] — [key].
+**Stop if** *(conditions that would change this bet):* 1. [m+t+t]  2. [m+t+t]  3. [m+t+t]
 [D-M menu]
 ```
 
