@@ -4,6 +4,25 @@ All notable changes documented here. Follows [Keep a Changelog](https://keepacha
 
 ---
 
+## [1.8.1] — 2026-03-19
+
+Patch: six panel-identified bugs and recommendations fixed before prod.
+
+### Fixed
+
+- **CURSOR.md Critical Output Rules stale L) reference:** `New evidence L) routing` corrected to `M) routing`. New evidence was moved to M in v1.7.0; read-first section had never been updated — live production bug.
+- **`→ eng-brief` removed from L) Hand off sub-menu (SKILL.md + CURSOR.md):** K) Eng brief is now first-class non-repeatable. Listing `→ eng-brief` in the Hand off sub-menu created a bypass of the non-repeatable gate — removed from both files.
+- **AskUserQuestion group header rendering spec added (SKILL.md):** AskUserQuestion overlays in Claude Code render options as a flat list — `── Group ──` separator lines are dropped. New rule: prepend group name as `[Group name] →` prefix to the first option of each group inside AskUserQuestion. Plain-text fallback continues to use full `── Group ──` separators.
+- **Group separator enforcement reminder added (CURSOR.md):** Critical Output Rules now explicitly states `── Group ──` separator lines are structural, not cosmetic, and must not be omitted or collapsed into a flat list.
+- **M) suppression now includes founder guidance:** When M) is suppressed (Medium/Low confidence), the rule now directs founders to the `→ To reach` elevation block as the data intake mechanism with explicit redirect copy.
+- **Pre-path challenge loop capped at 2 rounds (SKILL.md + CURSOR.md):** Previously unbounded. After 2 challenge rounds, D/E/F are removed and a forced path-selection prompt fires: *"You've stress-tested from two angles. Pick a path — or tell me what's still unresolved."*
+
+### Meta
+
+- **Critical Output Rules versioned:** Header now reads `## ⚠️ Critical Output Rules — v1.8.0` so future editors know to bump version on next release.
+
+---
+
 ## [1.8.0] — 2026-03-19
 
 Menu grouping redesign and Eng brief promotion. Three semantic groups replace the v1.7.0 tier labels. Reviewed and approved by panel (Gary Tan, Mike Krieger, Boris Cherny).

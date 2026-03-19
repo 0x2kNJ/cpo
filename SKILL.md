@@ -355,7 +355,7 @@ F) Reality check  — [inferred audience] reacts to each path — quick takes be
 **Pre-path challenge rules:**
 - Challenge options run against **all three paths**, not just the recommended one
 - When a challenge completes, re-surface the path-selection AskUserQuestion (with challenge block) and continue
-- Challenge loop has no fixed limit — the user can challenge multiple times before picking a path
+- Challenge loop is capped at **2 rounds** — after the second challenge completes, do not re-offer D/E/F. Surface only the path-selection AskUserQuestion with a note: *"You've stress-tested from two angles. Pick a path — or tell me what's still unresolved."*
 - After the user picks a path (A/B/C), proceed to Action 4 (Verdict) normally; journal write happens after Verdict as usual
 - **`--go` suppresses the challenge block entirely** — not partially, entirely. Do not render it when `--go` is present.
 - **`--quick` suppresses the challenge block entirely.**
@@ -426,6 +426,8 @@ Immediately follow with an AskUserQuestion offering next steps.
   - **Communicate upwards:** G) Sell-up — reframe for leadership · H) Board simulation — pressure-test in the boardroom · I) Investor simulation — run the pitch
   - **Move it forward:** J) Roadmap — stack against other bets · K) Eng brief — translate the decision for engineering · L) Hand off — select skill or agent · [M) New evidence — share what you found, I'll show what shifts] *(M) renders only when confidence is High; suppress when elevation `→` block fires)*
 
+**AskUserQuestion group header rendering:** AskUserQuestion overlays in Claude Code and Cursor render options as a flat list — `── Group ──` separator lines are dropped or mangled. Compensate: prepend the group name as a non-selectable label to the **first option of each group** using `[Group name] →` prefix. Example: first option reads `[Analyze further] → D) Stress test…`, next group first reads `[Communicate upwards] → G) Sell-up…`, third group first reads `[Move it forward] → J) Roadmap…`. Remaining options within each group have no prefix. The plain-text fallback (outside AskUserQuestion) always uses full `── Group ──` separator lines.
+
 **Note on F) Reality check — two contexts, same letter:**
 - **Pre-path (Response 2):** F) Reality check reacts to all three paths to help the user choose. Audience = inferred stakeholders.
 - **Post-verdict (Response 3 onward):** F) Reality check reacts to the **chosen path and verdict** to validate commitment. Different function — targeted pressure on the decision already made, not a comparison. Both use the same letter; context determines which variant fires.
@@ -468,7 +470,7 @@ L) Hand off       — select skill or agent
 Reply with a letter (or several). Skip to move on.
 ```
 
-M) renders only when confidence is High (no elevation `→` block competing). When confidence is Medium/Low, the `→ To reach` block in the Verdict already serves as the data intake — suppress M) to avoid duplication.
+M) renders only when confidence is High (no elevation `→` block competing). When confidence is Medium/Low, suppress M) — the `→ To reach` elevation block IS the data intake mechanism. If a founder asks where to put new evidence, point them there: *"Reply to the elevation prompt with what you found — I'll re-run with it locked."*
 
 **Next-steps re-surfacing:** After completing any D–M pick, re-offer the remaining unused picks via AskUserQuestion (or plain text fallback). Format:
 
@@ -520,7 +522,6 @@ Hand off — where does this decision go next?
 Always available:
 → export       Export decision to markdown (/cpo --export)
 → board-memo   Full board memo (/cpo --mode board-memo)
-→ eng-brief    Translate for engineering (/cpo --mode eng-brief)
 → journal      Save to decision journal (already running)
 
 [Detected on your system:]

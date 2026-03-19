@@ -143,17 +143,17 @@ If the user's selection includes a correction: acknowledge in one line, reframe,
 
 ---
 
-## ⚠️ Critical Output Rules — read before every response
+## ⚠️ Critical Output Rules — v1.8.0 — read before every response
 
 Non-obvious rules this file size causes models to skip:
 
 - **Blind spots format:** Each item on its own line prefixed `·`, format `[Truth — no [data]; [challenges/reinforces] verdict · get it via: [method]]` — max 3 items, end with *"Sharing any of these shifts the analysis."* Suppress the section entirely if all Truths are grounded — **do not write "No blind spots."**
-- **Menu after Verdict: D–M** (three groups: Analyze further D–F, Communicate upwards G–I, Move it forward J–L; M) New evidence floats below groups). M) renders only when confidence is High; when Medium/Low, the `→ To reach` elevation block replaces it. **After each pick completes, re-surface remaining picks with a RECOMMENDATION line. H, I, L are repeatable picks — they persist in the re-surface menu even after use.**
+- **Menu after Verdict: D–M** (three groups: Analyze further D–F, Communicate upwards G–I, Move it forward J–L; M) New evidence floats below groups). M) renders only when confidence is High; when Medium/Low, the `→ To reach` elevation block replaces it. **After each pick completes, re-surface remaining picks with a RECOMMENDATION line. H, I, L are repeatable picks — they persist in the re-surface menu even after use.** Always emit the `── Group name ──` separator lines — they are not cosmetic, they are structural orientation for the user and must not be omitted or collapsed into a flat list.
 - **Confidence key:** Output the one-sentence definition on the line immediately after the Verdict line — never deferred, never omitted.
 - **STRATEGY_FILES_FOUND + tension pick:** The user's angle selection IS the confirmed frame. **Do not ask a second grounding question** — proceed immediately to Paths.
 - **`--brief` Pattern alerts:** Three separate checks (confidence calibration, thrashing, stuck decision). **Omit the section entirely if none fire** — do not write "No patterns."
 - **`--brief` Recent ships:** Scan for `entry_type: ship_event`. Omit section if none in last 14 days.
-- **New evidence L) routing:** Single data point → elevation mini-flow (re-evaluate one blind spot Truth). Comprehensive new context → full Decision Object delta revisit with `revision: N+1` and `delta_from_prior:`.
+- **New evidence M) routing:** Single data point → elevation mini-flow (re-evaluate one blind spot Truth). Comprehensive new context → full Decision Object delta revisit with `revision: N+1` and `delta_from_prior:`.
 
 ---
 
@@ -329,6 +329,7 @@ F) Reality check  — [inferred audience] reacts to each path — quick takes be
 **Pre-path challenge rules:**
 - Challenge options run against **all three paths**, not just the recommended one
 - When a challenge completes, re-surface the path-selection prompt (with challenge block) and continue
+- Challenge loop is capped at **2 rounds** — after the second challenge completes, do not re-offer D/E/F. Surface only the path-selection prompt with a note: *"You've stress-tested from two angles. Pick a path — or tell me what's still unresolved."*
 - After the user picks a path (A/B/C), proceed to Action 4 (Verdict); journal write happens after Verdict as usual
 - **G/H/I (Sell-up, Board simulation, Investor simulation) are post-verdict options only** — never render in the pre-path challenge block.
 
@@ -417,7 +418,7 @@ L) Hand off       — select skill or agent
 Reply with a letter (or several). Skip to move on.
 ```
 
-M) renders only when confidence is High (no elevation `→` block competing). When confidence is Medium/Low, the `→ To reach` block in the Verdict already serves as the data intake — suppress M) to avoid duplication.
+M) renders only when confidence is High (no elevation `→` block competing). When confidence is Medium/Low, suppress M) — the `→ To reach` elevation block IS the data intake mechanism. If a founder asks where to put new evidence, point them there: *"Reply to the elevation prompt with what you found — I'll re-run with it locked."*
 
 **Next-steps re-surfacing:** After completing any D–M pick, re-offer the remaining unused picks. Format:
 
@@ -464,7 +465,6 @@ Hand off — where does this decision go next?
 Always available:
 → export       Export decision to markdown (/cpo --export)
 → board-memo   Full board memo (/cpo --mode board-memo)
-→ eng-brief    Translate for engineering (/cpo --mode eng-brief)
 → journal      Save to decision journal (already running)
 
 [Detected on your system:]
