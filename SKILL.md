@@ -1,6 +1,6 @@
 ---
 name: cpo
-version: 2.0.2
+version: 2.1.0
 last_updated: 2026-03-19
 argument-hint: "[problem or question] [--go] [--deep]"
 description: >-
@@ -29,7 +29,7 @@ allowed-tools:
 ```bash
 # Version check
 _INSTALLED_VERSION=$(cat ~/.cpo/.version 2>/dev/null || echo "unknown")
-_SKILL_VERSION="2.0.2"
+_SKILL_VERSION="2.1.0"
 if [ "$_INSTALLED_VERSION" != "$_SKILL_VERSION" ] && [ "$_INSTALLED_VERSION" != "unknown" ]; then
   echo "VERSION_MISMATCH: installed=$_INSTALLED_VERSION skill=$_SKILL_VERSION"
 fi
@@ -92,7 +92,10 @@ fi
 
 If `--context [name]` appears: load `~/.cpo/contexts/[name].md` instead. If `CONTEXT_LOADED_FRESH`: *"Reading context: [stage] — optimizing for [doctrine]."* If `NO_CONTEXT`: infer from prompt, ask at most one question. If bash fails entirely: proceed with `NO_CONTEXT` behavior — infer from prompt, flag all inferences.
 
-**STRATEGY_FILES_FOUND (inline):** Read up to 5 files (≤2,000 tokens each, `.claude/strategy/` first). Check for question-reframing tensions (conflicts in success metric, primary user, or time horizon). If tension found: surface as angle-selection before Frame. If no tension: fold posture silently into Frame, append one inline note after Line 1: *[Strategy: [one-clause posture].]* If `--go`: skip tension gate, incorporate silently.
+**STRATEGY_FILES_FOUND (inline):** Read up to 5 files (≤2,000 tokens each, `.claude/strategy/` first). Check for question-reframing tensions (conflicts in success metric, primary user, or time horizon).
+- **Tension found:** Surface as angle-selection before Frame — the user's pick IS the confirmed frame, proceed to Paths.
+- **No tension:** Fold posture silently into Frame, append one inline note after Line 1: *[Strategy: [one-clause posture].]*
+- **`--go` present:** Skip tension gate entirely, incorporate posture silently.
 
 ---
 
@@ -118,7 +121,7 @@ In compact mode: identify the **Dominant Truth** and reason from it. In `--deep`
 
 ## Three-Response Flow
 
-**Loading rule:** Before generating Response 1 in the normal interactive flow, `Read references/four-actions.md`. If unavailable, apply these inline fallbacks. **Exception:** `--go` and `--quick` bypass the interactive flow — do NOT load `four-actions.md` for those modes; the inline rules below are sufficient.
+**Loading rule:** Before generating Response 1 in the normal interactive flow, `Read references/four-actions.md`. If unavailable, apply these inline fallbacks. **If any rule in four-actions.md conflicts with inline fallbacks below, the inline fallback in SKILL.md takes precedence.** **Exception:** `--go` and `--quick` bypass the interactive flow — do NOT load `four-actions.md` for those modes; the inline rules below are sufficient.
 
 **Inline fallbacks (always in context):**
 - Grounding options: must represent structural angles (scope, segment, channel, sequencing), NEVER risk tolerances. Self-check: "Could I relabel these Bold/Balanced/Conservative?" If yes → rewrite.
@@ -133,6 +136,17 @@ In compact mode: identify the **Dominant Truth** and reason from it. In `--deep`
 
 > ❌ Wrong path labels: A) **Bold** B) **Balanced** C) **Conservative**
 > ✅ Right: A) **Sequence by capability** B) **Sequence by signal** C) **Time-box the decision**
+
+**Loop behaviors (inline — these must work even if four-actions.md doesn't load):**
+- **Conditional grounding skip:** If the user's prompt contains (1) a specific decision, (2) at least one explicit alternative, and (3) a constraint — skip the grounding question. Say *"Your frame is clear — going straight to paths."* and proceed to Response 2.
+- **Pre-verdict challenges (1/2/3):** Run the challenge against ALL THREE paths (not just the recommended one). After the challenge completes, re-surface the path-selection prompt with the 1/2/3 block again. After 3+ rounds without a commit, add a nudge: *"You've analyzed this from [N] angles — what's still unresolved?"* D-M options NEVER appear in the pre-path block — they are post-verdict only.
+- **Elevation loop exits:** Confidence reaches High · user replies with something other than the named gap · user says "skip" · loop has run twice. After 2 re-runs: *"Remaining uncertainty is structural — proceed with [current level]."*
+- **Elevation mini-flow:** When user provides elevation data → one response: (1) *"Locking: [assumption] = [value]."* (2) Updated three paths. (3) Verdict using prior selected path unless recommendation shifts. (4) D-M menu. Do NOT re-run the full three-response flow.
+- **Returning decision (`#name` with prior entries):** Replace Frame with delta frame: *"Returning to #[name] — last touched [date], verdict was [verdict]. Since then: [new context]."* Delta frame replaces the grounding question — proceed directly to Paths.
+- **D-M re-surfacing:** After any D-M pick completes, re-offer remaining picks with RECOMMENDATION. **Non-repeatable** (D, E, F, G, J, K): remove after use. **Repeatable** (H, I, L, M): persist. After H or I, recommend the pick that addresses what the simulation challenged.
+- **Reality check — two contexts:** Pre-path (1/2/3 block, labeled "3"): reacts to ALL THREE paths. Post-verdict (D-M menu, labeled "F"): reacts to the CHOSEN PATH and verdict only — this is a commitment validator, not a comparison.
+- **Progressive disclosure:** First decision ever (NO_DECISIONS): show D-G + "More →" in the D-M menu. Subsequent decisions: show full D-M.
+- **M) New evidence:** Single data point → run elevation mini-flow. Comprehensive new context → re-run Assess as delta, deliver updated Verdict with journal revision N+1.
 
 ```
 Action 1 — Frame    → State the decision. Inferences visible inline.
@@ -297,7 +311,7 @@ Every prompt runs Frame → Assess → Grounding → Paths → Verdict in that o
 | Post-PMF / growth | Scaling — NRR, expansion motion, compounding loops |
 | Series B+ | Mature — Rule of 40, CAC payback, path to exit |
 
-**`--deep` Response Format:** Insert after paths in Response 2, before path-selection prompt.
+**`--deep` Response Format:** Insert after paths in Response 2, before path-selection prompt. Each section renders as a `###` header.
 1. Problem Definition · 2. Five Truths Assessment · 3. Strategic Options (Three Paths)
 4. Recommendation + Kill Criteria · 5. Sequencing & Dependencies · 6. Risks & Mitigations
 7. GTM Considerations · 8. Organizational Implications · 9. Open Questions · 10. Decision Memo
@@ -398,10 +412,8 @@ If user's context signals a specific vertical, load the overlay:
 ## Self-Check Assertions
 
 Enforce at each step before proceeding. Each check is self-contained — no external file needed:
-- **No unnecessary questions:** If context was loaded (FRESH/STALE/MINIMAL), did you ask calibration questions? If yes → remove them.
 - **Grounding options are structural:** Could you relabel your A/B/C options as Bold/Balanced/Conservative? If yes → rewrite around scope, segment, channel, or sequencing.
 - **Exactly 3 paths:** Count your paths. If not 3 → re-generate.
-- **No placeholders in journal:** Does the journal YAML contain any `REPLACE_WITH_*` text? If yes → re-run with actual values.
 - **User selected the path:** Did the user explicitly pick A/B/C before you wrote the Verdict? If no → STOP (exception: `--go`/`--quick` auto-select the recommended path).
 - **≥3 measurable kill criteria:** Does each criterion have a named metric + specific threshold + timeframe? If not → rewrite before rendering D-M menu.
 - **Path labels are not risk labels:** Do your labels describe what the path *bets on*, or just how risky it is? If risk only → rewrite.
