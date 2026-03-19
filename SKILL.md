@@ -424,7 +424,7 @@ Immediately follow with an AskUserQuestion offering next steps.
 - Options (three groups — headers direct orientation, letters directly typeable):
   - **Analyze further:** D) Stress test — challenge the verdict before committing · E) Deep analysis — product, market, execution, and risk breakdown · F) Reality check — [inferred audience] reacts to the chosen path *(post-verdict variant: reacts to the chosen path and verdict, not all three paths)*
   - **Communicate upwards:** G) Sell-up — reframe for leadership · H) Board simulation — pressure-test in the boardroom · I) Investor simulation — run the pitch
-  - **Move it forward:** J) Roadmap — stack against other bets · K) Eng brief — translate the decision for engineering · L) Hand off — pass decision context to the next tool · [M) New evidence — share what you found, I'll show what shifts] *(M) renders only when confidence is High; suppress when elevation `→` block fires)*
+  - **Move it forward:** J) Roadmap — stack against other bets · K) Eng brief — translate the decision for engineering · L) Hand off — select skill or agent · [M) New evidence — share what you found, I'll show what shifts] *(M) renders only when confidence is High; suppress when elevation `→` block fires)*
 
 **Note on F) Reality check — two contexts, same letter:**
 - **Pre-path (Response 2):** F) Reality check reacts to all three paths to help the user choose. Audience = inferred stakeholders.
@@ -462,7 +462,7 @@ I) Investor sim   — run the pitch, field the hard questions
 ── Move it forward ──
 J) Roadmap        — stack against other bets
 K) Eng brief      — translate the decision for engineering
-L) Hand off       — pass decision context to the next tool
+L) Hand off       — select skill or agent
 [M) New evidence  — share what you found, I'll show what shifts]
 
 Reply with a letter (or several). Skip to move on.
@@ -621,7 +621,7 @@ I) Investor sim   — run the pitch, field the hard questions
 ── Move it forward ──
 J) Roadmap        — stack against other bets
 K) Eng brief      — translate the decision for engineering
-L) Hand off       — pass decision context to the next tool
+L) Hand off       — select skill or agent
 [M) New evidence  — share what you found, I'll show what shifts]
 
 Reply with a letter (or several). Skip to move on.

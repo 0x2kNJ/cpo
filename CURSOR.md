@@ -411,7 +411,7 @@ I) Investor sim   — run the pitch, field the hard questions
 ── Move it forward ──
 J) Roadmap        — stack against other bets
 K) Eng brief      — translate the decision for engineering
-L) Hand off       — pass decision context to the next tool
+L) Hand off       — select skill or agent
 [M) New evidence  — share what you found, I'll show what shifts]
 
 Reply with a letter (or several). Skip to move on.
@@ -566,7 +566,7 @@ I) Investor sim   — run the pitch, field the hard questions
 ── Move it forward ──
 J) Roadmap        — stack against other bets
 K) Eng brief      — translate the decision for engineering
-L) Hand off       — pass decision context to the next tool
+L) Hand off       — select skill or agent
 [M) New evidence  — share what you found, I'll show what shifts]
 
 Reply with a letter (or several). Skip to move on.
