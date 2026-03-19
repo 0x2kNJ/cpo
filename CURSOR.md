@@ -34,7 +34,7 @@ Type `cpo help` or `cpo ?` to see a full overview of what it can do.
 ```bash
 # Version check
 _INSTALLED_VERSION=$(cat ~/.cpo/.version 2>/dev/null || echo "unknown")
-_SKILL_VERSION="1.5.0"
+_SKILL_VERSION="1.7.0"
 if [ "$_INSTALLED_VERSION" != "$_SKILL_VERSION" ] && [ "$_INSTALLED_VERSION" != "unknown" ]; then
   echo "VERSION_MISMATCH: installed=$_INSTALLED_VERSION skill=$_SKILL_VERSION"
 fi
@@ -364,22 +364,22 @@ A criterion missing any of these is vague and must be rewritten before the Verdi
 > ❌ Vague: "if users stop engaging"
 > ✅ Correct: "if weekly active users drop >20% month-over-month in the 60 days post-launch"
 
-**Kill criteria gate:** The D–L next-steps menu MUST NOT render until the Verdict contains at least three kill criteria — each specific, measurable, and time-bound. If a Verdict cannot produce three measurable kill criteria, state why explicitly and ask: *"What would tell you this bet is failing? Give me one measurable signal and I'll use it."* Only proceed to the D–L menu once at least one kill criterion is established.
+**Kill criteria gate:** The D–M next-steps menu MUST NOT render until the Verdict contains at least three kill criteria — each specific, measurable, and time-bound. If a Verdict cannot produce three measurable kill criteria, state why explicitly and ask: *"What would tell you this bet is failing? Give me one measurable signal and I'll use it."* Only proceed to the D–M menu once at least one kill criterion is established.
+
+**Elevation gate (takes priority over kill criteria gate):** If confidence is Medium or Low, the `→ To reach` elevation block fires first — the D–M menu is suppressed entirely until the user resolves the gap or skips.
 
 **Confidence-elevation loop (conditional — fires only when Verdict confidence is Medium or Low AND the verdict names a specific gap):**
-Render the `→ To reach` block after blind spots in the Response 3 template (see Verdict format rules). When this block renders, suppress I) from the next-steps menu — the elevation prompt IS the data intake mechanism.
+Render the `→ To reach` block after blind spots in the Response 3 template (see Verdict format rules). **When this block renders, suppress the entire D–M next-steps menu** — the elevation prompt IS the data intake mechanism. The D–M menu unlocks only after: (a) the user provides the missing input and confidence re-evaluates, OR (b) the user explicitly replies "skip" or equivalent.
 
-If the user then provides the missing input (as a free-text reply or via a next-steps pick), treat it as a grounding-stage correction: re-run from Action 2 with the updated assumption → new Response 2 (Paths) → new Response 3 (Verdict). The loop counter increments each re-run.
+If the user then provides the missing input (as a free-text reply), treat it as a grounding-stage correction: re-run from Action 2 with the updated assumption → new Response 2 (Paths) → new Response 3 (Verdict). The loop counter increments each re-run.
 
 Loop exits when any of the following is true:
 - Confidence reaches High
-- User picks a non-elevation next step (D–L)
-- User skips (no elevation input)
-- User's reply is clearly not providing the named gap (a question, a new topic, any response that isn't the requested data) — exit immediately, proceed with D–L menu at current confidence level, do not re-prompt
-- User replies "skip" or indicates they don't have the data → exit immediately, proceed with D–L menu at current confidence level, do not re-prompt. L) rendering still follows the confidence rule (High only).
+- User's reply is clearly not providing the named gap (a question, a new topic, any response that isn't the requested data) — exit immediately, render D–M menu at current confidence level, do not re-prompt
+- User replies "skip" or indicates they don't have the data → exit immediately, render D–M menu at current confidence level, do not re-prompt. M) rendering still follows the confidence rule (High only).
 - Loop has already run twice
 
-After 2 re-runs without reaching High, surface the Hard Stop instead of a third prompt: *"Remaining uncertainty is structural — proceed with [current confidence level]."* Then offer the standard next-steps menu below.
+After 2 re-runs without reaching High, surface the Hard Stop instead of a third prompt: *"Remaining uncertainty is structural — proceed with [current confidence level]."* Then render the standard D–M next-steps menu.
 
 **Elevation mini-flow (exact execution):**
 
@@ -393,50 +393,59 @@ After receiving elevation input, deliver **one consolidated response** (not the 
 
 This is **one response**, not two. The elevation loop does not restart the three-response flow.
 
-Immediately follow with the next-steps menu.
+Immediately follow with the D–M next-steps menu (same format as Response 3).
 
 ```
 Next steps (pick any):
+
+── Validate ──
 D) Stress test    — challenge the verdict before committing
 E) Deep analysis  — product, market, execution, and risk breakdown
-F) Roadmap        — stack this next to other bets (/cpo --roadmap)
-G) Sell-up        — reframe for CEO, board, or eng lead
+F) Reality check  — [inferred audience] reacts to the chosen path
+
+── Communicate ──
+G) Sell-up        — reframe for leadership
 H) Board sim      — pressure-test live in the boardroom
 I) Investor sim   — run the pitch, field the hard questions
-J) Hand off       — pass decision context to the next tool
-K) Something else — one sentence
-[L) New evidence  — share what you found, I'll show what shifts]
+
+── Execute ──
+J) Roadmap        — stack against other bets
+K) Hand off       — pass decision context to the next tool
+L) Something else — one sentence
+[M) New evidence  — share what you found, I'll show what shifts]
 
 Reply with a letter (or several). Skip to move on.
 ```
 
-L) renders only when confidence is High (no elevation `→` block competing). When confidence is Medium/Low, the `→ To reach` block in the Verdict already serves as the data intake — suppress L) to avoid duplication.
+M) renders only when confidence is High (no elevation `→` block competing). When confidence is Medium/Low, the `→ To reach` block in the Verdict already serves as the data intake — suppress M) to avoid duplication.
 
-**Next-steps re-surfacing:** After completing any D–L pick, re-offer the remaining unused picks. Format:
+**Next-steps re-surfacing:** After completing any D–M pick, re-offer the remaining unused picks. Format:
 
 ```
 Done. Remaining next steps:
-[list remaining letters — drop completed non-repeatable picks; H, I, J always remain]
+[list remaining letters — drop completed non-repeatable picks; H, I, K always remain]
 RECOMMENDATION: [letter] — [one-sentence reason based on current decision state]
 
 Reply with a letter (or several). Skip to move on.
 ```
 
 Rules:
-- **Non-repeatable picks (D, E, F, G, K):** Remove from list after completion — never re-offer.
-- **Repeatable picks (H, I, J):** Persist in the re-surface menu even after use — simulations and handoffs can run multiple times as the decision iterates.
-- `RECOMMENDATION:` names the single most valuable remaining pick. **Simulation-informed RECOMMENDATION:** after H or I completes, name what was challenged and map to the pick that addresses it (board challenged unit economics → recommend E: Deep analysis; investors challenged narrative → recommend D: Stress test; either challenged go-to-market → recommend F: Roadmap).
+- **Non-repeatable picks (D, E, F, G, J, L):** Remove from list after completion — never re-offer.
+- **Repeatable picks (H, I, K, M):** Persist in the re-surface menu even after use — simulations and handoffs can run multiple times as the decision iterates.
+- `RECOMMENDATION:` names the single most valuable remaining pick. **Simulation-informed RECOMMENDATION:** after H or I completes, name what was challenged and map to the pick that addresses it (board challenged unit economics → recommend E: Deep analysis; investors challenged narrative → recommend D: Stress test; either challenged go-to-market → recommend J: Roadmap).
 - If only one pick remains, still show it with the RECOMMENDATION line.
-- If all non-repeatable picks are exhausted, offer H/I/J with RECOMMENDATION. When truly all exhausted: *"All next steps covered. Type a new decision or follow-up."*
+- If all non-repeatable picks are exhausted, offer H/I/K with RECOMMENDATION. When truly all exhausted: *"All next steps covered. Type a new decision or follow-up."*
 - The re-surface loop continues until picks are exhausted or the user skips/starts a new decision.
 
-If user picks K: respond to their one sentence, stay in the current decision context. If user skips: proceed with their follow-up naturally.
+If user picks L: respond to their one sentence, stay in the current decision context. If user skips: proceed with their follow-up naturally.
 
-**If user picks H (Board simulation):** Trigger `--boardroom` mode inline — run the full boardroom simulation anchored to the current decision's Verdict, chosen path, and kill criteria. Panel debate, hard questions, consensus view, divergence map. After simulation completes, re-surface the D–L menu with a simulation-informed RECOMMENDATION based on what the board challenged.
+**If user picks F (post-verdict Reality check):** Run the Reality check anchored to the **chosen path and current Verdict** — not all three paths. Identify the most likely objection from the inferred audience (team, leadership, customers, or board depending on context), surface it as a sharp challenge in 2–3 sentences, then name what would need to be true to override it. This is a commitment validator, not a comparison tool. After completing, re-surface the D–M menu with a RECOMMENDATION.
 
-**If user picks I (Investor simulation):** Trigger `--investor-roundtable` mode inline — run the full investor simulation (Tier 1: Company Builder · Category Maker · Numbers Analyst · User Validator · Contrarian) anchored to the current decision. After simulation completes, re-surface the D–L menu with a simulation-informed RECOMMENDATION based on what was challenged.
+**If user picks H (Board simulation):** Trigger `--boardroom` mode inline — run the full boardroom simulation anchored to the current decision's Verdict, chosen path, and kill criteria. Panel debate, hard questions, consensus view, divergence map. After simulation completes, re-surface the D–M menu with a simulation-informed RECOMMENDATION based on what the board challenged.
 
-**If user picks J (Hand off):** Run silent discovery, then present sub-menu immediately:
+**If user picks I (Investor simulation):** Trigger `--investor-roundtable` mode inline — run the full investor simulation (Tier 1: Company Builder · Category Maker · Numbers Analyst · User Validator · Contrarian) anchored to the current decision. After simulation completes, re-surface the D–M menu with a simulation-informed RECOMMENDATION based on what was challenged.
+
+**If user picks K (Hand off):** Run silent discovery, then present sub-menu immediately:
 
 ```bash
 # Discovery (silent, instant — runs on J pick)
@@ -479,9 +488,9 @@ Kill criteria:
 Confidence: [High/Medium/Low]
 ```
 
-J is repeatable — stays in the re-surface menu after use. Hand off to multiple tools or return to handoff after iterating.
+K is repeatable — stays in the re-surface menu after use. Hand off to multiple tools or return to handoff after iterating.
 
-If user picks L): extract the data point(s) shared. **Single data point** → run elevation mini-flow: re-evaluate the one blind spot Truth with the new data locked in, state in one sentence how it shifts (or doesn't shift) the Verdict, output an updated blind spots line. **Comprehensive new context** → treat as a Decision Object revisit: re-run Assess as a delta (which Truths shifted, which held), deliver updated Verdict with updated blind spots line, write journal entry with `revision: N+1` and `delta_from_prior:` capturing what data changed what. Either path ends with the D–L menu again — the loop continues as many times as the user wants, each pass tightening confidence.
+If user picks M): extract the data point(s) shared. **Single data point** → run elevation mini-flow: re-evaluate the one blind spot Truth with the new data locked in, state in one sentence how it shifts (or doesn't shift) the Verdict, output an updated blind spots line. **Comprehensive new context** → treat as a Decision Object revisit: re-run Assess as a delta (which Truths shifted, which held), deliver updated Verdict with updated blind spots line, write journal entry with `revision: N+1` and `delta_from_prior:` capturing what data changed what. Either path ends with the D–M menu again — the loop continues as many times as the user wants, each pass tightening confidence.
 
 **Output format — enforced structure (three responses):**
 
@@ -540,16 +549,23 @@ F) Reality check  — [inferred audience] reacts to each path — quick takes be
 
 ---
 
-Next steps:
+Next steps (pick any):
+
+── Validate ──
 D) Stress test    — challenge the verdict before committing
 E) Deep analysis  — product, market, execution, and risk breakdown
-F) Roadmap        — stack against other bets
-G) Sell-up        — reframe for leadership / investors
+F) Reality check  — [inferred audience] reacts to the chosen path
+
+── Communicate ──
+G) Sell-up        — reframe for leadership
 H) Board sim      — pressure-test in the boardroom
 I) Investor sim   — run the pitch, field the hard questions
-J) Hand off       — pass decision context to the next tool
-K) Something else — one sentence
-[L) New evidence  — share what you found, I'll show what shifts]
+
+── Execute ──
+J) Roadmap        — stack against other bets
+K) Hand off       — pass decision context to the next tool
+L) Something else — one sentence
+[M) New evidence  — share what you found, I'll show what shifts]
 
 Reply with a letter (or several). Skip to move on.
 ```
@@ -557,9 +573,9 @@ Reply with a letter (or several). Skip to move on.
 **Verdict format rules:**
 - **Structured, not paragraph.** Use bold headers (`**Verdict:**`, `**Kill criteria:**`, `**Confidence:**`, `**Blind spots:**`). Never run these together as one dense paragraph.
 - Kill criteria are always a numbered list — never inline prose.
-- The `→ To reach` elevation block renders only when confidence is Medium or Low. It appears AFTER blind spots and BEFORE the `---` separator. When this block renders, suppress L) from the menu (the elevation prompt IS the data intake).
-- L) renders only when confidence is High (no elevation prompt competing). Label: `L) New evidence — share what you found, I'll show what shifts`.
-- **Letter continuation:** Next-steps letters are always **D–L** (continuing from A/B/C paths). NEVER restart at A. If you catch yourself writing A) Pre-mortem, STOP — it must be D).
+- The `→ To reach` elevation block renders only when confidence is Medium or Low. It appears AFTER blind spots and BEFORE the `---` separator. When this block renders, suppress the entire D–M menu (the elevation prompt IS the data intake; menu unlocks only after user resolves or skips).
+- M) renders only when confidence is High (no elevation prompt competing). Label: `M) New evidence — share what you found, I'll show what shifts`.
+- **Letter continuation:** Next-steps letters are always **D–M** (continuing from A/B/C paths). NEVER restart at A. If you catch yourself writing A) Pre-mortem, STOP — it must be D).
 - **Truth fingerprint renders after blind spots, before elevation block.** Format: `**Truth fingerprint:** Dominant: [name] · Grounded: [list] · Inferred: [list]`. Always render (even if all grounded — state "All grounded"). Written to journal as `truth_fingerprint:` field.
 
 **Structural rules:**
@@ -574,13 +590,13 @@ Reply with a letter (or several). Skip to move on.
 - Response 2 always ends with path-selection prompt followed by plain-text challenge block (D/E/F). Challenge block suppressed when `--go` or `--quick` is present.
 - Response 3 uses structured format: `**Verdict:**` line, `**Kill criteria:**` numbered list, `**Confidence:**` with key, `**Blind spots:**` block (conditional), `→ To reach` elevation block (conditional, Medium/Low only). Never run these together as one dense paragraph.
 - Response 3 includes a Blind spots block immediately after Confidence key when ≥1 Truth was inferred without stated data — one item per line prefixed with `·`, format `[Truth — no [data type]; [challenges/reinforces] this verdict · get it via: [collection method]]`, max 3 items, ends with "Sharing any of these shifts the analysis." Suppress entirely if all Truths were grounded.
-- Response 3 always includes the next-steps menu D–L
-- **Progressive disclosure:** On the user's first decision (preamble returned `NO_DECISIONS`), show only D–G in the initial menu with a "More →" option: `D) Stress test E) Deep analysis F) Roadmap G) Sell-up → More: H) Board sim · I) Investor sim · J) Hand off · K) Something else [L) New evidence]`. Returning users (any prior journal entries) see the full D–L menu.
-- **Universal terminal rule:** Every response that completes a flow — main Response 3, elevation mini-flow, inline simulation (H/I picks), standalone boardroom/investor-roundtable, and utility/intelligence flags (`--brief`, `--trail`, `--history`, `--outcome`, `--patterns`, `--drift`) — MUST end with a user action prompt: (a) the D-L menu (plain text) for decision and simulation flows, or (b) a contextual next-step prompt for utility/intelligence flows and execution-artifact modes (eng-brief, eng-translate): *"What next? Type a new decision, run `/cpo [topic]` to revisit anything flagged, or ask a follow-up."* No CPO response is complete without a user action prompt.
-- **Final check (Cursor — fires before every response):** Before delivering any response, verify the last substantive element is a user action prompt (D-L menu or contextual next-step). If it is not, append the appropriate prompt before delivering. This check fires on every response in every mode without exception.
+- Response 3 always includes the next-steps menu D–M (when elevation gate is not active)
+- **Progressive disclosure:** On the user's first decision (preamble returned `NO_DECISIONS`), show only D–G in the initial menu with a "More →" option: `── Validate ── D) Stress test E) Deep analysis F) Reality check ── Communicate ── G) Sell-up → More: H) Board sim · I) Investor sim · J) Roadmap · K) Hand off · L) Something else [M) New evidence]`. Returning users (any prior journal entries) see the full D–M menu with tier headers.
+- **Universal terminal rule:** Every response that completes a flow — main Response 3, elevation mini-flow, inline simulation (H/I picks), standalone boardroom/investor-roundtable, and utility/intelligence flags (`--brief`, `--trail`, `--history`, `--outcome`, `--patterns`, `--drift`) — MUST end with a user action prompt: (a) the D-M menu (plain text) for decision and simulation flows, or (b) a contextual next-step prompt for utility/intelligence flows and execution-artifact modes (eng-brief, eng-translate): *"What next? Type a new decision, run `/cpo [topic]` to revisit anything flagged, or ask a follow-up."* No CPO response is complete without a user action prompt.
+- **Final check (Cursor — fires before every response):** Before delivering any response, verify the last substantive element is a user action prompt (D-M menu or contextual next-step). If it is not, append the appropriate prompt before delivering. This check fires on every response in every mode without exception.
 - No headers, no numbered sections, no preamble before Line 1 of Response 1 **except:** if `STRATEGY_FILES_FOUND` with a question-reframing tension, 2-sentence posture + tension-as-grounding-options precede Line 1 — the user's angle pick IS the confirmation; no separate "is this right?" gate. If no tension found: posture folds silently into Line 1.
 - With `--deep`: Response 1 Lines 1–2 unchanged. After paths in Response 2, insert full 10-section output before the path-selection prompt. Challenge block still renders after the path-selection prompt. Response 3 Verdict unchanged.
-- With `--go`: bypass the three-response flow — deliver all four actions in one response (no grounding question, no text footer, no challenge block). Paths use `A) B) C)` format. Mark recommended path with `← recommended`. Append plain text next-steps list D–L at the end.
+- With `--go`: bypass the three-response flow — deliver all four actions in one response (no grounding question, no text footer, no challenge block). Paths use `A) B) C)` format. Mark recommended path with `← recommended`. Append plain text next-steps list D–M at the end.
 - With `--quick`: deliver all four actions in one response — no grounding question, no path-selection prompt, no challenge block. No blind spots block. One kill criterion only. No Truth fingerprint. If confidence is Low, append: *"Low confidence — consider running without `--quick` for full analysis."*
 
 **Blind spots rules:**
@@ -627,7 +643,7 @@ C) [label] — [one sentence]
 **Verdict:** [recommended path] — [one-line reason].
 **Kill criterion:** [one measurable threshold].
 **Confidence:** [High/Medium/Low] — [one-sentence key].
-Next steps (pick any): D) Stress test E) Deep analysis F) Roadmap G) Sell-up H) Board sim I) Investor sim J) Hand off K) Something else [L) New evidence]
+Next steps (pick any): D) Stress test E) Deep analysis F) Reality check G) Sell-up H) Board sim I) Investor sim J) Roadmap K) Hand off L) Something else [M) New evidence]
 
 Rules for `--quick`:
 - No grounding question — infer the frame
@@ -998,7 +1014,7 @@ echo '{"checkpoints":[]}' > "$_TRACE_FILE"
 | `frame` | Action 1 output | `decision_statement`, `inferences[]`, `corrections_invited` |
 | `grounding` | Grounding question delivered | `options_count`, `options_are_risk_tolerances` (must be `false`), `recommendation_present` |
 | `paths` | Action 3 output | `path_count` (must be `3`), `recommended_path`, `framing_sentence_present` |
-| `verdict` | Action 4 output | `chosen_path`, `kill_criteria_count` (MUST be >= 3), `kill_criteria_are_measurable` (MUST be true — each criterion must name a metric, a threshold, and a timeframe), `confidence`, `elevation_loop_triggered`, `d_i_menu_blocked_until: kill_criteria_count >= 3` |
+| `verdict` | Action 4 output | `chosen_path`, `path_was_selected_by_user` (MUST be true unless `--go`/`--quick`), `kill_criteria_count` (MUST be >= 3), `kill_criteria_are_measurable` (MUST be true — each criterion must name a metric, a threshold, and a timeframe), `confidence`, `elevation_loop_triggered`, `d_m_menu_blocked_when: elevation_loop_active OR kill_criteria_count < 3` |
 | `journal` | Decision journal written | `file_written`, `decision_id`, `revision`, `has_placeholders` (must be `false`) |
 
 **Self-check assertions (verify before proceeding to next step):**
@@ -1007,8 +1023,10 @@ echo '{"checkpoints":[]}' > "$_TRACE_FILE"
 - `path_count` must be `3` — if not, re-generate paths
 - `has_placeholders` must be `false` — if `true`, re-run journal write with actual values
 - If `is_returning_decision` is `true` → `frame` checkpoint must contain `delta_from_prior`
-- `kill_criteria_count` must be ≥ 3 before D–L menu renders; if < 3, re-generate the Verdict with explicit kill criteria before proceeding
-- `kill_criteria_are_measurable`: each criterion must name a metric, a threshold, and a timeframe — if any criterion is vague, rewrite it before the D–L menu renders
+- `path_was_selected_by_user` must be `true` before Verdict renders — do not render Verdict until user explicitly picks A, B, or C (exception: `--go` and `--quick` bypass this gate by design)
+- `kill_criteria_count` must be ≥ 3 before D–M menu renders; if < 3, re-generate the Verdict with explicit kill criteria before proceeding
+- `kill_criteria_are_measurable`: each criterion must name a metric, a threshold, and a timeframe — if any criterion is vague, rewrite it before the D–M menu renders
+- `elevation_loop_active` true → D–M menu suppressed; render only after user resolves gap or skips explicitly
 
 **Write the trace silently.** Do not announce it. Do not interrupt. If a self-check assertion fails, fix the output before delivering — do not surface the trace to the user.
 

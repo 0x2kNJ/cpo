@@ -4,6 +4,44 @@ All notable changes documented here. Follows [Keep a Changelog](https://keepacha
 
 ---
 
+## [1.7.0] — 2026-03-19
+
+Three systemic flow fixes identified from live output screenshots — path selection gate, confidence-elevation loop gating, and post-verdict menu restructure. All three approved by panel (Gary Tan, Mike Krieger, Boris Cherny).
+
+### Fixed
+
+- **Path selection gate (self-check assertion):** Model was rendering the Verdict without the user explicitly picking a path. New self-check assertion `path_was_selected_by_user must be true before Verdict renders` enforces the gate in both SKILL.md and CURSOR.md. Exception: `--go` and `--quick` bypass by design (auto-select recommended path). CURSOR.md trace checkpoint updated to include `path_was_selected_by_user` in verdict step.
+
+- **Confidence-elevation loop gating:** When confidence was Medium/Low, the full D-L next-steps menu was rendering simultaneously with the elevation prompt — allowing users to skip gap resolution and proceed without grounding the decision. Fix: suppress the entire D-M menu when the elevation block fires. Menu unlocks only after (a) user provides the missing input and confidence re-evaluates, OR (b) user explicitly replies "skip". New self-check assertion `elevation_loop_active true → D-M menu suppressed` added to both files. Loop exit conditions updated from "proceed with D-L menu" to "render D-M menu".
+
+### Changed
+
+- **Post-verdict menu restructured from D-L to D-M with 3 semantic tiers:**
+  - **Validate:** D) Stress test · E) Deep analysis · F) Reality check *(post-verdict: reacts to chosen path/verdict, not all three paths)*
+  - **Communicate:** G) Sell-up · H) Board simulation · I) Investor simulation
+  - **Execute:** J) Roadmap *(moved from F)* · K) Hand off *(moved from J)* · L) Something else *(moved from K)* · [M) New evidence *(moved from L)*]
+  - Tier headers (`── Validate ──`, `── Communicate ──`, `── Execute ──`) added to all menu instances
+  - Progressive disclosure updated: first-time users see D–G + "More →" *(now covers full Validate tier + first Communicate option)*
+
+- **Post-verdict F) Reality check:** New variant added — reacts to the chosen path and current verdict (commitment validator), not all three paths (comparison tool). Pre-path F) Reality check in Response 2 is unchanged. Documented in spec: "two contexts, same letter" to prevent future editor confusion. Handler spec added for post-verdict F).
+
+- **Non-repeatable/repeatable picks updated:** Non-repeatable: D, E, F, G, J, L (was D, E, F, G, K). Repeatable: H, I, K, M (was H, I, J). Re-surfacing always-retain letters updated from H/I/J to H/I/K.
+
+- **Letter renames throughout (both SKILL.md and CURSOR.md):**
+  - F) Roadmap → J) Roadmap
+  - J) Hand off → K) Hand off
+  - K) Something else → L) Something else
+  - L) New evidence → M) New evidence
+  - "If user picks K" → "If user picks L" (Something else)
+  - "If user picks J (Hand off)" → "If user picks K (Hand off)"
+  - "J is repeatable" → "K is repeatable"
+  - "If user picks L)" → "If user picks M)"
+  - Simulation-informed RECOMMENDATION: "recommend F: Roadmap" → "recommend J: Roadmap"
+
+- **`_SKILL_VERSION`:** 1.5.0 → 1.7.0 in both SKILL.md and CURSOR.md *(bumped at session start before all edits)*.
+
+---
+
 ## [1.5.0] — 2026-03-19
 
 Architecture optimization — lazy-loading expanded. Three large inline sections moved to reference files with graceful fallbacks; two more compressed to stubs in-place. SKILL.md and CURSOR.md shrunk significantly without removing any behavior. All self-check enforcement gates kept inline.
