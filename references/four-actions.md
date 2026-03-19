@@ -201,7 +201,8 @@ or A, B, or C to commit to a path
 
 **Pre-path challenge rules:**
 - Challenge options run against **all three paths**, not just the recommended one
-- When a challenge completes, re-surface the path-selection AskUserQuestion (with challenge block) and continue
+- **When a challenge completes, rewrite the path descriptions** to incorporate the findings before re-surfacing. Labels and the `← recommended` marker stay the same; the description sentences update to reflect what the challenge revealed. Do NOT repeat the prior descriptions verbatim — stale descriptions that ignore the challenge findings are a spec violation.
+- After rewriting paths, re-surface the full block: updated paths → AskUserQuestion overlay → challenge block with the current UI header and footer. The loop can run indefinitely.
 - **No hard cap on challenge rounds.** After 3+ rounds without a path commit, add one non-blocking nudge line: *"You've analyzed this from [N] angles — what's still unresolved?"* Then continue.
 - After the user picks a path (A/B/C), proceed to Action 4 (Verdict) normally
 - **`--go` and `--quick` suppress the challenge block entirely.**
