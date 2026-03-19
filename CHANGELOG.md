@@ -4,6 +4,27 @@ All notable changes documented here. Follows [Keep a Changelog](https://keepacha
 
 ---
 
+## [1.5.0] — 2026-03-19
+
+Architecture optimization — lazy-loading expanded. Three large inline sections moved to reference files with graceful fallbacks; two more compressed to stubs in-place. SKILL.md and CURSOR.md shrunk significantly without removing any behavior. All self-check enforcement gates kept inline.
+
+### Added
+
+- **`references/flags/decide.md`** — Full `--decide` spec extracted here (Skill Handoff Contract, Discovery bash, Decision Logic, Output Format × 3, Install Source Map, Rules).
+- **`references/internal/contributor.md`** — Full Contributor Mode spec extracted here (bash block, field report template, fill instructions, max-3-per-session rule).
+- **`references/internal/trace.md`** — Execution Trace checkpoint table + trace file init extracted here. Self-check assertions kept inline in SKILL.md (enforcement gates must not be lazy-loaded).
+
+### Changed
+
+- **SKILL.md `--decide` section:** 133-line full spec → 3-line stub with `Read references/flags/decide.md` + fallback instruction.
+- **SKILL.md Contributor Mode:** 35-line full spec → 2-line stub with `Read references/internal/contributor.md` + silent-skip fallback.
+- **SKILL.md Execution Trace:** 35-line full spec → 12-line compact version (checkpoint table → reference file; self-check assertions retained inline).
+- **SKILL.md `--patterns` section:** 48-line full spec → 4-line stub with `Read references/flags/patterns.md` (reference file already existed; inline content redundant).
+- **CURSOR.md `--decide` section:** 78-line full spec → 4-line stub with `cat ~/.claude/skills/cpo/references/flags/decide.md` + fallback instruction.
+- **`_SKILL_VERSION`:** 1.4.9 → 1.5.0 in both SKILL.md and CURSOR.md.
+
+---
+
 ## [1.4.9] — 2026-03-19
 
 Universal terminal rule — no CPO response ends without a user action prompt. Every flow endpoint (main Response 3, elevation mini-flow, simulations, utility flags, execution-artifact modes) now has an explicit next-step prompt. Boardroom and investor-roundtable standalone invocations get a "what next?" line after transcript save. Final check rule added to structural rules in both SKILL.md and CURSOR.md: model must verify the last element is an action prompt before delivering any response. Label change: "CEO/board" → "c-suite" in G) Leadership reaction across all files.

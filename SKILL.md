@@ -33,7 +33,7 @@ allowed-tools:
 ```bash
 # Version check
 _INSTALLED_VERSION=$(cat ~/.cpo/.version 2>/dev/null || echo "unknown")
-_SKILL_VERSION="1.4.9"
+_SKILL_VERSION="1.5.0"
 if [ "$_INSTALLED_VERSION" != "$_SKILL_VERSION" ] && [ "$_INSTALLED_VERSION" != "unknown" ]; then
   echo "VERSION_MISMATCH: installed=$_INSTALLED_VERSION skill=$_SKILL_VERSION"
 fi
@@ -1195,135 +1195,8 @@ Full templates in `references/modes/[mode].md` — load with Read when needed.
 
 ## `--decide` Flag
 
-**Trigger:** `/cpo --decide` — inbound handoff from another skill. CPO acts as the decision layer: receives context from the calling skill, discovers what's available on the system, and routes to the best next action.
-
-**Purpose:** Any installed skill can invoke CPO at a decision fork. CPO reads the situation, scans the toolchain, and recommends the right next step — with an install suggestion + best available fallback if the ideal skill isn't present. CPO is never a dead end.
-
----
-
-### Skill Handoff Contract
-
-To invoke CPO from another skill, emit this block then call `/cpo --decide`:
-
-```
-**CPO Handoff Request**
-From: [skill name — e.g., /ship, /qa, /review]
-Context: [what we were doing — 1-3 sentences]
-Decision: [what fork we hit — one sentence]
-Options considered: [optional — what the calling skill identified as candidates]
-```
-
-**Example (from /qa after finding a critical regression):**
-```
-**CPO Handoff Request**
-From: /qa
-Context: QA pass complete on the pricing-redesign branch. Found a critical regression in the free-tier upgrade flow — 3 of 5 test scenarios fail.
-Decision: Do we block the release, ship with a flag, or escalate for immediate hotfix?
-Options considered: block release / ship behind feature flag / escalate to eng lead
-```
-
----
-
-### Discovery (silent, runs on trigger)
-
-```bash
-# Tier 1 — gstack skills
-which ship qa review plan-eng-review plan-cpo-review retro 2>/dev/null
-
-# Tier 2 — local custom skills
-ls ~/.claude/skills/ 2>/dev/null
-
-# Tier 3 — plugin cache skills
-ls ~/.claude/plugins/cache/ 2>/dev/null
-```
-
-Map discovered skills to capability:
-
-| Skill | Capability |
-|-------|-----------|
-| `ship` | Deployment, PR creation, release |
-| `qa` | Quality assurance, regression testing |
-| `review` | Code safety, staff engineer review |
-| `plan-eng-review` | Architecture decisions, technical design |
-| `plan-cpo-review` | Strategic/founder-level rethink |
-| `retro` | Post-incident review, team reflection |
-| Any skill in `~/.claude/skills/` | Read SKILL.md description to infer capability |
-
----
-
-### Decision Logic
-
-1. Parse the handoff context — understand what was happening and what fork was hit
-2. Run discovery (silent)
-3. **Match need to capability** using product judgment (not keyword matching). Weight factors: decision stakes (high stakes = recommend deeper analysis), time sensitivity (urgent = fastest available path), decision type (technical → review/plan-eng; strategic → plan-cpo; quality → qa; release → ship)
-4. Select the best available skill
-5. Deliver recommendation immediately — no four-action flow, no grounding questions
-
----
-
-### Output Format
-
-**When ideal skill is available:**
-```
-**CPO → [From] decision**
-Given [context in one clause], the right next step is:
-
-→ **[skill]** — [one-line reason why this skill, not another]
-
-[Watch for: [one measurable threshold] — if this triggers, escalate before proceeding.]
-
-Want me to hand off now? (Reply Y or describe what you need instead)
-```
-
-**"Watch for" rule:** Renders when the handoff context signals high stakes (critical bug, production issue, irreversible action, revenue impact). Omit for routine/reversible decisions. Format: one measurable threshold, one sentence.
-
-**When ideal skill is NOT installed:**
-```
-**CPO → [From] decision**
-Given [context in one clause], the ideal next step is [missing skill] — [why].
-
-[missing skill] isn't installed. → Install via: [source/command]
-
-Best available now: **[alternative skill]** — [why it's the right fallback given what's installed]
-
-Want to proceed with [alternative]? (Reply Y, or install [missing skill] and re-run)
-```
-
-**When no suitable skill is available:**
-```
-**CPO → [From] decision**
-Given [context], you'd benefit from [category of skill] — none are installed.
-
-Recommended installs:
-1. [skill] — [what it does, where to get it]
-2. [skill] — [what it does, where to get it]
-
-In the meantime: [specific manual action the user can take right now — never leave them stranded]
-```
-
----
-
-### Install Source Map
-
-When suggesting installs, use these sources:
-
-| Skill | Install |
-|-------|---------|
-| gstack skills (ship, qa, review, etc.) | `github.com/0x2kNJ/gstack` or gstack plugin |
-| anthropic-skills | Claude Code plugin registry |
-| Superpowers skills | Claude Code plugin registry |
-| Custom skills | Add SKILL.md to `~/.claude/skills/[name]/` |
-
----
-
-### Rules
-
-- **Execute immediately** — no four-action flow. This is a routing decision, not a product analysis.
-- **Never leave the user stranded** — always end with a concrete next action, even if no skill matches.
-- **One recommendation** — don't list options. Pick the best one. If it's unavailable, name the best fallback. Product judgment is the point.
-- **Context-aware routing** — the recommendation must reflect the specific decision context, not generic "try /qa" suggestions.
-- **Respect the calling skill** — don't dismiss what the calling skill surfaced. If `/qa` found a critical bug, don't recommend `/ship`.
-- **Version guard:** If CPO receives a `CPO Handoff Request` block but `--decide` is not in its flag list (older version), output: *"CPO received a handoff request but `--decide` requires v1.4.4+. Best available guidance: [one-line manual recommendation based on context]."* Never silently ignore a handoff request.
+**Trigger:** `/cpo --decide` — inbound handoff from another skill.
+**Load:** `Read references/flags/decide.md` — follow all instructions there.
 
 ---
 
@@ -1344,49 +1217,9 @@ When suggesting installs, use these sources:
 ## `--patterns` Flag
 
 **Trigger:** `/cpo --patterns` — read the full decision journal and surface the user's decision-making DNA.
-
 **Execute immediately** — no four-action flow.
-
-**Analysis dimensions:**
-
-1. **Truth weighting** — Which Truths appear as Dominant most often? Which are consistently Inferred (blind spots)? E.g., "Economic Truth drives 7 of your last 10 decisions. Execution Truth is inferred in 8 of 10."
-
-2. **Path preference** — Do you consistently pick the highest-confidence path, the most aggressive, or the most conservative? Pattern across A/B/C picks relative to the `← recommended` marker.
-
-3. **Kill criteria hit rate** — How many decisions triggered their kill criteria? Which criteria types (metric/timeline/user signal) are most commonly hit?
-
-4. **Reversal rate** — How many decisions were revised (journal entries with `revision: N+1`)? Within what timeframe? "3 of your last 8 decisions were revised within 30 days — typically after Execution Truth data arrived."
-
-5. **Confidence calibration** — How often does High confidence hold vs. get revised down? What's the accuracy rate of your Medium vs. Low confidence verdicts?
-
-**Output format:**
-```
-**Decision DNA — last [N] decisions**
-
-Truth profile:
-· Dominant: Economic (6/10) · Strategic (3/10) · User (1/10)
-· Consistently inferred: Execution (8/10) · Macro-Political (7/10)
-→ Blind spot pattern: You consistently underweight Execution Truth. 3 reversals in the last 6 months were driven by execution surprises.
-
-Path profile:
-· You pick the recommended path 7/10 times.
-· When you deviate: always toward the more aggressive option (3/3 cases).
-
-Kill criteria: 2 of 10 decisions triggered criteria. Both were Execution-related.
-
-Reversal rate: 3/10 decisions revised. Average time to revision: 23 days.
-Average confidence at revision: started Medium, dropped to Low before reversal.
-
-Calibration: High confidence verdicts held in 4/5 cases. Medium confidence: 3/6 held.
-
-**Pattern warning:** [if a concerning pattern is detected, flag it here — e.g., "You haven't run a Pre-mortem in your last 6 decisions. Your reversal rate on decisions without Pre-mortem is 50% vs 17% with."]
-```
-
 **Load:** `Read references/flags/patterns.md` — follow all instructions there.
-
 **Minimum entries:** If fewer than 3 journal entries exist, output: *"Not enough decisions to detect patterns yet. Make 3+ decisions to unlock pattern analysis."*
-
-*Note: 3 entries is the technical gate; meaningful patterns emerge at 8–10 entries.*
 
 ---
 
@@ -1406,73 +1239,24 @@ If the user's context or prompt signals a specific vertical, load the relevant o
 
 ## Contributor Mode (Dogfooding Loop)
 
-After every major output, silently score 0–10. If <10, file a report. **Do not interrupt the conversation.**
-
-Before running the bash block, set two variables from context:
-- `_CURRENT_MODE` = the internal mode name used (e.g., `ceo`, `boardroom`, `gtm`)
-- `_PROMPT_SUMMARY` = 3–5 word summary of what was asked (e.g., "paid api b2b launch")
-
-```bash
-mkdir -p ~/.cpo/field-reports
-_DATE=$(date +%Y-%m-%d)
-_MODE="${_CURRENT_MODE:-unknown}"
-_TOPIC=$(printf '%s' "${_PROMPT_SUMMARY:-output}" | tr '[:upper:]' '[:lower:]' | tr ' ' '-' | tr -cd '[:alnum:]-' | cut -c1-40)
-_SLUG="${_MODE}-${_TOPIC}"
-_TS=$(date +%s | tail -c 5)
-_FILE=~/.cpo/field-reports/${_DATE}-${_SLUG}-${_TS}.md
-cat > "$_FILE" << 'EOF'
-# Field Report
-date: [date]
-version: [skill version]
-mode: [mode]
-rating: [0-10]
-## What was asked
-## What the output achieved
-## What would make this a 10
-## Pattern (recurring failure mode?)
-EOF
-echo "Field report saved: $_FILE"
-```
-
-Fill `[date]` with today's date (YYYY-MM-DD), `[skill version]` with `$_SKILL_VERSION` from the preamble bash output, `[mode]` with `$_CURRENT_MODE`, and `[0-10]` with the actual score. Never write placeholder text literally.
-
-Max 3 reports per session. File and continue immediately.
+After every major output, silently score 0–10. If <10, file a report. Do not interrupt.
+**Load:** `Read references/internal/contributor.md` — follow all instructions there. Fallback if unreadable: skip silently (internal only).
 
 ---
 
 ## Execution Trace
 
-A hidden, machine-readable checkpoint log that fires at each spec-mandated step. The trace verifies spec compliance at runtime — not output quality (that's Contributor Mode), but whether the model followed the required flow.
+Hidden compliance checkpoint log. Write silently. Never show to user.
+**Load:** `Read references/internal/trace.md` — follow all checkpoint instructions there. Fallback if unreadable: run assertions below only, skip checkpoint logging.
 
-**Trace file:** Written once per invocation to `~/.cpo/.trace/`. Never shown to the user.
-
-```bash
-mkdir -p ~/.cpo/.trace
-_TRACE_FILE=~/.cpo/.trace/$(date +%Y-%m-%d-%s).json
-echo '{"checkpoints":[]}' > "$_TRACE_FILE"
-```
-
-**Checkpoints — append one JSON object per step:**
-
-| Step | Fires after | Required fields |
-|------|-------------|-----------------|
-| `preamble` | Bash block completes | `context_state`, `decisions_state`, `integrations`, `decision_object` |
-| `route` | Mode determined | `mode`, `flags[]`, `role`, `is_returning_decision` |
-| `frame` | Action 1 output | `decision_statement`, `inferences[]`, `corrections_invited` |
-| `grounding` | Grounding question delivered | `options_count`, `options_are_risk_tolerances` (must be `false`), `recommendation_present` |
-| `paths` | Action 3 output | `path_count` (must be `3`), `recommended_path`, `framing_sentence_present` |
-| `verdict` | Action 4 output | `chosen_path`, `kill_criteria_count` (MUST be >= 3), `kill_criteria_are_measurable` (MUST be true — each criterion must name a metric, a threshold, and a timeframe), `confidence`, `elevation_loop_triggered`, `d_i_menu_blocked_until: kill_criteria_count >= 3` |
-| `journal` | Decision journal written | `file_written`, `decision_id`, `revision`, `has_placeholders` (must be `false`) |
-
-**Self-check assertions (verify before proceeding to next step):**
-- If `context_state` is `FRESH` → model must not have asked calibration questions
-- `options_are_risk_tolerances` must be `false` — if `true`, re-generate grounding options
-- `path_count` must be `3` — if not, re-generate paths
-- `has_placeholders` must be `false` — if `true`, re-run journal write with actual values
-- If `is_returning_decision` is `true` → `frame` checkpoint must contain `delta_from_prior`
-- `kill_criteria_count` must be ≥ 3 before D–L menu renders; if < 3, re-generate the Verdict with explicit kill criteria before proceeding
-
-**Write the trace silently.** Do not announce it. Do not interrupt. If a self-check assertion fails, fix the output before delivering — do not surface the trace to the user.
+**Self-check assertions — enforce at each step before proceeding:**
+- `context_state` FRESH → no calibration questions asked
+- `options_are_risk_tolerances` must be `false` → re-generate grounding options if true
+- `path_count` must be `3` → re-generate paths if not
+- `has_placeholders` must be `false` → re-run journal write if true
+- `is_returning_decision` true → `frame` checkpoint must contain `delta_from_prior`
+- `kill_criteria_count` must be ≥ 3 before D–L menu renders → re-generate Verdict if not
+- `kill_criteria_are_measurable` (metric + threshold + timeframe per criterion) → rewrite vague criteria before D–L renders
 
 ---
 
