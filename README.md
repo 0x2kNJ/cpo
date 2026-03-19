@@ -1,11 +1,10 @@
 # (C)hief (P)roduct (O)fficer
 
-**The operating system for product decisions before execution.**
+**A human PM can hold a handful of decisions in working memory. CPO holds all of them** — with full context, cross-referenced assumptions, and mechanical decay tracking — and surfaces the one thing that matters most right now.
 
-`/cpo` helps founders, PMs, and executives decide **what to build, whether to build it, how to communicate it, and when to kill it** — before the team commits time, headcount, or capital.
+`/cpo` is the operating system for product decisions before execution. It helps founders, PMs, and executives decide **what to build, whether to build it, how to communicate it, and when to kill it** — before the team commits time, headcount, or capital.
 
 It sits between **"we have an idea"** and **"engineering is building it."**
-Opportunity assessment, go / no-go decisions, roadmap prioritization, investor and board simulations, sell-up narratives, and a decision log that compounds context over time.
 
 If this helps you make better product decisions, ⭐ the repo.
 
@@ -13,85 +12,79 @@ If this helps you make better product decisions, ⭐ the repo.
 
 ## The vision
 
-CPO's end goal is to orchestrate an entire product organization — not just advise on one decision, but manage the full surface area of product judgment across time: what to build, when to pivot, how to communicate, and when to kill.
+CPO's end goal is to **orchestrate an entire product organization** — not just advise on one decision, but manage the full surface area of product judgment across time.
 
-A human PM can hold a handful of decisions in working memory. CPO holds all of them — with full context, cross-referenced assumptions, and mechanical decay tracking — and surfaces the one thing that matters most right now.
+Today, every AI tool in the product ecosystem accelerates execution. CPO is the missing layer that accelerates *judgment*.
 
-This is not about replacing product leaders. It is about giving them capabilities that are structurally impossible without persistent memory, cross-decision reasoning, and automated integrity checks running on every write.
+**Where CPO is today:** A strategic advisor that frames decisions across five dimensions, explores three paths before recommending one, defines kill criteria upfront, and logs everything in a persistent journal that compounds context over time. Every session starts smarter than the last.
 
-**Where CPO is today:** a strategic advisor that frames decisions, pressure-tests them across five dimensions, logs them in a persistent journal, and compounds context over time. Every session starts smarter than the last.
-
-**Where CPO is going:** a product operating system that can detect when your strategy is drifting before you notice, surface the one decision blocking everything else, tell you which of your past predictions were wrong, and orchestrate handoffs to the right execution tools at the right time — automatically.
+**Where CPO is going:** A full product operating system where decisions flow automatically from strategic framing to execution handoff to outcome tracking — where the system monitors kill criteria countdowns across all active bets, detects when your team's implicit strategy has drifted from your explicit one, autonomously routes decisions to the right execution tools, and maintains a living model of your entire product portfolio's health. Not a better prompt — a product organization's nervous system.
 
 ---
 
 ## What makes CPO different
 
-These are capabilities that do not exist in traditional PM workflows — not because PMs lack skill, but because the capabilities require persistent memory, cross-decision computation, and automated integrity checks that humans cannot maintain manually at scale.
+These capabilities require persistent memory, cross-decision computation, and automated integrity checks. They don't exist in traditional PM workflows — not because PMs lack skill, but because the mechanics are structurally impossible to maintain manually at scale.
 
-### 1. Spec Coherence Validator
-Every time a new decision is logged, CPO automatically checks it against all active decisions for contradictions, assumption collisions, and kill criteria conflicts — scoped to related topics, not false positives across unrelated domains. A human PM cannot re-read every prior decision before making a new one. CPO does it on every write.
+### Your new strategy contradicts a decision you made 3 months ago — and CPO catches it before you ship
+**Spec Coherence Validator.** Every time a decision is logged, CPO automatically checks it against all active decisions for contradictions, assumption collisions, and kill criteria conflicts — scoped to related topics, not false alarms across unrelated domains.
 
-### 2. Decision Dependency Graph (`--graph`)
-Maps which decisions depend on which other decisions. Identifies the bottleneck decision blocking the most downstream work. Scores bottlenecks by fan-out, staleness, and confidence. A human PM tracks dependencies in their head or a spreadsheet that goes stale the moment it's written. CPO computes the graph live from the actual decision content.
+### The one decision blocking everything else — surfaced automatically
+**Decision Dependency Graph (`--graph`).** CPO maps which decisions depend on which others, scores bottlenecks by fan-out, staleness, and confidence, and identifies the single decision whose resolution unblocks the most downstream work. Computed live from actual decision content — no spreadsheet to maintain.
 
-### 3. Kill Criterion Countdown (`--kills`)
-Cross-cutting dashboard of every active kill criterion across all decisions, with days remaining, urgency classification (triggered / approaching / active / undated / external), and cross-reference with the dependency graph. When a bottleneck decision also has an approaching kill criterion, CPO surfaces the compounding risk. No PM manually maintains a countdown timer across 15 active decisions.
+### Every active kill criterion across every bet, with a countdown timer
+**Kill Criterion Countdown (`--kills`).** Cross-cutting dashboard with days remaining, urgency classification (triggered / approaching / active / undated / external), and cross-reference with the dependency graph. When a bottleneck decision also has an approaching kill criterion, CPO surfaces the compounding risk.
 
-### 4. Consequence Tracking as Prediction Market
-At decision time, CPO auto-generates 2–3 falsifiable predictions about what should change if the recommended path succeeds. Each has a check date derived from kill criteria timeframes. When the date arrives, `--brief` and `--status` surface the prediction for verification. Over time, this creates a track record of whether your decision framework actually predicts outcomes — a personal prediction market that compounds institutional learning.
+### Your decisions generate predictions — and CPO checks them against reality
+**Consequence Tracking.** At decision time, CPO auto-generates 2–3 falsifiable predictions about what should change if the recommended path succeeds. Each has a check date. When the date arrives, `--brief` surfaces the prediction for verification. Over time, this becomes a personal prediction market — a track record of whether your decision framework actually predicts outcomes.
 
-### 5. Session Replay (Hindsight Bias Guard)
-When you close the loop on a decision with `--outcome`, CPO first reconstructs what you knew at the time — Truth fingerprint, open questions, kill criteria, paths considered, predictions made — before asking what happened. This prevents the single most common cognitive bias in retrospectives: judging past decisions with information you didn't have. No PM workflow does this automatically.
+### Before you judge a past decision, CPO shows you what you actually knew at the time
+**Session Replay.** When you close the loop with `--outcome`, CPO reconstructs your information state at decision time — Truth fingerprint, open questions, paths considered, predictions made — before asking what happened. This prevents hindsight bias: the single most common failure mode in retrospectives.
 
-### 6. Decision Decay Index
-Every active decision gets a mechanical decay score based on age, number of inferred assumptions, and confidence level. Decisions with a `shelf_life` field (for long-horizon bets like annual strategy) use that instead of the default 30-day divisor. `--brief` and `--status` surface Stale and Degraded decisions before the founder has to remember to check. Assumptions rot silently — CPO makes the rot visible.
+### Assumptions rot silently. CPO makes the rot visible.
+**Decision Decay Index.** Every active decision gets a mechanical decay score based on age, inferred assumptions, and confidence level. `--brief` and `--status` surface Stale and Degraded decisions automatically. Long-horizon decisions (annual strategy, platform bets) can set a `shelf_life` to prevent false alarms.
 
-### 7. Founder Pattern Drift
-With 10+ logged decisions, CPO computes rolling-window behavioral analysis: comparing your last 10 decisions against prior ones across 5 dimensions — Truth weighting bias, path preference, confidence calibration, reversal rate, and kill criteria usage. It tells you how your decision-making style is evolving — intentional growth or unconscious habit change. No human PM has the data fidelity to do this for themselves.
+### How your decision-making style is evolving — and whether you've noticed
+**Founder Pattern Drift.** With 10+ logged decisions, CPO computes rolling-window behavioral analysis across 5 dimensions: Truth weighting bias, path preference, confidence calibration, reversal rate, and kill criteria usage. It tells you whether shifts in your decision patterns are intentional growth or unconscious drift.
 
 ---
 
 ## Start here
 
-New idea — where's the opportunity?
+**New idea — where's the opportunity?** Three paths, kill criteria, and a clear verdict.
 → `/cpo what should we build`
 
-Need a go / no-go?
+**Need a go / no-go?** Five Truths assessment, three options, and what to kill it on.
 → `/cpo should we do this`
 
-Heading into a raise?
+**Heading into a raise?** Five investor archetypes debate your pitch live.
 → `/cpo simulate an investor meeting`
 
-Preparing for a board meeting?
+**Preparing for a board meeting?** Multi-turn simulation with archetypes who go off-agenda.
 → `/cpo simulate the board`
 
-Need to build the case upward?
+**Need to build the case upward?** 1-min and 5-min pitch with objection pre-emption.
 → `/cpo --sell-up CEO`
 
-Want a right-now executive snapshot?
+**Right-now executive snapshot?** Force-ranks to ONE red line blocking velocity.
 → `/cpo --status`
 
-Want a weekly strategic digest?
+**Weekly strategic digest?** Kill criteria, decay scores, consequence checks, drift alerts.
 → `/cpo --brief`
 
-Notice logic drift from prior commitments?
-→ `/cpo --drift`
-
-Want to see your decision patterns over time?
+**See your decision-making DNA.** Truth bias, path preference, confidence calibration.
 → `/cpo --patterns`
 
-See all active kill criteria with countdown timers?
+**All active kill criteria with countdown timers.** Grouped by urgency.
 → `/cpo --kills`
 
-Map decision dependencies and bottlenecks?
+**Decision dependencies and bottlenecks.** Which decision unblocks the most?
 → `/cpo --graph`
 
-Revisiting a prior decision?
+**Revisiting a prior decision?** Session replay guards against hindsight bias.
 → `/cpo --outcome [topic]` or `/cpo #[decision-name]`
 
-First time here?
-→ `/cpo ?`
+First time here? → `/cpo ?`
 
 ---
 
@@ -101,47 +94,13 @@ First time here?
 
 ## Why I built this
 
-We are moving into a world where the ability to build is becoming widely accessible.
+When execution becomes abundant, judgment becomes scarce. Every AI tool today accelerates shipping — but bad strategy plus great execution is still failure.
 
-More people can now operate like engineers. Teams can prototype, ship, automate, and iterate with a speed that used to require much larger organizations. That changes the game.
+Over many years leading strategy and building products across financial services and web3, I found that the hardest problems were never about execution. They were upstream: which opportunity is worth pursuing, which assumptions will kill you, what is the right path for this stage, and how do you know when to stop.
 
-But it also raises the stakes on a different question:
+CPO encodes that way of working — think clearly, test tradeoffs honestly, pressure-test bets before they become expensive, and iterate without losing the plot. It is the missing layer that sits before execution and alongside it.
 
-**What should we build in the first place?**
-
-When execution becomes abundant, judgment becomes scarce.
-When shipping gets easier, deciding well becomes more valuable.
-When everyone can build, the teams that win are the ones that know **where to point that power**.
-
-I built CPO because I believe that knowing what to build is now one of the most important skills in modern product work — and one of the most underserved.
-
-Over many years leading strategy and building products across financial services and web3, I found that the hardest problems were rarely about execution alone. They were upstream decision problems:
-
-- Which opportunity is actually worth pursuing?
-- Which assumptions matter most?
-- What is the right path for this stage of company?
-- How do you communicate the decision clearly enough that others can align behind it?
-- And how do you know when to stop?
-
-I also noticed a persistent gap in the tooling.
-
-Most AI skill sets today are weighted toward execution. They help teams write faster, code faster, ship faster, and automate faster once a direction has already been chosen. That matters. But far fewer tools help teams make the decision itself with rigor.
-
-That gap matters more now, not less.
-
-Because bad strategy plus great execution is still failure.
-Because faster teams can still waste years.
-Because more output does not automatically create more value.
-
-CPO is my attempt to encode a way of working I developed under real product and strategy pressure: a way to think clearly, test tradeoffs honestly, pressure-test bets before they become expensive, communicate decisions in a way others can align behind, and iterate quickly without losing the plot.
-
-This is not a replacement for execution-focused skills. It is the missing layer that should sit before them and alongside them.
-
-My hope is that CPO helps push the ecosystem toward better product judgment as a first-class capability — not just better output. If more people now have the power to build, then more people also need better tools for deciding what deserves to be built.
-
-That is the movement I want to contribute to.
-
-If that resonates with you, you are exactly who I built this for.
+If more people now have the power to build, they also need better tools for deciding what deserves to be built.
 
 ---
 
@@ -371,7 +330,7 @@ So each decision starts with more context than the last one.
 
 ## See it work
 
-Here are four short examples that show how teams use CPO in practice: to develop a product idea, reach a go / no-go decision, run a weekly brief, and prepare for a board meeting.
+Five examples showing how teams use CPO in practice: developing a product idea, reaching a go / no-go, running a weekly brief, preparing for a board meeting, and using structural intelligence across active bets.
 
 ### 1) Developing a product idea
 
@@ -452,6 +411,29 @@ The weekly brief helped leadership step back from day-to-day motion and see wher
 
 **Why it mattered**
 The team went into the board meeting better prepared for pushback, with stronger answers, clearer logic, and a more coherent story about where the company was going and why.
+
+---
+
+### 5) Structural intelligence across active bets
+
+**Prompt**
+```
+/cpo --kills
+```
+
+**What CPO returned**
+- scanned 8 active decisions and extracted 14 kill criteria
+- classified each: 1 TRIGGERED (enterprise pilot past 90-day window), 3 APPROACHING, 8 ACTIVE, 2 with no timeframe
+- cross-referenced with the dependency graph — the triggered criterion belonged to a decision that also blocked 3 downstream bets
+- surfaced: *"⚠ #enterprise-pilot is both past its kill window AND blocking 3 other decisions — resolve this first."*
+
+**Then running `/cpo --graph`:**
+- mapped all decision dependencies, identified `#enterprise-pilot` as the bottleneck (fan-out score: 4.7)
+- showed the transitive chain: `#enterprise-pilot → #pricing-model → #series-a-narrative` (3 hops)
+- recommended resolving the bottleneck before committing to the Series A narrative
+
+**Why it mattered**
+No PM manually maintains countdown timers across 14 kill criteria, cross-references them against a dependency graph, and identifies compounding risk where a bottleneck also has a triggered kill criterion. This is structural intelligence that only exists with persistent memory and automated cross-referencing.
 
 ---
 
