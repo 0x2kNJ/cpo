@@ -1,10 +1,12 @@
 # CPO — Strategic Product Advisor (Cursor Edition)
 
+> **Note (v1.9.3):** Gate enforcement and all behavioral rules now live in **SKILL.md**, which loads automatically when you type `/cpo`. This file is a **setup guide only** — you do not need to load it for the skill to work. Use `@CURSOR.md` or `.cursorrules` only if you want additional Cursor-specific context (trigger table, smoke test).
+
 ## How to use in Cursor
 
-**Option A — Per-conversation:** Type `@CURSOR.md` at the start of a new chat to load the full advisor.
+**Just type `/cpo`** — the skill loads SKILL.md automatically with full gate enforcement.
 
-**Option B — Always-on:** Copy the contents of this file into your project's `.cursorrules` file. The advisor will be active in every chat in that project.
+**Optional — additional Cursor context:** Type `@CURSOR.md` at the start of a chat, or copy this file into your project's `.cursorrules` file.
 
 Once loaded, just talk to it naturally: *"Should we build this?"*, *"Simulate an investor meeting"*, *"What should we prioritize?"*
 

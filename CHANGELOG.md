@@ -4,6 +4,19 @@ All notable changes documented here. Follows [Keep a Changelog](https://keepacha
 
 ---
 
+## [1.9.3] — 2026-03-19
+
+**Stronger gate enforcement + panel fixes.** v1.9.2 gates didn't fire in Cursor — model merged all responses, skipped 1/2/3 challenge block, invented custom options. Gates upgraded from soft "stop" to MUST contain / MUST NOT contain per response. Challenge block made structurally non-optional. CURSOR.md header updated.
+
+### Fixed (panel: Gary Tan, Mike Krieger, Boris Cherny)
+
+- **MUST/MUST NOT constraints per gate:** GATE 1 MUST contain frame + truth + grounding question; MUST NOT contain paths, verdict, D-M. GATE 2 MUST contain 3 paths + 1/2/3 challenge block; MUST NOT contain verdict, kill criteria, D-M.
+- **1/2/3 challenge block non-optional (Krieger):** "Not ready to commit?" → "Before committing — stress test, analyze, or reality check:". Added to GATE 2 MUST contain list.
+- **CURSOR.md header updated (Cherny):** States enforcement lives in SKILL.md, file is setup guide only. Primary instruction: "Just type `/cpo`."
+- **Self-check wording strengthened:** "this response ends here" → "STOP. This response is complete."
+
+---
+
 ## [1.9.2] — 2026-03-19
 
 **Gate markers into SKILL.md — `/cpo` now self-enforcing without setup.**

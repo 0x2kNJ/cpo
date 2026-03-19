@@ -33,7 +33,7 @@ allowed-tools:
 ```bash
 # Version check
 _INSTALLED_VERSION=$(cat ~/.cpo/.version 2>/dev/null || echo "unknown")
-_SKILL_VERSION="1.9.2"
+_SKILL_VERSION="1.9.3"
 if [ "$_INSTALLED_VERSION" != "$_SKILL_VERSION" ] && [ "$_INSTALLED_VERSION" != "unknown" ]; then
   echo "VERSION_MISMATCH: installed=$_INSTALLED_VERSION skill=$_SKILL_VERSION"
 fi
@@ -569,8 +569,10 @@ If user picks M): extract the data point(s) shared. **Single data point** → ru
 Or correct the frame in a sentence — we'll re-run from Assess.
 ```
 
-> ⛔ **GATE 1 — Response 1 ends here.** Do not generate paths. Do not select a grounding option on the user's behalf.
-> **Self-check:** Has the user replied with a grounding choice (A/B/C/D or a frame correction) in this same message? If no → this response ends here. If yes → proceed to Response 2.
+> ⛔ **GATE 1 — Response 1 ends here.** Do not generate paths. Do not select a grounding option on the user's behalf. Wait for the user's reply.
+> **Self-check before continuing:** Has the user replied with a grounding choice (A/B/C/D or a frame correction) in this same message? If no → STOP. This response is complete. If yes → proceed to Response 2.
+> **MUST contain:** Frame line (`*I'm reading this as:*`), Dominant Truth line (`*The [Truth] is what this turns on:*`), grounding question with lettered options (A/B/C + D to reframe).
+> **MUST NOT contain:** paths (A/B/C with labels), verdict, kill criteria, D-M menu, 1/2/3 challenge block.
 
 **Response 2 — Paths (delivered after user confirms grounding):**
 
@@ -582,18 +584,18 @@ A) **[Situational label]** — [≤2 sentences]
 B) **[Situational label]** — [≤2 sentences]  ← recommended
 C) **[Situational label]** — [≤2 sentences]
 
-[→ AskUserQuestion: path selection (see Action 3)]
-
-Not ready to commit? Dig deeper first:
+Before committing — stress test, analyze, or reality check:
 1) Stress test    — challenge all three paths
 2) Deep analysis  — all paths across product, market, execution, and risk
 3) Reality check  — [inferred audience] reacts to each path
 
-Reply 1, 2, or 3 to dig deeper — or A, B, or C to commit now. Correct the Frame if it's off.
+Pick A, B, or C to commit. Pick 1, 2, or 3 to dig deeper first.
 ```
 
-> ⛔ **GATE 2 — Response 2 ends here.** Do not generate the Verdict. Do not render D-M options.
-> **Self-check:** Has the user replied with a path choice (A/B/C) or a pre-commitment pick (1/2/3) in this same message? If no → this response ends here. If yes → A/B/C proceeds to Verdict; 1/2/3 runs the challenge then re-surfaces path selection.
+> ⛔ **GATE 2 — Response 2 ends here.** Do not generate the Verdict. Do not render D-M options. Do not write kill criteria. Wait for the user's reply.
+> **Self-check before continuing:** Has the user replied with a path choice (A/B/C) or a pre-commitment pick (1/2/3) in this same message? If no → STOP. This response is complete. If yes → A/B/C proceeds to Verdict (Response 3); 1/2/3 runs the challenge analysis then re-surfaces path selection with the 1/2/3 block again.
+> **MUST contain:** framing sentence, exactly 3 paths with situational labels, one path marked `← recommended`, the 1/2/3 challenge block (always — this is not optional).
+> **MUST NOT contain:** verdict, kill criteria, confidence rating, D-M menu (D through M letters), blind spots, truth fingerprint.
 
 **Response 3 — Verdict + next steps (delivered after user picks a path):**
 
