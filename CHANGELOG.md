@@ -4,31 +4,24 @@ All notable changes documented here. Follows [Keep a Changelog](https://keepacha
 
 ---
 
-## [1.9.0] — 2026-03-19
+## [1.9.1] — 2026-03-19
 
-**Architecture rewrite: instructions-first CURSOR.md.** Complete restructure of CURSOR.md to solve the fundamental compliance failure: models were ignoring all gate enforcement, format rules, and structural constraints because behavioral rules were buried 145 lines deep behind preamble and context-loading code.
+**Revert v1.9.0 architecture rewrite.** The v1.9.0 complete rewrite of CURSOR.md removed inline ⛔ GATE markers and self-check questions that were the behavioral cues making gate enforcement work in Cursor Composer. The rewrite replaced them with abstract rules at the top of the document, which models ignored entirely — producing identical broken output (all phases merged, no gates, wrong Truth names). Reverted to v1.8.12 content which has the inline markers that were working.
 
-### Changed — Architecture
+### Reverted
 
-- **Instructions-first structure:** CURSOR.md now opens with 7 mandatory behavioral rules at the very top — before the preamble, before context loading, before anything. The first thing a model reads is "THREE SEPARATE RESPONSES" with exact templates and ⛔ STOP markers.
-- **Document reduced from 648 to ~300 lines (~55% cut).** Signal-to-noise ratio dramatically improved. Detailed reference content (elevation loops, challenge rules, D-M pick behaviors) now lives in SKILL.md only. CURSOR.md is the behavioral enforcement layer.
-- **Tone shifted from documentation to instruction.** Previous: *"Response 2 always ends with..."* (describes what happens). New: *"⛔ RESPONSE 2 ENDS HERE. Do not write a verdict."* (commands what to do).
-- **Exact output templates in the first 80 lines.** Even if the model reads nothing else, it knows: what Response 1 looks like, what Response 2 looks like, what Response 3 looks like, and when to stop.
+- **CURSOR.md restored to v1.8.12** — all inline ⛔ GATE markers, self-check questions, trigger table, smoke test, and structural rules restored
+- **v1.9.0 architecture (instructions-first) abandoned** — the approach of putting abstract rules at line 1 while removing inline behavioral cues produced worse compliance than the original document
 
-### Fixed — Root Causes
+### Lesson
 
-- **Critical Output Rules were at line 146** — after 145 lines of preamble/context loading. By the time the model reached format constraints, it had already formed an intent to "give product advice." Rules now start at line 1.
-- **Five Truth names were being substituted** — models used generic names (Desirability, Viability, etc.) instead of spec names (User Truth, Strategic Truth, etc.). Rule 3 now lists exact names with an explicit prohibition on substitution.
-- **Invented sections (Weekend Plan, Technical Notes, etc.)** — models added helpful sections not in the spec. Rule 4 now explicitly prohibits common invented sections by name.
-- **No gate enforcement in Cursor** — there is no AskUserQuestion mechanical pause. The document now uses ⛔ STOP markers, self-check questions, and explicit deletion instructions ("If you find yourself writing paths before the user replied — STOP. Delete what you wrote.").
+Inline behavioral cues (⛔ STOP markers placed at the exact point where the model should stop, self-check questions that force the model to verify state before proceeding) are more effective than abstract rules at the top of a document. The model needs the cue at the moment of decision, not as a pre-loaded instruction.
 
-### Removed (from CURSOR.md — still in SKILL.md)
+---
 
-- Detailed elevation loop mechanics
-- Full D-M pick behavior descriptions (H/I/L/M handling)
-- Smoke test (now unnecessary if rules are followed — reintroduce if needed)
-- Feature register (SKILL.md concern, not Cursor enforcement)
-- Detailed structural rules section (replaced by Rule 1-7)
+## [1.9.0] — 2026-03-19 [REVERTED in 1.9.1]
+
+**Architecture rewrite: instructions-first CURSOR.md.** Reverted — see 1.9.1 notes.
 
 ---
 
