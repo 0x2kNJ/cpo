@@ -106,10 +106,7 @@ It pressure-tests every decision across **Five Truths**:
 - **Macro-Political**
 - **Execution**
 
-Before making a recommendation, it explores **Three Paths**:
-- **Bold**
-- **Balanced**
-- **Conservative**
+Before making a recommendation, it explores **Three Paths** — situational labels derived from the decision at hand, not fixed risk categories. Each path names what it bets on, optimizes for, or defers.
 
 It also:
 - labels claims as **fact / assumption / inference / judgment**
@@ -237,11 +234,10 @@ Every decision is tested across five dimensions:
 
 CPO does not jump straight to one answer. It explores multiple paths first.
 
-| Path | What it means |
-|:---|:---|
-| Bold | Highest upside, highest risk |
-| Balanced | Strong upside with bounded downside |
-| Conservative | Protect focus, preserve runway, buy learning |
+Each path is labeled situationally — naming what it commits to, not how risky it is:
+- *"Resolve toward [X] / Resolve toward [Y] / Defer [conflict]"* — for strategy conflicts
+- *"Concentrate on [focus] / Sequence by [dependency] / Time-box [decision]"* — for scope/sequencing
+- *"Community-led / Product-led / Partner-led"* — for channel decisions
 
 ### 3) Decision hygiene
 
@@ -301,11 +297,11 @@ Here are four short examples that show how teams use CPO in practice: to develop
 - framed the activation problem across the **Five Truths**
 - identified the most likely opportunity as reducing time-to-value in the first session
 - proposed **Three Paths**:
-  - **Bold** — redesign onboarding around a guided setup flow
-  - **Balanced** — add templates, checklists, and milestone nudges
-  - **Conservative** — improve existing onboarding copy and instrumentation first
+  - **Redesign the first session** — guided setup flow, maximum time-to-value reduction
+  - **Layer progressive nudges** — templates, checklists, and milestone triggers on existing flow
+  - **Instrument before rebuilding** — improve copy and tracking first, let data decide the rebuild
 - surfaced key assumptions, risks, and kill criteria for each path
-- recommended a **Balanced** path to increase activation without a full rebuild
+- recommended **Layer progressive nudges** to increase activation without a full rebuild
 
 **Why it mattered**
 The team did not just get ideas. They got a structured product direction, a clear recommendation, and a sharper view of what had to be true before investing more.
@@ -322,9 +318,9 @@ The team did not just get ideas. They got a structured product direction, a clea
 **What CPO returned**
 - pressure-tested the opportunity across user demand, strategic fit, economics, timing, and execution risk
 - showed **Three Paths**:
-  - **Bold** — launch broadly this quarter
-  - **Balanced** — run a narrow beta with 5–10 target accounts
-  - **Conservative** — delay and focus on core retention first
+  - **Launch broadly this quarter** — maximum signal, maximum risk
+  - **Constrained beta with 5–10 accounts** — real data, bounded blast radius
+  - **Defer and shore up retention first** — protect the base, revisit next quarter
 - labeled major claims as **fact / assumption / inference / judgment**
 - identified kill criteria, including weak pull from current customers and high execution drag on the roadmap
 - recommended **go, but only as a constrained beta**, not a full launch
@@ -461,7 +457,7 @@ CPO supports 20 core modes. Invoke them with natural language — CPO routes aut
 
 ### Flags
 
-CPO supports 22 flags for shaping how it reasons and communicates.
+CPO supports 24 flags for shaping how it reasons and communicates.
 
 | Flag | Example | What it does |
 |:---|:---|:---|
@@ -483,8 +479,10 @@ CPO supports 22 flags for shaping how it reasons and communicates.
 | `--history` | `/cpo --history enterprise` | Full decision journal. Optional keyword filter. |
 | `--outcome` | `/cpo --outcome enterprise-pause` | Closes the loop on a prior decision. Records what happened. Detects path patterns over time. |
 | `--export` | `/cpo --export` | Writes output to `~/.cpo/exports/YYYY-MM-DD-[slug].md` — shareable with co-founders, boards, investors. |
-| `--schedule-brief` | `/cpo --schedule-brief` | Sets up a recurring weekly brief that runs automatically on a schedule you define — no manual trigger needed. Uses `anthropic-skills:schedule`. |
+| `--schedule-brief` | `/cpo --schedule-brief` | Sets up a recurring weekly brief that runs automatically on a schedule you define — no manual trigger needed. Uses `anthropic-skills:schedule`. *(Claude Code only — Cursor users see manual reminder setup.)* |
 | `--setup-integrations` | `/cpo --setup-integrations` | Detects MCP data sources and configures live data enrichment for Five Truths assessments. |
+| `--import-context [path]` | `/cpo --import-context ./strategy.md` | Imports a context file from a specified path into `~/.cpo/context.md`. Useful for onboarding a new project or syncing context from a shared repo. |
+| `--scan-strategy` | `/cpo --scan-strategy` | Alone: re-run strategic context scan and rebuild posture summary. With a question (`/cpo --scan-strategy [question]`): cross-reference strategy files against the question, surface tensions/alignments/silences, then run the four-action flow with strategy-anchored grounding options. |
 | `--stack` | `/cpo --stack` | Shows the full product workflow with coverage status. Detects installed complementary skills. |
 | `--update` | `/cpo --update` | Outputs update instructions: `cd ~/.claude/skills/cpo && git pull`. |
 
@@ -505,6 +503,7 @@ CPO uses shared local state so it can compound context over time. Everything liv
 | `~/.cpo/integrations.md` | Live data source config — injected into Five Truths | Enriches assessments with real company data |
 | `~/.cpo/.version` | Version tracking | Surfaces mismatches between skill and saved state |
 | `~/.cpo/contexts/` | Named contexts for multi-company use | Supports `--context [name]` switching |
+| `.claude/strategy/` | Project-level strategy docs — read by CPO on each session for strategic posture synthesis | Keeps CPO grounded in the project's current direction; populated by `--save-context` or manually |
 
 ---
 
@@ -529,11 +528,23 @@ cpo/
     │   ├── crypto-web3.md
     │   ├── identity-auth.md
     │   └── developer-platforms.md
-    └── modes/                  # Full mode templates (20 modes)
-        ├── ceo.md
-        ├── boardroom.md
-        ├── investor-roundtable.md
+    ├── modes/                  # Full mode templates (20 modes)
+    │   ├── ceo.md
+    │   ├── boardroom.md
+    │   ├── investor-roundtable.md
+    │   └── ...
+    └── flags/                  # Full flag behavior specs (15 files, loaded on demand)
+        ├── brief.md
+        ├── roadmap.md
+        ├── sell-up.md
+        ├── combinations.md     # Flag stacking and combination rules
         └── ...
+
+# Project-level strategy context (auto-read on session start)
+.claude/strategy/               # Strategy docs scanned by CPO preamble
+    ├── strategy.md             # (example) company strategy
+    ├── roadmap.md              # (example) product roadmap
+    └── ...
 ```
 
 ---
@@ -578,7 +589,7 @@ The pattern is simple:
 | Tool | When | What it does |
 |:---|:---|:---|
 | [gstack](https://github.com/garrytan/gstack) `/plan-eng-review` | After `/cpo` → need implementation plan | Architecture, data flow, edge cases |
-| [gstack](https://github.com/garrytan/gstack) `/plan-ceo-review` | After `/cpo` → need product / brand review | 10-star product thinking, reframe |
+| [gstack](https://github.com/garrytan/gstack) `/plan-ceo-review` | After `/cpo` recommendation → pressure-test the experience and vision | 10-star product thinking, narrative reframe, challenge premises |
 | [gstack](https://github.com/garrytan/gstack) `/review` | After `eng-brief` → need code review | Bugs that pass CI, completeness gaps |
 | [gstack](https://github.com/garrytan/gstack) `/qa` | After `postmortem` or `red-team` → need QA plan | Real browser, real clicks, regression tests |
 | [gstack](https://github.com/garrytan/gstack) `/retro` | After decision shipped → team retrospective | Per-person breakdown, shipping streaks |
@@ -659,6 +670,6 @@ Yes. CPO compounds context over time through its shared local state and decision
 
 ## Version · License
 
-Current: **v1.0.0** — [view changelog](CHANGELOG.md)
+Current: **v1.4.1** — [view changelog](CHANGELOG.md)
 
 MIT. Free forever. Go make better product decisions.

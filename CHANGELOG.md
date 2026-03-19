@@ -4,6 +4,253 @@ All notable changes documented here. Follows [Keep a Changelog](https://keepacha
 
 ---
 
+## [1.4.1] — 2026-03-18
+
+Second panel review pass (Gary Tan · Mike Krieger · Boris Cherny). 7 bug fixes, 2 new features, Bold/Balanced/Conservative contamination cleanup.
+
+### Fixed — spec bugs (both files unless noted)
+
+**Elevation exit contradiction:** Line 341 said "(I) renders since elevation exited)" which contradicted the confidence-based rule. Removed the parenthetical — confidence is now the sole source of truth for I) rendering. I) rendering follows the confidence rule (High only) regardless of how elevation exits.
+
+**Journal template keys:** `bold/balanced/conservative` keys contradicted the "Never use Bold/Balanced/Conservative" rule. Changed to `path_a/path_b/path_c`.
+
+**Trace field:** `d_h_menu_blocked_until` → `d_i_menu_blocked_until` across both files.
+
+**Flag loading fallback (CURSOR.md):** Added fallback rule for `.cursorrules` flag `cat` failures — proceed from stub description, same as mode loading fallback.
+
+**SKILL.md elevation exit wording drift:** SKILL.md used a different formulation than CURSOR.md for the same elevation exit rule. Matched CURSOR.md's exact wording.
+
+**Bold/Balanced/Conservative contamination (SKILL.md — 7 instances):** Four authoritative sections (Action summary box, Help text, Operating Principles, Decision Flow) still said "Bold · Balanced · Conservative" as path labels — directly contradicting Action 3's explicit ban. All replaced with "Three situational paths" / "situational labels." Three additional stale references in grounding quality bar ("those come next"), grounding option bar ("already handled by Bold/Balanced/Conservative"), and `--outcome` flag description also fixed. Zero B/B/C-positive references remain.
+
+**`--go` flag table parity (SKILL.md):** Missing "Also skips the `STRATEGY_FILES_FOUND` confirmation gate" clause. Added to match CURSOR.md.
+
+### Added — Five Truths persistence
+
+After completing Assess (when a decision object exists via `#name`, or when `--deep` is passed), writes a Five Truths snapshot to `~/.cpo/.scratch/[slug]-truths.md`. Users can reference it in multi-turn conversations. After the Verdict in Response 3, one line: *"Five Truths saved to `~/.cpo/.scratch/[slug]-truths.md` — reference anytime."*
+
+### Added — Next-steps re-surfacing with RECOMMENDATION
+
+After completing any D–I pick, the remaining unused picks are re-offered with a `RECOMMENDATION:` line naming the single most valuable next pick given what just happened. Initial menu (first D–I after Verdict) has no RECOMMENDATION; all re-surfaced menus include one. Loop continues until picks are exhausted or user skips/starts a new decision. AskUserQuestion format (SKILL.md) with plain text fallback.
+
+### Changed — "Data loop" → "New evidence"
+
+Option I) renamed from "Data loop" to "New evidence" across both files — enforcement TL;DR, menu instances, routing sections, and all references. Conditionality explanation added: I) renders only when confidence is High.
+
+### Changed — Menu letter range D–H → D–I
+
+All D–H references updated to D–I across both files, including kill criteria gate, elevation exits, trace fields, enforcement blocks, and inline letter references.
+
+### Updated — README.md
+
+- Three Paths section: Bold/Balanced/Conservative table replaced with situational label description and examples
+- All 4 example outputs updated from B/B/C labels to situational labels
+- Version bumped to v1.4.1
+
+---
+
+## [1.4.0] — 2026-03-18
+
+Strategy enrichment extended across the base flow and key flags. Situational path labels. Flag combination rules formalized.
+
+### Changed — Base flow `STRATEGY_FILES_FOUND` handler
+
+The base `/cpo [question]` flow now runs a **lightweight tension check** in addition to posture synthesis when strategy files are found. After reading and synthesizing the files, it scans for ↓ conflicts that change the success metric, primary user, or time horizon. Any found are surfaced in the same confirmation block before the user responds. One gate covers both posture and tensions. This is the lightweight version — no full ↑/↓/○ cross-reference output; use `--scan-strategy [question]` for the full explicit treatment.
+
+`--go` + `STRATEGY_FILES_FOUND` updated: tension check runs silently; if a question-reframing conflict is found, one inline note is added; no reframe gate fires.
+
+### Changed — Action 3 path labels (global)
+
+**Bold/Balanced/Conservative removed as default path labels.** Path labels are now situational — verb phrases derived from the confirmed grounding frame. Labels name what each path commits to, optimizes for, or defers — not the risk appetite. Derivation rules:
+- For conflict tensions: *"Resolve toward [X] / Resolve toward [Y] / Defer [conflict]"*
+- For sequencing/scope decisions: *"Concentrate on [focus] / Sequence by [dependency] / Time-box [decision]"*
+- For any frame: labels must answer "what does this path bet on?" not "how risky is it?"
+
+Self-check added to Action 3 spec: if replacing labels with Bold/Balanced/Conservative still makes sense → rewrite.
+
+Structural rule updated. Response 2 template updated. Converging paths edge case updated.
+
+### Changed — `--since` flag
+
+Temporal cross-reference format made explicit. When `PRIOR_ENTRY_FOUND`, output a structured ↑ Reinforces / ↓ Challenges / ○ Still open block before the Frame. Reframe check added: if ↓ Challenges row changes success metric, primary user, or time horizon — fire one reframe check line and wait. One reframe check maximum per invocation.
+
+### Changed — `--roadmap` flag
+
+Strategy alignment check added (runs before Step 1 when strategy context was loaded from preamble). Cross-references the bet collection against strategy docs in ↑ Aligned / ↓ Conflicts / ○ Silent format. Reframe check: if a conflict changes the prioritization criteria — fire one reframe check and wait. When combined with `--scan-strategy`, the explicit scan-strategy cross-reference replaces the alignment check (no double output).
+
+### Changed — `--sell-up` flag
+
+Strategy alignment check added (runs before Step 1 when strategy context was loaded). Cross-references the pitch recommendation against strategy docs. ↓ contradictions surfaced as a warning note — not a gate. Sell-up always proceeds; the user decides how to handle conflicts.
+
+### Added — `references/flags/combinations.md`
+
+New reference file documenting valid and invalid flag combinations, global stacking rules, and per-combination behavior. Referenced from new SKILL.md stub: "Flag Combination Rules."
+
+**Valid combinations:** `--scan-strategy + --since`, `--scan-strategy + --roadmap`, `--scan-strategy + --go`, `--since + --go`, `--scan-strategy + --sell-up`
+
+**Invalid combinations:** Any `--scan-strategy`/`--since` with `--brief`, `--trail`, `--history`, `--outcome` — no question to cross-reference against.
+
+**Global rules:** one reframe check per invocation; `--go` suppresses all reframe gates; enrichment is additive (strategy docs first, temporal delta second); reframe check always fires after all enrichment, before Frame.
+
+### Fixed — three panel-identified gaps (post-review patch)
+
+**combinations.md enrichment order ambiguity:** Global rules now explicitly state the fixed enrichment order — `--scan-strategy → --since → --roadmap`. Previously said "first one encountered" without defining what that order is.
+
+**SKILL.md single-read clarification:** STRATEGY_FILES_FOUND lightweight tension check now explicitly marked "while reading for posture synthesis (not a separate read)" to prevent models from doing two sequential file reads.
+
+**CURSOR.md v1.4.0 parity (full):** All v1.4.0 behavioral changes now present inline in CURSOR.md (Cursor cannot defer to external reference files):
+- STRATEGY_FILES_FOUND handler: posture synthesis + lightweight tension check + `--go` exception
+- Action 3 paths template: situational labels, derivation rules, self-check, worked example
+- Response 2 template: updated to situational labels
+- Structural rules: Bold/Balanced/Conservative removed, situational label rule added
+- Converging paths edge case: updated
+- Decision Flow diagram: updated
+- Operating Principles: updated
+- Help text (`cpo ?`): updated
+- `--since` section: full temporal cross-reference format + reframe gate
+- `--roadmap` section: strategy alignment check + reframe gate + note on --scan-strategy combination
+- `--sell-up` section: strategy alignment check (warning not gate) + explicit skip if no strategy context
+- New "Flag Combination Rules" section inline (enrichment order, valid/invalid combinations, global rules)
+
+---
+
+## [1.3.0] — 2026-03-18
+
+`--scan-strategy` redesign, version drift fixes, and CURSOR.md parity.
+
+### Changed — `--scan-strategy` (two-path design)
+
+`--scan-strategy` now has two distinct execution paths:
+
+- **Path A (standalone):** `/cpo --scan-strategy` with no question — unchanged behavior. Runs the filename heuristic scan, reads up to 5 strategy files, outputs a refreshed posture summary. Ends with "Update complete."
+- **Path B (with question):** `/cpo --scan-strategy [question]` — new behavior. Scans and reads strategy files, cross-references them against the specific question (`↑ Supports / ↓ Conflicts / ○ Silent`), then runs the normal four-action flow. Grounding options (Action 1) are strategy-anchored — built from tensions and alignments found in the docs, not generic Bold/Balanced/Conservative angles.
+
+Path B replaces the standard `STRATEGY_FILES_FOUND` posture confirmation — cross-reference IS the strategy context, one output not two stacked. Post-flow confirmation cites which files were used.
+
+SKILL.md routing list exception, flags table description, and stub section updated. `references/flags/scan-strategy.md` fully rewritten with complete two-path spec including the strategy-anchored grounding quality rule and wrong/right examples.
+
+### Changed — CURSOR.md parity
+
+CURSOR.md updated to v1.3.0: `_SKILL_VERSION` bumped, routing list and flags table updated, `--scan-strategy` section fully rewritten inline with complete Path A and Path B spec (Cursor does not defer to external files — spec lives inline).
+
+### Fixed — version drift
+
+SKILL.md frontmatter `version` and preamble bash `_SKILL_VERSION` were both `1.0.0` despite the skill being at v1.2.0 editorially. Bumped to `1.3.0`. `last_updated` corrected from `2026-03-17` to `2026-03-18`. CURSOR.md `_SKILL_VERSION` similarly corrected from `1.0.0` to `1.3.0`.
+
+### Added — `references/flags/export.md`, `references/flags/save-context.md`
+
+`--export` and `--save-context` flag behavior externalized from SKILL.md into dedicated reference files, matching the externalization pattern established in v1.2.0. Flag count in `references/flags/` increases from 12 to 14.
+
+### Size
+
+- v1.3.0: ~10,492 words / 1,109 lines
+- Reduction from v1.1.0 baseline (16,039 words): ~34.6%
+
+---
+
+## [1.2.0] — 2026-03-18
+
+Architectural refactor: externalize all heavy flag behavior sections from SKILL.md into `references/flags/` files. Replaces inline content with 2-line stubs + Load instructions. No behavioral changes — all specification content preserved in the external files.
+
+### Changed — SKILL.md
+
+**Flag sections externalized (12 total):** `--brief`, `--trail`, `--history`, `--since`, `--outcome`, `--schedule-brief`, `--setup-integrations`, `--import-context`, `--scan-strategy`, `--roadmap`, `--sell-up`, Stack Detection & Workflow Handoffs
+
+Each section reduced to:
+```
+## `--[flag]` Flag Behavior
+**Trigger:** [description]
+**Load:** `Read references/flags/[flag].md` — follow all instructions there.
+```
+
+**References section updated** to include `references/flags/[flag].md` in the full file list.
+
+### Added — `references/flags/` directory
+
+12 new files containing the full specification for each externalized flag. Content is identical to what was inline — no behavioral changes.
+
+### Size reduction
+
+- Before: 16,039 words / 1,768 lines (~20K tokens, ~10% of 200K context window)
+- After: ~11,400 words / 1,208 lines (~14K tokens, ~7% of 200K context window)
+- Reduction: ~29% (~4,600 words). Flags pay context cost only when invoked.
+
+**Motivation:** Panel review identified "lost in the middle" attention degradation on a 1,768-line document — behavioral rules in the middle sections received lower attention weight. The mode stubs pattern (already used for 20 modes) applied to flags.
+
+---
+
+## [1.1.0] — 2026-03-18
+
+Spec hardening pass following three-panel review (Gary Tan · Mike Krieger · Boris Cherny). All changes are behavioral fixes or parity gaps — no feature additions.
+
+### Fixed — SKILL.md
+
+**P0 — `--go` + `STRATEGY_FILES_FOUND` gate conflict**
+- `--go` promises no gates and no `AskUserQuestion` calls, but `STRATEGY_FILES_FOUND` used plain-prose "Wait for confirmation" that was not covered by `--go`'s existing escape hatch
+- Added explicit exception: when `--go` is present, skip the `STRATEGY_FILES_FOUND` confirmation gate entirely, incorporate strategy synthesis silently into the Frame, and add one hedged inline line
+
+**P1 — Structural rule contradiction**
+- "Response 1 Line 1 always starts with `*I'm reading this as:`" clashed with the `STRATEGY_FILES_FOUND` exception that precedes it
+- Updated structural rule to carry the exception inline
+
+**P1 — `DECISION_OBJECT_LOADED` grounding behavior unspecified**
+- Spec was silent on whether the grounding `AskUserQuestion` still fires for returning decisions
+- Added explicit rule: the delta frame IS the grounding for returning decisions — no grounding `AskUserQuestion` fires in Response 1
+
+**P1 — `NO_STRATEGY_FILES` offer timing collision**
+- Spec said "after the first full response" but Response 1 already ends with a grounding `AskUserQuestion`, creating a collision
+- Changed to "after the full three-response flow is complete (after Response 3 is delivered)"
+
+**P1 — Confidence key missing from Response 3 template**
+- Prose spec said "confidence key on very next line" but the Response 3 template had no slot for it
+- Added `*Confidence key: [one-sentence definition]*` line to template
+
+**P1 — `--scan-strategy` not independently executable**
+- Spec described the heuristic in prose but gave no bash block — a model had to reconstruct it from the preamble
+- Added full executable bash block inline under `--scan-strategy`
+
+**P1 — Elevation loop exits redundant/ambiguous**
+- Exits 3 and 4 were "User skips" and "User replies 'skip'" — effectively the same; also referenced a D–H menu not yet shown
+- Simplified to 3 unambiguous exit conditions
+
+**P2 — `--go` discoverability**
+- New users never saw `--go` in the natural NO_CONTEXT+NO_DECISIONS path
+- Added one-line tip at the end of the NO_CONTEXT+NO_DECISIONS handler
+
+### Fixed — CURSOR.md
+
+**P0 — Kill criteria gate missing from execution trace**
+- Verdict checkpoint used `kill_criteria_count (populate as integer, 0 if none)` with no MUST assertion and no `d_h_menu_blocked_until` gate
+- Updated checkpoint to: `kill_criteria_count (MUST be >= 3)`, `kill_criteria_are_measurable (MUST be true — each criterion must name a metric, a threshold, and a timeframe)`, and `d_h_menu_blocked_until: kill_criteria_count >= 3`
+
+**P1 — Version hardcoding in bootstrap**
+- `echo "1.0.0" > ~/.cpo/.version` would write the wrong version after any bump
+- Changed to `echo "$_SKILL_VERSION" > ~/.cpo/.version`
+
+**P1 — `--go` + `STRATEGY_FILES_FOUND` parity gap**
+- CURSOR.md global flags table did not document the `STRATEGY_FILES_FOUND` gate exception for `--go`
+- Added "Also skips the `STRATEGY_FILES_FOUND` confirmation gate" to the `--go` flag row
+
+**P1 — `--scan-strategy` bash block missing**
+- CURSOR.md described `--scan-strategy` in prose but omitted the executable bash block
+- Added the same bash block as SKILL.md
+
+**P2 — `NO_INTEGRATIONS` offer text truncated**
+- CURSOR.md offer line omitted "and enrich Five Truths with real numbers" vs SKILL.md
+- Restored full offer text
+
+### Updated — README.md
+
+- Flag count updated: 22 → 24
+- Added `--import-context [path]` flag row
+- Added `--scan-strategy` flag row
+- Added `.claude/strategy/` row to persistent layers table
+- Added `.claude/strategy/` to structure diagram
+- Added `--schedule-brief` Cursor limitation note: *(Claude Code only — Cursor users see manual reminder setup.)*
+- Updated gstack `/plan-ceo-review` handoff description to clarify CPO→recommendation→plan-ceo-review for experience/vision pressure-test
+- Version bumped to v1.1.0
+
+---
+
 ## [1.0.0] — 2026-03-17
 
 First public release.
