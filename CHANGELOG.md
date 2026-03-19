@@ -4,6 +4,19 @@ All notable changes documented here. Follows [Keep a Changelog](https://keepacha
 
 ---
 
+## [1.8.8] — 2026-03-19
+
+Patch: Conditional Grounding disabled in CURSOR.md; Verdict anti-hallucination rules added to Critical Output Rules.
+
+### Fixed
+
+- **Conditional Grounding DISABLED in CURSOR.md (root cause of gate regression):** The exception said "collapse R1+R2 into a single response when the prompt is specific." This directly contradicted the ONE RESPONSE PER TURN rule ("initial call = R1 only"). Cursor models resolved the contradiction by doing R1+R2+R3 in one pass. The exception is not compatible with Cursor's agentic mode where there is no mechanical pause mechanism. In CURSOR.md, GATE 1 is now unconditional — always ask a grounding question regardless of prompt specificity. The Conditional Grounding exception remains available in SKILL.md where AskUserQuestion creates a hard mechanical pause.
+- **Verdict format anti-hallucination rules added to Critical Output Rules:** The model was inventing non-spec sections in Response 3 ("Why:" block, "Weekend execution plan" table, "Dependencies to confirm", "Concrete sequence"). Added to the read-first section: prohibited sections explicitly enumerated; one-line reason belongs on the Verdict line itself, not in a separate paragraph.
+- **Processing narration prohibited:** Added to Critical Output Rules: "Never open with 'Using the CPO skill to...' or 'Treating this as...' — start directly with `*I'm reading this as:`."
+- **Critical Output Rules version tag updated:** v1.8.7 → v1.8.8.
+
+---
+
 ## [1.8.7] — 2026-03-19
 
 Hotfix: GATE 2 was bypassed by Conditional Grounding and STRATEGY_FILES_FOUND exceptions.
