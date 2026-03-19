@@ -31,6 +31,15 @@ Need to build the case upward?
 Want a weekly strategic digest?
 → `/cpo --brief`
 
+Notice logic drift from prior commitments?
+→ `/cpo --drift`
+
+Want to see your decision patterns over time?
+→ `/cpo --patterns`
+
+Revisiting a prior decision?
+→ `/cpo --outcome [topic]` or `/cpo #[decision-name]`
+
 First time here?
 → `/cpo ?`
 
@@ -111,21 +120,28 @@ Before making a recommendation, it explores **Three Paths** — situational labe
 It also:
 - labels claims as **fact / assumption / inference / judgment**
 - defines **kill criteria upfront**
+- records a **Truth fingerprint** on every decision (Dominant · Grounded · Inferred)
 - remembers company context across sessions
-- logs major decisions in a searchable journal
+- logs major decisions in a searchable, addressable journal
+- lets you retire superseded decisions with `--invalidate` and detect **logic drift** with `--drift`
 - simulates investor and board conversations in real time
+- acts as a **decision layer for your full skill stack** via `--decide` handoffs
 
 The sleeper feature is the decision log.
 
-Every major decision is timestamped, reasoned, and searchable. Over time, `/cpo` becomes a living record of how your company thinks: what you believed, what you chose, what happened, and which patterns keep repeating.
+Every major decision is timestamped, reasoned, and searchable. Tag any decision with `#name` (e.g., `/cpo #pricing should we add a free tier?`) to create an addressable record you can revisit, update, and track over time. CPO tracks a **Truth fingerprint** — Dominant, Grounded, and Inferred Truths — on every decision, so the reasoning behind each call is never lost.
+
+When a decision is superseded, use `--invalidate` to retire it cleanly — with an annotation — so it stops polluting future context. When a series of small decisions has quietly moved you away from a prior commitment, use `--drift` to surface the contradiction before it becomes expensive.
 
 Run `/cpo --brief` for a weekly intelligence digest:
 - kill criteria approaching
 - unresolved decisions needing follow-up
 - patterns in decision quality
-- strategic drift across bets
+- logic drift across bets
 
-A year in, you do not just have outputs. You have **institutional memory**.
+Run `/cpo --patterns` to see your decision-making DNA: which Truths you consistently over- or under-weight, how often your kill criteria actually trigger, and whether your confidence calibration is accurate.
+
+A year in, you do not just have outputs. You have **institutional memory** — and a mirror on how you actually make decisions.
 
 ---
 
@@ -457,13 +473,13 @@ CPO supports 20 core modes. Invoke them with natural language — CPO routes aut
 
 ### Flags
 
-CPO supports 24 flags for shaping how it reasons and communicates.
+CPO supports 26 flags for shaping how it reasons and communicates.
 
 | Flag | Example | What it does |
 |:---|:---|:---|
-| `--go` | `/cpo --go should we raise now` | Skip menus. Route directly. Get the answer immediately. Also skips simulation gate. |
-| `--deep` | `/cpo --deep should we pivot` | Full 10-section structured output. All Five Truths assessed. |
-| `--quick` | `/cpo --quick is freemium right for us` | One paragraph. Dominant Truth only. |
+| `--go` | `/cpo --go should we raise now` | Skip menus. Route directly. Get the answer immediately. Also skips simulation gate and strategy confirmation. |
+| `--deep` | `/cpo --deep should we pivot` | Full 10-section structured output. All Five Truths assessed explicitly. |
+| `--quick` | `/cpo --quick is freemium right for us` | Single-response mode. Dominant Truth + immediate recommendation + one kill criterion. No grounding questions. |
 | `--memo` | `/cpo --memo should we enter healthcare` | Formats output as a printable decision memo. No headers. |
 | `--silent` | `/cpo --silent should we kill this` | No calibration questions. Proceeds with stated assumptions. Flags every inference. |
 | `--compare` | `/cpo --compare option-a vs option-b` | Runs two approaches side-by-side on the same input. |
@@ -476,17 +492,31 @@ CPO supports 24 flags for shaping how it reasons and communicates.
 | `--since` | `/cpo --since last-time` | Temporal delta — leads with what changed since a prior baseline. Pulls from decision journal. |
 | `--brief` | `/cpo --brief` | Proactive weekly intelligence brief. Kill criteria alerts, unresolved decisions, pattern warnings. |
 | `--trail` | `/cpo --trail` | 90-day strategic diary — all journal entries, one page. |
-| `--history` | `/cpo --history enterprise` | Full decision journal. Optional keyword filter. |
+| `--history` | `/cpo --history enterprise` | Full decision journal. Optional keyword filter or exact `#name` lookup. |
 | `--outcome` | `/cpo --outcome enterprise-pause` | Closes the loop on a prior decision. Records what happened. Detects path patterns over time. |
+| `--patterns` | `/cpo --patterns` | Decision DNA — scans the journal for Truth weighting bias, path preference, kill criteria hit rate, reversal rate, and confidence calibration. Surfaces behavioral patterns. |
+| `--invalidate` | `/cpo --invalidate #pricing` | Marks a past decision as retired. Annotates with date and reason. Future context loads skip it; `--history` always shows it. |
+| `--drift` | `/cpo --drift` | Logic drift detection — scans the last 10 decisions for structural contradictions: unacknowledged Truth fingerprint shifts, verdict reversals, or kill criteria degradation. |
+| `--decide` | `/cpo --decide` | Inbound handoff from another skill. CPO reads the situation, scans your installed toolchain, and routes to the best next action — with install suggestion + fallback if the ideal skill isn't present. |
 | `--export` | `/cpo --export` | Writes output to `~/.cpo/exports/YYYY-MM-DD-[slug].md` — shareable with co-founders, boards, investors. |
-| `--schedule-brief` | `/cpo --schedule-brief` | Sets up a recurring weekly brief that runs automatically on a schedule you define — no manual trigger needed. Uses `anthropic-skills:schedule`. *(Claude Code only — Cursor users see manual reminder setup.)* |
+| `--schedule-brief` | `/cpo --schedule-brief` | Sets up a recurring weekly brief that runs automatically. Uses `anthropic-skills:schedule`. *(Claude Code only.)* |
 | `--setup-integrations` | `/cpo --setup-integrations` | Detects MCP data sources and configures live data enrichment for Five Truths assessments. |
-| `--import-context [path]` | `/cpo --import-context ./strategy.md` | Imports a context file from a specified path into `~/.cpo/context.md`. Useful for onboarding a new project or syncing context from a shared repo. |
-| `--scan-strategy` | `/cpo --scan-strategy` | Alone: re-run strategic context scan and rebuild posture summary. With a question (`/cpo --scan-strategy [question]`): cross-reference strategy files against the question, surface tensions/alignments/silences, then run the four-action flow with strategy-anchored grounding options. |
-| `--stack` | `/cpo --stack` | Shows the full product workflow with coverage status. Detects installed complementary skills. |
+| `--import-context [path]` | `/cpo --import-context ./strategy.md` | Imports a context file into `~/.cpo/`. Useful for syncing context from a shared repo. |
+| `--scan-strategy` | `/cpo --scan-strategy` | Alone: re-run strategic context scan and rebuild posture summary. With a question: cross-reference strategy files, surface tensions/alignments, then run the four-action flow with strategy-anchored grounding. |
+| `--stack` | `/cpo --stack` | Shows the full product workflow with coverage status. Detects installed complementary skills and marks CPO-aware ones with `[✓ CPO-aware]`. |
 | `--update` | `/cpo --update` | Outputs update instructions: `cd ~/.claude/skills/cpo && git pull`. |
 
 > Natural language should still be the default. Flags are best when you want format control, audience control, or repeatable workflows.
+
+### Decision Objects
+
+Tag any decision with `#name` to make it addressable across sessions:
+
+```
+/cpo #pricing should we add a free tier?
+```
+
+CPO creates a named journal entry and links all future analyses on the same decision. Revisit it anytime — CPO opens with a delta frame (what's changed since last time) instead of starting fresh. Use `--history #pricing`, `--outcome #pricing`, or `--since #pricing` for exact lookup by name.
 
 ---
 
@@ -497,10 +527,11 @@ CPO uses shared local state so it can compound context over time. Everything liv
 | Path | What it stores | Why it matters |
 |:---|:---|:---|
 | `~/.cpo/context.md` | Company profile — stage, model, constraint, priorities | Keeps answers grounded in your actual company. Loads every session. |
-| `~/.cpo/decisions/` | Decision journal — one YAML per major analysis | Builds a searchable strategic history. Foundation for `--brief`, `--trail`, `--since`. |
+| `~/.cpo/decisions/` | Decision journal — one YAML per major analysis (schema v1.5: includes Truth fingerprint, status, kill criteria) | Builds a searchable strategic history. Foundation for `--brief`, `--trail`, `--since`, `--drift`, `--invalidate`. |
 | `~/.cpo/simulations/` | Boardroom and investor roundtable transcripts | Preserves full simulation sessions |
 | `~/.cpo/exports/` | Exported memos and analyses — dated and slugged | Makes outputs portable and shareable |
 | `~/.cpo/integrations.md` | Live data source config — injected into Five Truths | Enriches assessments with real company data |
+| `~/.cpo/.scratch/` | Five Truths snapshots — written after Assess on named decisions (`#name`) or `--deep` runs | Quick reference for the full reasoning behind any decision mid-conversation |
 | `~/.cpo/.version` | Version tracking | Surfaces mismatches between skill and saved state |
 | `~/.cpo/contexts/` | Named contexts for multi-company use | Supports `--context [name]` switching |
 | `.claude/strategy/` | Project-level strategy docs — read by CPO on each session for strategic posture synthesis | Keeps CPO grounded in the project's current direction; populated by `--save-context` or manually |
@@ -533,10 +564,14 @@ cpo/
     │   ├── boardroom.md
     │   ├── investor-roundtable.md
     │   └── ...
-    └── flags/                  # Full flag behavior specs (15 files, loaded on demand)
+    ├── handoff-contract.md     # Skill Handoff Contract for CPO-aware skill authors
+    └── flags/                  # Full flag behavior specs (17 files, loaded on demand)
         ├── brief.md
         ├── roadmap.md
         ├── sell-up.md
+        ├── drift.md            # Logic drift detection spec
+        ├── invalidate.md       # Journal invalidation spec
+        ├── patterns.md         # Decision DNA analysis spec
         ├── combinations.md     # Flag stacking and combination rules
         └── ...
 
@@ -572,6 +607,16 @@ The pattern is simple:
 4. **CPO returns to evaluate** — weekly brief · follow-up go / no-go · board review · decision journal review
 
 **CPO decides. Other skills operationalize. CPO returns to evaluate.**
+
+### CPO as a decision layer (`--decide`)
+
+Any installed skill can invoke CPO at a decision fork using the `--decide` flag. CPO reads the handoff context, scans your installed toolchain, and recommends the best next action — including install suggestions if the ideal skill isn't present.
+
+Skills that implement this contract are marked `[✓ CPO-aware]` in `/cpo --stack` output.
+
+**Example:** `/qa` finds a critical regression and doesn't know whether to block the release or escalate. It emits a `CPO Handoff Request` block and calls `/cpo --decide`. CPO reads the context, scans the available skills, and routes to the right next action.
+
+For skill authors: see `references/handoff-contract.md` for the full contract spec.
 
 ### Example handoffs
 
@@ -665,6 +710,12 @@ Yes. Use `@CURSOR.md` at the start of a conversation, or add it to `.cursorrules
 
 **Does it remember my company context?**
 Yes. CPO compounds context over time through its shared local state and decision journal.
+
+**Can I retire old decisions that no longer reflect my thinking?**
+Yes. `/cpo --invalidate [topic]` marks any journal entry as retired — with a reason you provide. Future context loads skip it silently; `--history` always shows it for audit. This prevents old superseded decisions from polluting new analysis.
+
+**What is logic drift?**
+Logic drift is when a series of individually reasonable decisions quietly moves you away from a prior strategic commitment — without ever explicitly deciding to change course. `/cpo --drift` scans your last 10 decisions for structural contradictions: unacknowledged Truth fingerprint shifts, verdict reversals without explanation, and kill criteria degradation. The passive drift surface also fires automatically whenever you write a new journal entry that shifts Dominant Truth from the last one on the same topic.
 
 ---
 
