@@ -537,6 +537,7 @@ CPO uses shared local state so it can compound context over time. Everything liv
 | `~/.cpo/simulations/` | Boardroom and investor roundtable transcripts | Preserves full simulation sessions |
 | `~/.cpo/exports/` | Exported memos and analyses — dated and slugged | Makes outputs portable and shareable |
 | `~/.cpo/integrations.md` | Live data source config — injected into Five Truths | Enriches assessments with real company data |
+| `~/.cpo/signals/` | Cross-skill signals — structured YAML files written by other skills (retro, QA, review) | Enriches `--status` with real-time project data: velocity trends, quality regressions, review findings. See `references/signals-contract.md`. |
 | `~/.cpo/.scratch/` | Five Truths snapshots — written after Assess on named decisions (`#name`) or `--deep` runs | Quick reference for the full reasoning behind any decision mid-conversation |
 | `~/.cpo/.version` | Version tracking | Surfaces mismatches between skill and saved state |
 | `~/.cpo/contexts/` | Named contexts for multi-company use | Supports `--context [name]` switching |
@@ -571,6 +572,7 @@ cpo/
     │   ├── investor-roundtable.md
     │   └── ...
     ├── handoff-contract.md     # Skill Handoff Contract for CPO-aware skill authors
+    ├── signals-contract.md     # Cross-skill Signals Contract for --status enrichment
     └── flags/                  # Full flag behavior specs (17 files, loaded on demand)
         ├── brief.md
         ├── roadmap.md

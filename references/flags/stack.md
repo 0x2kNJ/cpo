@@ -60,17 +60,21 @@ PRODUCT STACK — detected skills
   Strategy     /cpo                    ✓ built-in
   Roadmap      /cpo --roadmap          ✓ built-in
   Sell-up      /cpo --sell-up          ✓ built-in
-  Plan         [detected or "—"]       ✓ or ·
-  Review       [detected or "—"]       ✓ or ·
-  Ship         [detected or "—"]       ✓ or ·
-  QA           [detected or "—"]       ✓ or ·
-  Retro        [detected or "—"]       ✓ or ·
+  Plan         [detected or "—"]       ✓ or ·        [signals: type] or [no signals]
+  Review       [detected or "—"]       ✓ or ·        [signals: type] or [no signals]
+  Ship         [detected or "—"]       ✓ or ·        [signals: type] or [no signals]
+  QA           [detected or "—"]       ✓ or ·        [signals: type] or [no signals]
+  Retro        [detected or "—"]       ✓ or ·        [signals: type] or [no signals]
   Outcome      /cpo --outcome          ✓ built-in
 
 Coverage: [N]/9 stages covered
 ```
 
+**Signal status detection:** For each detected skill, check if a corresponding signal file exists in `~/.cpo/signals/{skill-name}-latest.yaml`. If it exists and is not stale (see `references/signals-contract.md` for staleness thresholds), show `[signals: {signal_type}]`. If it exists but is stale, show `[signals: {signal_type} — stale]`. If no signal file exists, show `[no signals]`. Built-in CPO stages (Strategy, Roadmap, Sell-up, Outcome) do not show signal status — they feed `--status` directly through the decision journal.
+
 If any stage is missing, add one line: *"Gaps in [stage names]. These stages work manually — the stack is strongest when all stages have skills."* No install instructions — just visibility.
+
+If skills are detected but none write signals, append: *"No skills writing signals yet. Skills that write to `~/.cpo/signals/` enrich `/cpo --status` with real-time project data. See `references/signals-contract.md`."*
 
 ## CPO-aware detection
 
