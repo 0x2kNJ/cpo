@@ -4,6 +4,25 @@ All notable changes documented here. Follows [Keep a Changelog](https://keepacha
 
 ---
 
+## [1.8.12] — 2026-03-19
+
+Patch: Six UX/flow bugs fixed — grounding correction first-class, D-M/1-2-3 boundary enforced, challenge loop cap removed, F surfaced post-path-commit, structural rules corrected. Root cause of screenshot bug (D/E/H/I in structural rule) eliminated.
+
+### Fixed
+
+- **Root cause fix — structural rule `(D/E/H/I)` → `(numbered 1/2/3)`:** The structural rules section described Response 2's terminal challenge block as `(D/E/H/I — never inside the overlay)`. D/E/H/I is post-verdict letter notation. Any model reading this spec would generate D-K at the path stage instead of 1/2/3. This is confirmed by production screenshots showing D) Stress test / G) Sell-up / J) Roadmap / K) Eng brief appearing after Paths, with no path-selection AskUserQuestion. Fixed to: `(numbered 1/2/3 — never inside the overlay, never lettered D-M)` with an explicit prohibition: "⛔ D-M letters must not appear anywhere in Response 2."
+- **Final check rule disambiguated by response phase:** The universal final check said "verify the last element is AskUserQuestion, D-M menu, or contextual next-step" — applying "D-M menu" universally caused models to treat D-M as correct for all phases. Replaced with phase-specific terminal element rules: Response 1 ends with grounding AskUserQuestion; Response 2 ends with path AskUserQuestion + 1/2/3 block; Response 3 ends with D-M menu. Added: "If you are about to write D) E) F) as a terminal element, verify you are in Response 3 — if not, stop and replace."
+- **Grounding correction promoted to first-class AskUserQuestion option (D) Reframe):** The correction path was buried in plain text below the grounding modal: "Or correct the frame in a sentence." In Cursor, the modal shows only A/B/C — the correction path was invisible. Fixed: grounding AskUserQuestion now always includes a 4th option `D) Reframe — [one clause naming element to correct]. Type your correction.` When D is selected or the user types free-text: re-run from Action 2, no re-ask of grounding question, no re-run of Action 1.
+- **Challenge block "challenge the top path" label corrected to "challenge all three paths":** The spec body said "Challenge options run against all three paths, not just the recommended one" but the label in the challenge block said "Stress test — challenge the top path." Direct contradiction — models resolving the ambiguity would challenge path B only. Fixed in both the Action 3 pre-path challenge rules section and the Response 2 output format template.
+- **Pre-path challenge loop hard cap removed:** The 2-round hard stop ("after the second challenge completes, do not re-offer 1/2/3") was paternalistic and forced commitment before the user was ready. Replaced with: no hard cap — continue offering 1/2/3 until the user commits. After 3+ rounds, add one non-blocking nudge line ("what's still unresolved?") then continue. Never force commitment.
+- **D-M letter boundary rule added to CURSOR.md trigger table:** New explicit row for user correction (D or free text) + new inline boundary rule: "Response 2 uses numbers only (1/2/3). Response 3 uses letters only (D-M). If you are writing D) E) F) and have not yet received a path selection, you are in the wrong phase — stop and output 1/2/3."
+- **Pre-path challenge rules extended to enumerate all D-M letters as post-verdict-only:** Previous rule said "G/H/I are post-verdict options only — never render in the pre-path challenge block." Extended to explicitly list all D-M letters: "D–M options (Stress test, Deep analysis, Reality check, Sell-up, Board sim, Investor sim, Roadmap, Eng brief, Hand off, New evidence) are post-verdict only." Closes the case where a model might reason that D/E are acceptable at the path stage because they share names with 1/2.
+- **F) Reality check surfaced prominently post-path-commit:** Added one-line callout immediately after the Verdict line: "Path [letter] locked. If you want to pressure-test before acting, start with F) Reality check below." Makes F discoverable without adding a pre-verdict gate.
+- **CURSOR.md smoke test expanded from 3 to 5 prompts:** Added steps to verify D) Reframe triggers correctly (re-runs Assess → Paths + 1/2/3, not Verdict) and that 1) Stress test fires correctly (analysis + re-surfaced path AskUserQuestion + 1/2/3, not Verdict). Step 5 confirms D-M menu contains letters not numbers.
+- **Critical Output Rules version tag updated:** v1.8.11 → v1.8.12.
+
+---
+
 ## [1.8.11] — 2026-03-19
 
 Patch: CURSOR.md-excluded feature register added — closes Boris Cherny's last remaining spec gap.

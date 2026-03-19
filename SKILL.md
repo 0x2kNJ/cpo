@@ -279,8 +279,8 @@ End Response 1 with an AskUserQuestion to confirm the decision angle before gene
 Grounding AskUserQuestion format:
 - Re-ground: Name the decision being analyzed (e.g. "For [decision in 3–5 words] —")
 - RECOMMENDATION: [option] because [one-line reason from the Dominant Truth]
-- Options: 2–3 lettered choices naming the *specific frames or angles* for this decision (not Bold/Balanced/Conservative — never used as labels). E.g.: `A) [two wedges: X + Y] · B) [one wedge + Z as distribution] · C) [one type, one use case, one partner]`
-- Always append as plain text below the overlay (visible to user): *"Or correct the frame in a sentence — we'll re-run from Assess."*
+- Options: 3 lettered choices naming the *specific frames or angles* for this decision (not Bold/Balanced/Conservative — never used as labels), **plus always a 4th correction option:** `D) Reframe — [one clause naming the element to correct]. Type your correction.` E.g.: `A) [two wedges: X + Y] · B) [one wedge + Z as distribution] · C) [one type, one use case, one partner] · D) Reframe — [what to correct]`
+- **When D is selected or the user types a free-text correction:** acknowledge in one line (*"Got it — re-running with [correction]."*), re-run from Action 2 with the updated frame. Do not re-ask the grounding question. Do not re-run Action 1.
 
 **Grounding option quality bar:** Options must represent meaningfully different *decision angles* — scope (which wedges to pursue), distribution strategy (direct vs. channel), or customer segment (broad vs. narrow). They must NOT represent different risk tolerances (aggressive vs. conservative). Risk tolerance is surfaced in path descriptions and the Verdict confidence level — not in path labels. If your grounding options could be relabeled Bold/Balanced/Conservative, they are wrong — generate new ones that represent structural scope or strategy differences instead.
 
@@ -347,21 +347,23 @@ End Response 2 with an AskUserQuestion for path selection. No Verdict yet — th
 After the AskUserQuestion overlay, append a plain-text block (never inside the overlay). The challenge block always comes BEFORE the commit CTA — 1/2/3 are pre-commitment tools (numbered, not lettered, to avoid confusion with A/B/C path labels):
 ```
 Not ready to commit? Dig deeper first:
-1) Stress test    — challenge the top path
+1) Stress test    — challenge all three paths
 2) Deep analysis  — all paths across product, market, execution, and risk
 3) Reality check  — [inferred audience] reacts to each path
 
 Reply 1, 2, or 3 to dig deeper — or A, B, or C to commit now.
 ```
 
+**⛔ The 1/2/3 challenge block is the ONLY permitted terminal element at the path stage. Do NOT render the D–M menu (D through M) here — those letters are post-verdict only. If you find yourself writing D) E) F) G) at the path stage, you have produced the wrong output. Stop and render 1/2/3 instead.**
+
 **Pre-path challenge rules:**
 - Challenge options run against **all three paths**, not just the recommended one
 - When a challenge completes, re-surface the path-selection AskUserQuestion (with challenge block) and continue
-- Challenge loop is capped at **2 rounds** — after the second challenge completes, do not re-offer 1/2/3. Surface only the path-selection AskUserQuestion with a note: *"You've stress-tested from two angles. Pick a path — or tell me what's still unresolved."*
+- **No hard cap on challenge rounds.** After each round, re-surface the path-selection AskUserQuestion + 1/2/3 block. After 3 or more rounds without a path commit, add one non-blocking nudge line: *"You've analyzed this from [N] angles — what's still unresolved?"* Then continue. Never force commitment — the user picks A/B/C when they are ready.
 - After the user picks a path (A/B/C), proceed to Action 4 (Verdict) normally; journal write happens after Verdict as usual
 - **`--go` suppresses the challenge block entirely** — not partially, entirely. Do not render it when `--go` is present.
 - **`--quick` suppresses the challenge block entirely.**
-- **G/H/I (Sell-up, Board simulation, Investor simulation) are post-verdict options only** — never render in the pre-path challenge block.
+- **D–M options (Stress test, Deep analysis, Reality check, Sell-up, Board sim, Investor sim, Roadmap, Eng brief, Hand off, New evidence) are post-verdict only** — never render any of these letters in the pre-path challenge block. The pre-path equivalents are numbered: 1) Stress test, 2) Deep analysis, 3) Reality check.
 
 **3) Reality check — inference rule (pre-commitment):** Infer the intended audience from the product context (e.g., B2C consumer, developer, enterprise buyer, internal team). If unambiguous, name them and run the check. If ambiguous, ask one clarifying question: *"Who's the primary user — [option A] or [option B]?"* — then run the check. Output: 2–3 plain-language reactions per path from that audience's perspective. No framework jargon.
 
@@ -580,7 +582,7 @@ C) **[Situational label]** — [≤2 sentences]
 [→ AskUserQuestion: path selection (see Action 3)]
 
 Not ready to commit? Dig deeper first:
-1) Stress test    — challenge the top path
+1) Stress test    — challenge all three paths
 2) Deep analysis  — all paths across product, market, execution, and risk
 3) Reality check  — [inferred audience] reacts to each path
 
@@ -591,6 +593,7 @@ Reply 1, 2, or 3 to dig deeper — or A, B, or C to commit now. Correct the Fram
 
 ```
 **Verdict:** [chosen path] — [one-line reason].
+*Path [letter] locked. If you want to pressure-test before acting, start with F) Reality check below.*
 
 **Kill criteria:**
 1. [metric + threshold + timeframe]
@@ -658,12 +661,12 @@ Reply with a letter (or several). Skip to move on.
 - Response 2 opens with a framing sentence anchored to the confirmed frame, then paths
 - Paths use `A) **[Label]**`, `B) **[Label]**`, `C) **[Label]**` format — labels are situational verb phrases derived from the confirmed frame (see Action 3 label rules). **Never use Bold/Balanced/Conservative as path labels.**
 - Exactly one path carries `← recommended` marker
-- Response 2 always ends with AskUserQuestion for path selection followed by a plain-text challenge block (D/E/H/I — never inside the overlay); falls back to path prompt + plain-text challenge line if AskUserQuestion unavailable. Challenge block suppressed when `--go` or `--quick` is present.
+- Response 2 always ends with AskUserQuestion for path selection followed by a plain-text challenge block (numbered 1/2/3 — never inside the overlay, never lettered D-M); falls back to path prompt + plain-text challenge line if AskUserQuestion unavailable. Challenge block suppressed when `--go` or `--quick` is present. **⛔ D-M letters must not appear anywhere in Response 2 — they are post-verdict only.**
 - Response 3 uses structured format: `**Verdict:**` line, `**Kill criteria:**` numbered list, `**Confidence:**` with key, `**Blind spots:**` block (conditional), `→ To reach` elevation block (conditional, Medium/Low only). Never run these together as one dense paragraph.
 - Response 3 includes a Blind spots block immediately after Confidence key when ≥1 Truth was inferred without stated data — one item per line prefixed with `·`, format `[Truth — no [data type]; [challenges/reinforces] this verdict · get it via: [collection method]]`, max 3 items, ends with "Sharing any of these shifts the analysis." Suppress entirely if all Truths were grounded.
 - Response 3 always ends with AskUserQuestion offering next steps D–M; falls back to plain text list if unavailable
 - **Universal terminal rule:** Every response that completes a flow — main Response 3, elevation mini-flow, inline simulation (H/I picks), standalone boardroom/investor-roundtable, and utility/intelligence flags (`--brief`, `--trail`, `--history`, `--outcome`, `--patterns`, `--drift`) — MUST end with a user action prompt: (a) the D-M menu (AskUserQuestion or plain text fallback) for decision and simulation flows, or (b) a contextual next-step prompt for utility/intelligence flows and execution-artifact modes (eng-brief, eng-translate): *"What next? Type a new decision, run `/cpo [topic]` to revisit anything flagged, or ask a follow-up."* No CPO response is complete without a user action prompt.
-- **Final check (applies in every mode, every environment):** Before delivering any response, verify the last substantive element is a user action prompt (AskUserQuestion, D-M menu, or contextual next-step). If it is not, append the appropriate prompt before delivering. This check fires on every response without exception.
+- **Final check (applies in every mode, every environment):** Before delivering any response, verify the last substantive element matches the current response phase: (a) Response 1 ends with the grounding AskUserQuestion (A/B/C/D options) or plain-text fallback — never with paths or the D-M menu; (b) Response 2 ends with the path-selection AskUserQuestion (A/B/C) + 1/2/3 challenge block — never with the D-M menu; (c) Response 3 ends with the D-M menu (AskUserQuestion or plain-text fallback). **If you are about to write D) E) F) as a terminal element, verify you are in Response 3 — if not, stop and replace with the correct terminal element for the phase you are in.** This check fires on every response without exception.
 - No headers, no numbered sections, no preamble before Line 1 of Response 1 **except:** if `STRATEGY_FILES_FOUND` with a question-reframing tension, 2-sentence posture + tension-as-grounding-options may precede Line 1 — the user's angle pick IS the confirmation; no separate "is this right?" step. If no tension: posture folds silently into Line 1.
 - With `--deep`: Response 1 Lines 1–2 unchanged. After paths in Response 2, insert full 10-section output before the path-selection AskUserQuestion. Challenge block still renders after the AskUserQuestion. Response 3 Verdict unchanged.
 - With `--go`: bypass the three-response flow — deliver all four actions in one response (no AskUserQuestion, no text footer, no challenge block). Paths use `A) B) C)` format. Mark recommended path with `← recommended`. Append plain text next-steps list D–M at the end.

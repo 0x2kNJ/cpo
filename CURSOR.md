@@ -143,7 +143,7 @@ If the user's selection includes a correction: acknowledge in one line, reframe,
 
 ---
 
-## ⚠️ Critical Output Rules — v1.8.11 — read before every response
+## ⚠️ Critical Output Rules — v1.8.12 — read before every response
 
 Non-obvious rules this file size causes models to skip:
 
@@ -151,13 +151,16 @@ Non-obvious rules this file size causes models to skip:
 
   | Trigger | Your complete output | Gate that follows |
   |---|---|---|
-  | Initial `/cpo` call (standard) | Frame + Assess + grounding question | GATE 1 — wait for user reply |
+  | Initial `/cpo` call (standard) | Frame + Assess + grounding question (A/B/C + D) Reframe) | GATE 1 — wait for user reply |
   | Initial `/cpo` call + `STRATEGY_FILES_FOUND` | Frame + Assess + Paths + 1/2/3 block *(grounding confirmed by tension selection — no grounding question)* | GATE 2 — wait for user reply |
   | Initial `/cpo` call + `DECISION_OBJECT_LOADED` | Delta frame — no grounding question *(delta IS the confirmed frame; see "Returning decision" section)* | GATE 2 — wait for user reply |
-  | User replies with grounding (A/B/C or correction) | Paths + 1/2/3 block | GATE 2 — wait for user reply |
+  | User replies with grounding (A/B/C angle selection) | Paths + 1/2/3 block | GATE 2 — wait for user reply |
+  | User selects D) Reframe or types a correction | Re-run from Assess with correction — Paths + 1/2/3 block | GATE 2 — wait for user reply |
   | User replies with path or pre-commitment (A/B/C or 1/2/3) | Verdict + D–M menu | None |
   | User picks a D–M option | That one option + re-surface remaining | None |
   | `--go` or `--quick` flag | Single condensed response — all phases | None — only these two flags collapse all gates |
+
+  **⛔ Letter/number boundary — never cross it:** Response 2 uses numbers only (1/2/3 challenge block). Response 3 uses letters only (D–M menu). If you are writing D) E) F) and have not yet received a path selection from the user, you are in the wrong phase — stop and output the 1/2/3 challenge block instead.
 
   **Gate exception scope rule:** An exception that collapses GATE N does NOT automatically collapse GATE N+1. Each gate is independent. Exactly three exceptions exist in CURSOR.md: `STRATEGY_FILES_FOUND` collapses GATE 1 only (grounding confirmed by tension pick); `DECISION_OBJECT_LOADED` collapses GATE 1 only (delta frame IS the grounding); `--go`/`--quick` collapse all gates. No other exceptions exist — if you find yourself reasoning about another exception, stop and re-read this table.
 
@@ -172,7 +175,7 @@ Non-obvious rules this file size causes models to skip:
 - **`--brief` Pattern alerts:** Three separate checks (confidence calibration, thrashing, stuck decision). **Omit the section entirely if none fire** — do not write "No patterns."
 - **`--brief` Recent ships:** Scan for `entry_type: ship_event`. Omit section if none in last 14 days.
 - **New evidence M) routing:** Single data point → elevation mini-flow (re-evaluate one blind spot Truth). Comprehensive new context → full Decision Object delta revisit with `revision: N+1` and `delta_from_prior:`.
-- **Gate verification (3-prompt smoke test — run in Cursor to confirm enforcement works):** ① Send `/cpo should we add a free tier?` — correct output: Frame + Assess + grounding question only. If Paths appear without a user reply, GATE 1 is broken. ② Reply `A` — correct output: Paths + 1/2/3 block only. If the Verdict appears, GATE 2 is broken. ③ Reply `A` — correct output: Verdict + D–M menu. Gates verified.
+- **Gate verification (5-prompt smoke test — run in Cursor to confirm enforcement works):** ① Send `/cpo should we add a free tier?` — correct output: Frame + Assess + grounding question (A/B/C + D) Reframe) only. If Paths appear, GATE 1 is broken. ② Reply `D` (Reframe) — correct output: Paths + 1/2/3 block only. If the Verdict appears, GATE 2 is broken. If D-M letters appear instead of 1/2/3, the letter boundary is broken. ③ Reply `1` (Stress test) — correct output: stress test analysis across all three paths + re-surfaced path AskUserQuestion + 1/2/3 block. If the Verdict appears, GATE 2 is broken. ④ Reply `A` — correct output: Verdict + D–M menu. ⑤ Confirm D–M menu contains D through M (or D through K for first-time users) — NOT 1/2/3. All gates verified.
 
 ---
 
