@@ -396,6 +396,7 @@ Full templates in `references/modes/[mode].md` — load with Read when needed. *
 | `--scan-strategy` | Cross-reference strategy files | `references/flags/scan-strategy.md` |
 | `--invalidate` | Retire a past decision | `references/flags/invalidate.md` |
 | `--invalidate-all` | Bulk invalidation | `references/flags/invalidate.md` |
+| `--status` | Executive snapshot — one red line + action | `references/flags/status.md` |
 | `--drift` | Logic drift detection | `references/flags/drift.md` |
 | `--stack` | Product workflow coverage | `references/flags/stack.md` |
 | `--decide` | Inbound handoff from other skill | `references/flags/decide.md` |
