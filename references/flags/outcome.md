@@ -46,6 +46,8 @@ Display as:
 >
 > **What you didn't know:** [list inferred Truths — these were blind spots at decision time]
 
+**Pre-v1.4 fallback:** If `truth_fingerprint` is missing from the matched entry, skip the Truth reconstruction lines (Dominant Truth, Grounded, Inferred, "What you didn't know") and note: *"Truth fingerprint unavailable for this entry (pre-v1.4). Showing available context only."* Still display open questions, kill criteria, paths considered, and the chosen verdict — those fields exist in all schema versions.
+
 This reconstruction prevents hindsight bias — the user sees their information state at decision time before evaluating the outcome. Only after displaying this, ask: *"With this context: what actually happened?"*
 
 Then record the outcome:

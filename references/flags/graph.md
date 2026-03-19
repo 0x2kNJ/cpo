@@ -19,6 +19,8 @@ else
 fi
 ```
 
+**Schema version gate:** Only include entries with `schema_version: "1.5"` or higher in the graph analysis. Older entries may lack `truth_fingerprint`, `three_paths`, or `consequences` fields required for dependency detection. If entries are excluded, note: *"[N] entries excluded — pre-v1.5 schema. Run decisions through `/cpo` to upgrade."*
+
 ## Dependency Detection (prose analysis)
 
 For each active decision, scan these fields to infer dependencies:
@@ -30,10 +32,16 @@ For each active decision, scan these fields to infer dependencies:
 
 Build a directed graph: `decision_A → decision_B` means A depends on B being resolved.
 
+**Edge confidence:** Classify each edge as:
+- **Strong** `→` — explicit reference to another decision by name, `decision_id`, or direct topic mention in `recommendation:` or `open_questions:`
+- **Weak** `→?` — inferred from topic overlap, shared keywords, or indirect references in `three_paths:` or `kill_criteria:`
+
+In the output, strong edges show as `#A → #B [explicit]` and weak edges as `#A →? #B [inferred]`.
+
 ## Bottleneck Scoring
 
 For each node in the graph:
-- **Fan-out score:** Number of decisions that directly or transitively depend on this node
+- **Fan-out score:** Number of decisions that directly or transitively depend on this node. Strong edges contribute 1.0 to fan-out; weak edges contribute 0.3.
 - **Staleness penalty:** Days since last revision × 0.1 (added to fan-out)
 - **Confidence discount:** Low confidence nodes get 1.5× multiplier on their bottleneck score (they're blocking AND uncertain)
 
@@ -67,6 +75,7 @@ Critical path: Resolve #[bottleneck] → unblocks [N] decisions → next bottlen
 ## Rules
 
 - If fewer than 2 active decisions: *"Need at least 2 active decisions to build a graph. Log more decisions to unlock dependency analysis."*
+- **Small graph (≤5 active decisions):** Skip bottleneck scoring math. Show a flat dependency list with one bottleneck callout: `Bottleneck: #[id] — [why]. Dependencies: [flat list of edges].` Reserve the full scoring (fan-out, staleness penalty, confidence discount) for 6+ decisions where the math produces meaningful differentiation.
 - Dependencies are inferred from content analysis — they may not be explicit. Flag uncertain edges: `#A →? #B (inferred, not explicit)`
 - If no dependencies found across all decisions: *"All [N] decisions appear independent — no dependency edges detected. This could mean decisions are well-isolated, or that cross-references aren't explicit enough in your prompts."*
 - Bottleneck identification always names one decision — even if the graph is sparse

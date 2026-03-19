@@ -90,6 +90,7 @@ Kill criteria usage: [Prior avg per decision] → [Recent avg] · [tightening / 
 ```
 
 **Rolling window rules:**
+- **Sort by decision date, not filesystem time:** Sort entries by their `date:` field (from the YAML content), not by filesystem modification timestamp. Edits via `--outcome` change the file's mtime but don't change when the decision was made — sorting by mtime would contaminate the "recent" window with old decisions that were merely updated.
 - Only compute when ≥10 entries exist (need enough for a meaningful "recent" window)
 - If 10-19 entries: prior window is smaller — flag: *"Prior window has only [N] entries — drift signals are early."*
 - Always show the rolling window analysis AFTER the standard pattern output, separated by a `---`

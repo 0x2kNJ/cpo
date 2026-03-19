@@ -38,14 +38,14 @@ Then output:
 > If no consequence checks are due: omit this section entirely.
 >
 > **Decision decay:**
-> [For each active decision, compute a decay score: `(days_since_decision / 30) × (number_of_inferred_truths / 5) × confidence_multiplier` where confidence_multiplier is 1.5 for Low, 1.0 for Medium, 0.5 for High. Higher scores = more degraded assumptions.]
+> [For each active decision, compute a decay score: `(days_since_decision / 30) × (number_of_inferred_truths / 5) × confidence_multiplier` where confidence_multiplier is 1.5 for Low, 1.0 for Medium, 0.5 for High. Classify: **Fresh** (<1.0) · **Aging** (1.0–2.0) · **Stale** (2.0–4.0) · **Degraded** (>4.0). Only surface Stale and Degraded decisions.]
 >
-> [List decisions with decay score > 2.0, ranked by score:]
-> "[decision_id/date] — [topic] — decay: [score] (aged [N] days, [M] inferred truths, confidence: [level]). Original assumptions may no longer hold."
+> [List decisions classified as Stale or Degraded, ranked by score:]
+> "[decision_id/date] — [topic] — **[Stale/Degraded]** (aged [N] days, [M] inferred truths, confidence: [level]). Original assumptions may no longer hold."
 >
-> [If any decision scores > 4.0: "⚠ [decision_id] assumptions are significantly degraded — revisit with `/cpo #[id]` or kill with `--invalidate [id]`."]
+> [If any decision is Degraded: "⚠ [decision_id] assumptions are significantly degraded — revisit with `/cpo #[id]` or kill with `--invalidate [id]`."]
 >
-> If no decisions score > 2.0: omit this section entirely.
+> If no decisions are Stale or Degraded: omit this section entirely.
 >
 > **Recent ships (last 14 days):**
 > [Scan all loaded journal entries for `entry_type: ship_event` where `date:` is within 14 days of today. For each: "Mar 18 — v0.19.2.0 shipped (branch: feature/x) → [PR link]". If none in the last 14 days: omit this section entirely — do not write "none".]

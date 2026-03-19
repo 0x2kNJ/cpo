@@ -26,11 +26,14 @@ For each active decision:
 2. Parse each criterion for: **metric** (what's being measured), **threshold** (the number/direction), **timeframe** (deadline or window)
 3. Compute days elapsed since the decision's `date:` field
 4. If the criterion has an explicit timeframe (e.g., "within 60 days"), compute days remaining: `timeframe_days - days_elapsed`
+   **Date anchor rule:** The start date for a kill criterion countdown is always the decision's `date:` field unless the criterion explicitly references a different anchor (e.g., "post-launch", "after shipping v2"). For ambiguous anchors, default to decision date and flag: `[criterion] — countdown from decision date (anchor unclear)`. Timeframe extraction is best-effort — if no number of days/weeks/months is parseable, classify as NO_TIMEFRAME.
+
 5. Classify status:
    - **TRIGGERED** — days remaining ≤ 0 (past the window)
    - **APPROACHING** — days remaining ≤ 20% of original timeframe
    - **ACTIVE** — days remaining > 20% of original timeframe
    - **NO_TIMEFRAME** — criterion has no parseable timeframe (flag for user attention)
+   - **EXTERNAL** — criterion depends on an external event rather than an internal metric (e.g., "if competitor launches a comparable product," "if regulation passes"). These cannot be counted down mechanically. Show as `⚪ EXTERNAL — requires manual check: [criterion text]`
 
 ## Output Format
 
@@ -54,7 +57,10 @@ KILL CRITERIA DASHBOARD — [N] criteria across [M] decisions
   #[decision_id] — [criterion text] — no parseable deadline
   Consider adding a timeframe: `/cpo #[id]` to revisit
 
-Summary: [triggered] triggered · [approaching] approaching · [active] active · [no_tf] undated
+⚪ EXTERNAL (depends on outside event):
+  #[decision_id] — [criterion text] — requires manual check
+
+Summary: [triggered] triggered · [approaching] approaching · [active] active · [external] external · [no_tf] undated
 ```
 
 ## Rules
@@ -64,3 +70,4 @@ Summary: [triggered] triggered · [approaching] approaching · [active] active �
 - Sort within each group by urgency (fewest days remaining first)
 - After output, prompt: *"Act on a triggered criterion? Run `/cpo --outcome [topic]` to close the loop. Or `/cpo --status` for the executive view."*
 - If any criteria are TRIGGERED, append a priority note: *"⚠ [N] kill criteria past their window — these decisions need resolution before new commitments."*
+- **All-green happy path:** If all criteria are classified as ACTIVE (no TRIGGERED, no APPROACHING), output a positive summary: *"All [N] kill criteria within safe range. Earliest approaching: [criterion with fewest days remaining] in [X] days."* This reinforces that the founder's bets are on track.
