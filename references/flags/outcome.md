@@ -25,7 +25,30 @@ fi
 
 > *"You chose [path] on [topic] ([date]). Verdict: [verdict]. Kill criteria: [criterion 1] · [criterion 2]. What happened?"*
 
-Surface the prior entry, ask the user what happened and what the outcome was. Then record the outcome:
+Surface the prior entry, ask the user what happened and what the outcome was.
+
+**Session Replay (hindsight bias guard):**
+Before asking "What happened?", reconstruct and display what was known AT DECISION TIME:
+- Truth fingerprint at the time: which Truths were grounded vs. inferred
+- What the open questions were (from `open_questions:` field)
+- What the kill criteria were (from `kill_criteria:` field)
+- What alternatives existed (from `three_paths:` field)
+- What was explicitly unknown (from inferred Truths in the fingerprint)
+
+Display as:
+
+> **What you knew then:**
+> Dominant Truth: [Truth] · Grounded: [list] · Inferred: [list]
+> Open questions: [list from entry]
+> Kill criteria: [list from entry]
+> Paths considered: A) [path_a] · B) [path_b] · C) [path_c]
+> Chosen: [verdict/recommendation]
+>
+> **What you didn't know:** [list inferred Truths — these were blind spots at decision time]
+
+This reconstruction prevents hindsight bias — the user sees their information state at decision time before evaluating the outcome. Only after displaying this, ask: *"With this context: what actually happened?"*
+
+Then record the outcome:
 
 ```bash
 # Outcome recording — replace OUTCOME_STATUS, OUTCOME_DATE_VALUE, OUTCOME_NOTES_VALUE with actual values

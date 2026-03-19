@@ -1,6 +1,6 @@
 ---
 name: cpo
-version: 2.1.0
+version: 2.3.0
 last_updated: 2026-03-19
 argument-hint: "[problem or question] [--go] [--deep]"
 description: >-
@@ -398,6 +398,8 @@ Full templates in `references/modes/[mode].md` — load with Read when needed. *
 | `--invalidate-all` | Bulk invalidation | `references/flags/invalidate.md` |
 | `--status` | Executive snapshot — one red line + action | `references/flags/status.md` |
 | `--drift` | Logic drift detection | `references/flags/drift.md` |
+| `--graph` | Decision dependency graph | `references/flags/graph.md` |
+| `--kills` | Kill criteria countdown dashboard | `references/flags/kills.md` |
 | `--stack` | Product workflow coverage | `references/flags/stack.md` |
 | `--decide` | Inbound handoff from other skill | `references/flags/decide.md` |
 | `--update` | `cd ~/.claude/skills/cpo && git pull` | (inline) |

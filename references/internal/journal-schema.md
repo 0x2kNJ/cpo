@@ -40,6 +40,10 @@ truth_fingerprint: "Dominant: REPLACE_WITH_DOMINANT_TRUTH . Grounded: REPLACE_WI
 delta_from_prior: REPLACE_WITH_WHAT_CHANGED_OR_NA
 open_questions:
   - REPLACE_WITH_OPEN_QUESTION
+consequences:
+  - marker: REPLACE_WITH_CONSEQUENCE_DESCRIPTION
+    check_date: REPLACE_WITH_DATE_TO_CHECK
+    status: pending
 outcome: pending
 outcome_date: ""
 outcome_notes: ""
@@ -59,8 +63,39 @@ Replace every `REPLACE_WITH_*` value with the actual content from the output jus
 
 **`delta_from_prior`:** For returning decisions, write a one-line summary of what changed. For new decisions, write `na`.
 
+**`consequences`:** Auto-generated at decision time. Each consequence is a predicted downstream effect of this decision — something that should become visible within a specific timeframe. `marker` is a one-sentence prediction (e.g., "If we ship the paywall, free-tier signups should drop 20-40%"). `check_date` is when to look for this effect (typically 30-90 days out). `status` is `pending`, `confirmed`, or `disconfirmed`. `--status` and `--brief` scan for consequences past their `check_date` that are still `pending` — surfacing them as "consequence check due."
+
 **Consistency check:** If a new journal entry contradicts a recent one (same `decision_id` or same topic, opposite verdict), flag it inline: *"Note: last time we looked at [topic] ([date]), verdict was X. Today's context shifts that to Y because Z."*
 
 **Passive drift surface:** When writing a new journal entry, check whether the incoming entry's Dominant Truth differs from the most recent non-invalidated entry on the same `decision_id` or topic. If it does, append one non-blocking line: *"Note: Dominant Truth shifted from [prior] -> [current] vs. your last entry on [topic]. Intentional? Run `/cpo --drift` for a full drift check, or `--invalidate [topic]` to retire the prior entry."*
 
 **Decision object queries:** When `--since #name`, `--outcome #name`, or `--history #name` is passed, filter journal entries by `decision_id` instead of keyword search. This is exact — no fuzzy matching needed.
+
+## Spec Coherence Validator (runs at write time)
+
+Before persisting a new journal entry, run a silent coherence check against all active (non-invalidated) entries:
+
+**Check 1 — Contradiction detection:**
+For the new entry's `recommendation:` and `kill_criteria:`, scan all active entries. Flag if:
+- The new recommendation directly contradicts an active recommendation on a related topic (e.g., "go all-in on enterprise" vs. an active "stay focused on SMB")
+- A new kill criterion conflicts with an active entry's recommendation (e.g., new kill criterion is "abandon if enterprise revenue < $50k in 90 days" while an active entry recommends deprioritizing enterprise)
+
+**Check 2 — Assumption collision:**
+Parse the `truth_fingerprint:` of the new entry. For each Grounded Truth, check if any active entry's Grounded Truth on the same dimension makes a contradictory claim. Example: new entry grounds Economic Truth on "CAC < $50" while active entry grounds Economic Truth on "CAC is acceptable at $120."
+
+**Check 3 — Kill criteria overlap:**
+If the new entry's kill criteria reference the same metric as an active entry's kill criteria but with a different threshold or timeframe, flag the discrepancy.
+
+**Output behavior:**
+- If any check fires: append one non-blocking line after the journal write confirmation (internal, not user-facing in standard mode): *"⚠ Coherence: [new entry] [contradicts/tensions with] [active entry decision_id or date] — [one-sentence description]. Run `/cpo --drift` to investigate."*
+- If `--verbose` or `--deep`: surface the full coherence findings inline after the Verdict.
+- Never block the journal write — coherence issues are warnings, not errors.
+- Cap at 3 coherence warnings per write — if more found, note: *"[N] additional coherence notes suppressed — run `/cpo --drift` for full view."*
+
+**Bash helper (runs before the journal write):**
+```bash
+# Load active entries for coherence check
+_ACTIVE_ENTRIES=$(grep -l "status: active" ~/.cpo/decisions/*.yaml 2>/dev/null | xargs -I{} cat {} 2>/dev/null)
+```
+
+The coherence validator uses the loaded active entries in prose analysis — it does not require additional bash beyond loading them.

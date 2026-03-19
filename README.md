@@ -40,6 +40,12 @@ Notice logic drift from prior commitments?
 Want to see your decision patterns over time?
 → `/cpo --patterns`
 
+See all active kill criteria with countdown timers?
+→ `/cpo --kills`
+
+Map decision dependencies and bottlenecks?
+→ `/cpo --graph`
+
 Revisiting a prior decision?
 → `/cpo --outcome [topic]` or `/cpo #[decision-name]`
 
@@ -141,8 +147,12 @@ Run `/cpo --brief` for a weekly intelligence digest:
 - unresolved decisions needing follow-up
 - patterns in decision quality
 - logic drift across bets
+- consequence predictions due for verification
+- decision decay scores on aging assumptions
 
-Run `/cpo --patterns` to see your decision-making DNA: which Truths you consistently over- or under-weight, how often your kill criteria actually trigger, and whether your confidence calibration is accurate.
+Run `/cpo --graph` to see the dependency graph across all active decisions — bottleneck identification, transitive chains, orphaned decisions. Run `/cpo --kills` for a cross-cutting dashboard of every active kill criterion with countdown timers grouped by urgency.
+
+Run `/cpo --patterns` to see your decision-making DNA: which Truths you consistently over- or under-weight, how often your kill criteria actually trigger, and whether your confidence calibration is accurate. With 10+ decisions, CPO computes rolling-window drift — comparing your recent 10 decisions against prior ones to surface how your decision style is evolving.
 
 A year in, you do not just have outputs. You have **institutional memory** — and a mirror on how you actually make decisions.
 
@@ -476,7 +486,7 @@ CPO supports 20 core modes. Invoke them with natural language — CPO routes aut
 
 ### Flags
 
-CPO supports 28 flags for shaping how it reasons and communicates.
+CPO supports 30 flags for shaping how it reasons and communicates.
 
 | Flag | Example | What it does |
 |:---|:---|:---|
@@ -502,6 +512,8 @@ CPO supports 28 flags for shaping how it reasons and communicates.
 | `--invalidate` | `/cpo --invalidate #pricing` | Marks a past decision as retired. Annotates with date and reason. Future context loads skip it; `--history` always shows it. |
 | `--invalidate-all` | `/cpo --invalidate-all` | Bulk invalidation — mark all active journal entries as invalidated. Optional `#name` filter to scope to one decision. Requires YES confirmation. Add `--hard` to permanently delete YAML files (irreversible). |
 | `--drift` | `/cpo --drift` | Logic drift detection — scans the last 10 decisions for structural contradictions: unacknowledged Truth fingerprint shifts, verdict reversals, or kill criteria degradation. |
+| `--graph` | `/cpo --graph` | Decision dependency graph — identifies bottleneck decisions blocking the most downstream work, transitive chains, and orphaned decisions with no connections. |
+| `--kills` | `/cpo --kills` | Kill criteria countdown dashboard — cross-cutting view of ALL active kill criteria with days remaining, grouped by urgency (triggered / approaching / active / undated). |
 | `--decide` | `/cpo --decide` | Inbound handoff from another skill. CPO reads the situation, scans your installed toolchain, and routes to the best next action — with install suggestion + fallback if the ideal skill isn't present. |
 | `--export` | `/cpo --export` | Writes output to `~/.cpo/exports/YYYY-MM-DD-[slug].md` — shareable with co-founders, boards, investors. |
 | `--schedule-brief` | `/cpo --schedule-brief` | Sets up a recurring weekly brief that runs automatically. Uses `anthropic-skills:schedule`. *(Claude Code only.)* |
@@ -573,11 +585,13 @@ cpo/
     │   └── ...
     ├── handoff-contract.md     # Skill Handoff Contract for CPO-aware skill authors
     ├── signals-contract.md     # Cross-skill Signals Contract for --status enrichment
-    └── flags/                  # Full flag behavior specs (17 files, loaded on demand)
+    └── flags/                  # Full flag behavior specs (19 files, loaded on demand)
         ├── brief.md
         ├── roadmap.md
         ├── sell-up.md
         ├── drift.md            # Logic drift detection spec
+        ├── graph.md            # Decision dependency graph spec
+        ├── kills.md            # Kill criteria countdown dashboard spec
         ├── invalidate.md       # Journal invalidation spec
         ├── patterns.md         # Decision DNA analysis spec
         ├── combinations.md     # Flag stacking and combination rules

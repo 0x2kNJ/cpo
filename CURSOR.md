@@ -960,6 +960,8 @@ In compact mode: identify the **Dominant Truth** and reason from it. In `--deep`
 | `--invalidate [topic or #id]` | Mark a past decision as invalidated. Annotates with date + reason. Future context loads skip invalidated entries; `--history` always shows them. |
 | `--invalidate-all` | Bulk invalidation — mark all active journal entries as invalidated. Optional `#name` filter. Requires confirmation with entry count. `--invalidate-all --hard` permanently deletes YAML files (irreversible). |
 | `--drift` | On-demand logic drift detection. Cross-references Truth fingerprints + verdict directions across recent decisions. Surfaces only structural contradictions — not semantic similarity. |
+| `--graph` | Decision dependency graph — bottleneck detection, transitive dependencies, orphaned decisions |
+| `--kills` | Cross-cutting kill criteria dashboard — all active criteria with countdown timers, grouped by urgency |
 
 ### Calibration Protocol
 

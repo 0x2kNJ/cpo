@@ -141,6 +141,12 @@ Read `operating_bias:` from `~/.cpo/context.md` if present. If not present, infe
 - *Inferred from <5 entries:* flag as low confidence — `[inferred, low signal — only N path choices available]`
 - This determines whether the Action is a build move, a research move, or a relationship move
 
+**Step 6b — Consequence check**
+Scan all active decisions' `consequences:` fields. If any consequence has `check_date` in the past and `status: pending`, it's an unverified prediction — the founder made a bet and hasn't checked if it played out. Surface as a yellow-level finding: *"Unverified consequence from [decision_id]: '[marker]' — was due [check_date]."* If the consequence is related to the current red line candidate, elevate it.
+
+**Step 6c — Decision decay**
+For each active decision, compute a mechanical decay score: `(days_since_decision / 30) × (inferred_truths_count / 5) × confidence_multiplier` (Low=1.5, Medium=1.0, High=0.5). Decisions scoring > 4.0 are candidates for the "At risk" line — their original assumptions are significantly degraded. Decisions scoring > 2.0 are noted as aging. This is a quantitative signal, not a judgment — use it to weight other synthesis steps.
+
 **Step 7 — Open question recurrence**
 Scan `open_questions:` across all entries. If the same question (or semantically equivalent question) appears in 2+ entries, it is a chronic unresolved blocker — likely the real red line even if confidence on individual decisions looks ok.
 - *If recurring question found:* surface it as a red line candidate

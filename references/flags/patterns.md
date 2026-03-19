@@ -66,3 +66,31 @@ Watch for: [one specific behavioral pattern to watch for in the next 3 decisions
 - If `truth_fingerprint:` is missing from older journal entries (pre-v1.4), skip Truth bias dimension and note: *"Truth bias: requires journal entries from v1.4+ — run more decisions to populate"*
 - Pattern summary is always plain language, no jargon
 - "Watch for" is always one concrete, observable behavior — not a meta-instruction
+
+## Rolling Window Analysis
+
+When 10+ journal entries exist, compute patterns across two windows:
+- **Recent window:** Last 10 decisions
+- **Prior window:** Decisions 11-20 (or all remaining if fewer than 20 total)
+
+For each analysis dimension, compare the two windows and surface drift:
+
+```
+PATTERN DRIFT — comparing recent 10 vs prior [N] decisions
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Truth bias shift:    [Prior dominant] → [Recent dominant] · [stable / shifting / volatile]
+Path preference:     [Prior A/B/C%] → [Recent A/B/C%] · [stable / shifting]
+Confidence trend:    [Prior avg] → [Recent avg] · [calibrating up / calibrating down / stable]
+Reversal rate:       [Prior %] → [Recent %] · [improving / worsening / stable]
+Kill criteria usage: [Prior avg per decision] → [Recent avg] · [tightening / loosening / stable]
+
+[If any dimension shows >25% shift: "Notable drift in [dimension] — your decision-making style is evolving. This may be intentional growth or unconscious habit change."]
+[If all stable: "Decision patterns stable across both windows — consistent operating style."]
+```
+
+**Rolling window rules:**
+- Only compute when ≥10 entries exist (need enough for a meaningful "recent" window)
+- If 10-19 entries: prior window is smaller — flag: *"Prior window has only [N] entries — drift signals are early."*
+- Always show the rolling window analysis AFTER the standard pattern output, separated by a `---`
+- The rolling window is behavioral (how you decide), not topical (what you decide about)
