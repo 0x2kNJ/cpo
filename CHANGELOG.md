@@ -4,6 +4,48 @@ All notable changes documented here. Follows [Keep a Changelog](https://keepacha
 
 ---
 
+## [2.0.0] — 2026-03-19
+
+**Major refactor: SKILL.md split from 1,430 → 403 lines.** Panel consensus (Gary Tan, Mike Krieger, Boris Cherny) was that the file was too big for consistent model compliance — attention is finite and rules compete. Behavioral core (templates, ⛔ gates, hard rules) now dominates signal-to-noise. Detailed generation rules moved to reference files loaded on demand.
+
+### Architecture
+
+- **SKILL.md:** 403 lines — preamble, response templates + ⛔ gates, Five Truths, hard rules, mode/flag routing tables, self-check assertions, red flags
+- **`references/four-actions.md`:** All detailed Action 1-4 rules — grounding option quality bar, path label generation, worked examples, D-M menu behavior, elevation loop, kill criteria quality bar, blind spots rules, structural rules, calibration protocol, user role detection
+- **`references/internal/preamble-handlers.md`:** Detailed state handling for CONTEXT_LOADED_*, DECISIONS_FOUND, INTEGRATIONS_FOUND, VERSION_MISMATCH, STRATEGY_FILES_FOUND
+- **`references/internal/routing-map.md`:** Internal mode routing table (user language → mode)
+- **`references/internal/journal-schema.md`:** YAML schema + write rules for decision journal
+- **`references/flags/help.md`:** Help invocation text
+
+### Changed
+
+- Mode stubs compressed from 5 lines/mode to single routing table row
+- Flag stubs compressed from section-per-flag to single routing table row
+- Operating principles, communication style, calibration protocol moved to `references/four-actions.md`
+- Version bumped to 2.0.0
+
+### Preserved
+
+- All ⛔ GATE markers and MUST/MUST NOT constraints from v1.9.3-1.9.4
+- All response templates (R1, R2, R3) with exact formatting
+- All self-check assertions
+- Preamble bash block unchanged
+
+---
+
+## [1.9.4] — 2026-03-19
+
+**1/2/3 challenge block and D-M menu visibility fixes.** Model was generating its own path-selection prompt instead of using the template, and the D-M menu was being hidden by the elevation rule.
+
+### Fixed
+
+- Added explicit instruction: "This is the exact output for Response 2. Do not add your own path-selection question."
+- Changed 1/2/3 block from "Not ready to commit?" to "Before committing — stress test, analyze, or reality check:"
+- D-M menu now always renders below elevation prompt (was previously suppressed entirely)
+- Fixed internal contradiction: old rule said "suppress entire D-M menu" during elevation, new rule says "always show"
+
+---
+
 ## [1.9.3] — 2026-03-19
 
 **Stronger gate enforcement + panel fixes.** v1.9.2 gates didn't fire in Cursor — model merged all responses, skipped 1/2/3 challenge block, invented custom options. Gates upgraded from soft "stop" to MUST contain / MUST NOT contain per response. Challenge block made structurally non-optional. CURSOR.md header updated.
