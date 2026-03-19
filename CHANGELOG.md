@@ -4,6 +4,19 @@ All notable changes documented here. Follows [Keep a Changelog](https://keepacha
 
 ---
 
+## [1.8.3] — 2026-03-19
+
+Patch: Cursor still runs through in one pass — architectural fix + H/I menu drop + GATE 2 misplacement.
+
+### Fixed
+
+- **ONE RESPONSE PER TURN rule (CURSOR.md Critical Output Rules + Structural rules) — architectural fix:** ⛔ GATE markers from v1.8.2 proved insufficient — Cursor's agentic model treats the entire `/cpo` invocation as a single task to complete and ignores inline stop signals. Root cause: the spec described three response sections, but the model read it as one continuous output. Fix: the enforcement rule is now framed architecturally — each user turn triggers exactly one response phase. The model's job for an initial `/cpo` call IS Response 1 and nothing more. It cannot answer a question it just asked. Rule added both to Critical Output Rules (read first) and to Structural rules (co-located with the formatting spec).
+- **GATE 2 misplacement fixed (CURSOR.md):** In v1.8.2, the GATE 2 marker was placed between the path-selection prompt and the "append challenge block" instruction, causing the challenge block (D/E/F) to never render — the model stopped before reaching it. Moved to after the closing of the challenge block.
+- **H and I dropped from post-verdict menu (CURSOR.md progressive disclosure):** The `→ More:` collapsed line was inside the `── Communicate upwards ──` group block. Models were reading "Communicate upwards = G + More" and then rendering J/K/L separately as Move it forward — but attributing H/I to the More line already "handled" under Communicate upwards, then dropping them. Fix: the More line now sits OUTSIDE any group header, with explicit rule: "Do not drop H or I."
+- **Version tag corrected:** Critical Output Rules header updated from v1.8.1 → v1.8.3.
+
+---
+
 ## [1.8.2] — 2026-03-19
 
 Patch: Cursor agentic loop runs through without stopping + progressive disclosure rendering bug.
