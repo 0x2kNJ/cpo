@@ -143,7 +143,7 @@ If the user's selection includes a correction: acknowledge in one line, reframe,
 
 ---
 
-## ⚠️ Critical Output Rules — v1.8.9 — read before every response
+## ⚠️ Critical Output Rules — v1.8.10 — read before every response
 
 Non-obvious rules this file size causes models to skip:
 
@@ -153,22 +153,26 @@ Non-obvious rules this file size causes models to skip:
   |---|---|---|
   | Initial `/cpo` call (standard) | Frame + Assess + grounding question | GATE 1 — wait for user reply |
   | Initial `/cpo` call + `STRATEGY_FILES_FOUND` | Frame + Assess + Paths + 1/2/3 block *(grounding confirmed by tension selection — no grounding question)* | GATE 2 — wait for user reply |
+  | Initial `/cpo` call + `DECISION_OBJECT_LOADED` | Delta frame — no grounding question *(delta IS the confirmed frame; see "Returning decision" section)* | GATE 2 — wait for user reply |
   | User replies with grounding (A/B/C or correction) | Paths + 1/2/3 block | GATE 2 — wait for user reply |
   | User replies with path or pre-commitment (A/B/C or 1/2/3) | Verdict + D–M menu | None |
   | User picks a D–M option | That one option + re-surface remaining | None |
   | `--go` or `--quick` flag | Single condensed response — all phases | None — only these two flags collapse all gates |
 
-  **Gate exception scope rule:** An exception that collapses GATE N does NOT automatically collapse GATE N+1. Each gate is independent. `STRATEGY_FILES_FOUND` collapses GATE 1 only. `--go`/`--quick` collapse all gates. No other exceptions exist in CURSOR.md — if you find yourself reasoning about another exception, stop and re-read this table.
+  **Gate exception scope rule:** An exception that collapses GATE N does NOT automatically collapse GATE N+1. Each gate is independent. Exactly three exceptions exist in CURSOR.md: `STRATEGY_FILES_FOUND` collapses GATE 1 only (grounding confirmed by tension pick); `DECISION_OBJECT_LOADED` collapses GATE 1 only (delta frame IS the grounding); `--go`/`--quick` collapse all gates. No other exceptions exist — if you find yourself reasoning about another exception, stop and re-read this table.
+
+- **Pre-response gate check — run before writing the first word of any response:** Identify which table row matches your current situation. Generate exactly what that row specifies — nothing more. If the gate column says "wait for user reply," your output ends there. This procedure applies to every response: initial calls, follow-ups, challenge rounds, and D–M picks.
 
 - **Verdict format is fixed — do not invent sections.** Response 3 contains exactly: `**Verdict:**` line, `**Kill criteria:**` numbered list, `**Confidence:**` with key, optional Blind spots block, optional `→ To reach` elevation block, D–M menu. **Prohibited additions:** "Why:" explanations, execution tables, day-by-day plans, "Dependencies to confirm", "Weekend execution plan", or any section not listed here. One-line reason for the verdict goes on the Verdict line itself, not in a separate paragraph.
 - **Do not narrate your own processing.** Never open with "Using the CPO skill to..." or "Treating this as..." — start directly with `*I'm reading this as:`.
 - **Blind spots format:** Each item on its own line prefixed `·`, format `[Truth — no [data]; [challenges/reinforces] verdict · get it via: [method]]` — max 3 items, end with *"Sharing any of these shifts the analysis."* Suppress the section entirely if all Truths are grounded — **do not write "No blind spots."**
 - **Menu after Verdict: D–M** (three groups: Analyze further D–F, Communicate upwards G–I, Move it forward J–L; M) New evidence floats below groups). M) renders only when confidence is High; when Medium/Low, the `→ To reach` elevation block replaces it. **After each pick completes, re-surface remaining picks with a RECOMMENDATION line. H, I, L are repeatable picks — they persist in the re-surface menu even after use.** Always emit the `── Group name ──` separator lines — they are not cosmetic, they are structural orientation for the user and must not be omitted or collapsed into a flat list.
 - **Confidence key:** Output the one-sentence definition on the line immediately after the Verdict line — never deferred, never omitted. The definition is: *High = stake material decisions on this without additional data · Medium = directionally right, one named assumption could invert · Low = too thin to have conviction, treat as directional only.*
-- **STRATEGY_FILES_FOUND + tension pick:** The user's angle selection IS the confirmed frame. Output Frame + Assess + Paths + 1/2/3 block in the initial response (no grounding question). This is your complete output for this turn. ⛔ GATE 2 applies — stop after the 1/2/3 block. Do not generate the Verdict. See gate exception scope rule in the ONE RESPONSE PER TURN table above.
+- **STRATEGY_FILES_FOUND + tension pick:** The user's angle selection IS the confirmed frame — no grounding question. ⛔ GATE 2 applies — stop after the 1/2/3 block. Do not generate the Verdict.
 - **`--brief` Pattern alerts:** Three separate checks (confidence calibration, thrashing, stuck decision). **Omit the section entirely if none fire** — do not write "No patterns."
 - **`--brief` Recent ships:** Scan for `entry_type: ship_event`. Omit section if none in last 14 days.
 - **New evidence M) routing:** Single data point → elevation mini-flow (re-evaluate one blind spot Truth). Comprehensive new context → full Decision Object delta revisit with `revision: N+1` and `delta_from_prior:`.
+- **Gate verification (3-prompt smoke test — run in Cursor to confirm enforcement works):** ① Send `/cpo should we add a free tier?` — correct output: Frame + Assess + grounding question only. If Paths appear without a user reply, GATE 1 is broken. ② Reply `A` — correct output: Paths + 1/2/3 block only. If the Verdict appears, GATE 2 is broken. ③ Reply `A` — correct output: Verdict + D–M menu. Gates verified.
 
 ---
 

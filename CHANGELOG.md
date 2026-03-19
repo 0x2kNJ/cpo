@@ -4,6 +4,21 @@ All notable changes documented here. Follows [Keep a Changelog](https://keepacha
 
 ---
 
+## [1.8.10] — 2026-03-19
+
+Patch: DECISION_OBJECT_LOADED added to trigger table; pre-response gate check; CURSOR gate verification test; STRATEGY_FILES_FOUND bullet trimmed.
+
+### Fixed
+
+- **`DECISION_OBJECT_LOADED` row added to trigger table:** The table claimed to be exhaustive but omitted returning decisions — a `/cpo #name` call with a loaded decision object collapses GATE 1 (delta frame replaces grounding question), while GATE 2 still applies. Added as a new row: Initial `/cpo` call + `DECISION_OBJECT_LOADED` → Delta frame (no grounding question) → GATE 2. The table is now actually exhaustive.
+- **Gate exception scope rule updated to enumerate all 3 exceptions:** Previous wording said "`STRATEGY_FILES_FOUND` collapses GATE 1 only. `--go`/`--quick` collapse all gates. No other exceptions exist." Now reads: "Exactly three exceptions exist in CURSOR.md: `STRATEGY_FILES_FOUND` collapses GATE 1 only; `DECISION_OBJECT_LOADED` collapses GATE 1 only; `--go`/`--quick` collapse all gates." Eliminates the false implication that only 2 exceptions exist.
+- **Pre-response gate check added to Critical Output Rules:** New bullet immediately after the trigger table: "Before writing the first word of any response, identify which table row matches your current situation. Generate exactly what that row specifies — nothing more. If the gate column says 'wait for user reply,' your output ends there." Forces explicit table lookup before model begins writing.
+- **STRATEGY_FILES_FOUND bullet trimmed:** The standalone bullet restated what the trigger table already said (Frame + Assess + Paths + GATE 2). Trimmed to non-redundant information only: "The user's angle selection IS the confirmed frame — no grounding question. ⛔ GATE 2 applies — stop after the 1/2/3 block. Do not generate the Verdict."
+- **CURSOR gate verification test added to Critical Output Rules:** New final bullet with a 3-prompt smoke test: ① standard prompt → Frame + grounding only (fail = Paths appeared without user reply); ② reply A → Paths + 1/2/3 only (fail = Verdict appeared); ③ reply A → Verdict + D–M menu (gates verified). Gives editors and users a behavioral contract that is testable, not just spec-asserted.
+- **Critical Output Rules version tag updated:** v1.8.9 → v1.8.10.
+
+---
+
 ## [1.8.9] — 2026-03-19
 
 Patch: Exhaustive trigger→output→gate table; gate exception scope rule; CURSOR.md vs SKILL.md environment compatibility guardrail.
