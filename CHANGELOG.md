@@ -4,6 +4,17 @@ All notable changes documented here. Follows [Keep a Changelog](https://keepacha
 
 ---
 
+## [1.8.4] — 2026-03-19
+
+Patch: remaining panel items — confidence key definition inline, self-check assertions at both gates.
+
+### Fixed
+
+- **Confidence key definition now inline in Critical Output Rules (CURSOR.md):** The bullet previously said "output the one-sentence definition" without specifying what that definition is. A model reading only the Critical Output Rules section would know to output something but not what. Added the full definition inline: *High = stake material decisions on this without additional data · Medium = directionally right, one named assumption could invert · Low = too thin to have conviction, treat as directional only.*
+- **Self-check assertions added at both gates (CURSOR.md Structural rules):** Added positive-framing gate checks co-located with the Response 1 and Response 2 formatting rules. Gate 1: *"Has the user replied with a grounding choice in this same message? If no → end here."* Gate 2: *"Has the user replied with a path choice or challenge pick in this same message? If no → end here."* These complement the architectural ONE RESPONSE PER TURN rule with active decision-point checks rather than only prohibition language.
+
+---
+
 ## [1.8.3] — 2026-03-19
 
 Patch: Cursor still runs through in one pass — architectural fix + H/I menu drop + GATE 2 misplacement.
