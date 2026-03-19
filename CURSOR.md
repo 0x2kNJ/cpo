@@ -380,9 +380,9 @@ Immediately follow with the next-steps menu.
 ```
 Next steps (pick any):
 D) Pre-mortem — stress-test this plan before committing
-E) Sell-up — reframe for CEO, board, or eng lead
-F) Deep dive — full Five Truths + 10-section output
-G) Roadmap — stack this next to other bets (/cpo --roadmap)
+E) Deep dive — full Five Truths + 10-section output
+F) Roadmap — stack this next to other bets (/cpo --roadmap)
+G) Sell-up — reframe for CEO, board, or eng lead
 H) Something else — one sentence
 [I) New evidence — share what you found, I'll show what shifts]
 
@@ -464,9 +464,9 @@ Reply A, B, or C. Or correct the Frame if it's off.
 
 Next steps:
 D) Pre-mortem — stress-test before committing
-E) Sell-up — reframe for leadership / investors
-F) Deep dive — full Five Truths + 10-section
-G) Roadmap — stack against other bets
+E) Deep dive — full Five Truths + 10-section
+F) Roadmap — stack against other bets
+G) Sell-up — reframe for leadership / investors
 H) Something else — one sentence
 [I) New evidence — share what you found, I'll show what shifts]
 

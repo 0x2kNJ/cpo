@@ -391,7 +391,7 @@ A criterion missing any of these is vague and must be rewritten before the Verdi
 Immediately follow with an AskUserQuestion offering next steps.
 - Re-ground: *"Verdict confirmed — [one-clause summary]. Pick a next step, or type a few letters to stack more."*
 - No RECOMMENDATION on initial menu (see AskUserQuestion Format exception above).
-- Options: D) Pre-mortem — stress-test this · E) Sell-up — reframe for leadership · F) Deep dive — full Five Truths · G) Roadmap — stack vs other bets · H) Something else — one sentence · [I) New evidence — share what you found, I'll show what shifts] (I) renders only when confidence is High; suppress when elevation `→` block fires)
+- Options: D) Pre-mortem — stress-test this · E) Deep dive — full Five Truths · F) Roadmap — stack vs other bets · G) Sell-up — reframe for leadership · H) Something else — one sentence · [I) New evidence — share what you found, I'll show what shifts] (I) renders only when confidence is High; suppress when elevation `→` block fires)
 
 The overlay captures one selection. If the user wants multiple next steps, they can type additional letters in their reply (e.g., "D and G") — honor each one in sequence.
 
@@ -399,9 +399,9 @@ If AskUserQuestion unavailable, output:
 ```
 Next steps (pick any):
 D) Pre-mortem — stress-test this plan before committing
-E) Sell-up — reframe for CEO, board, or eng lead
-F) Deep dive — full Five Truths + 10-section output
-G) Roadmap — stack this next to other bets (/cpo --roadmap)
+E) Deep dive — full Five Truths + 10-section output
+F) Roadmap — stack this next to other bets (/cpo --roadmap)
+G) Sell-up — reframe for CEO, board, or eng lead
 H) Something else — one sentence
 [I) New evidence — share what you found, I'll show what shifts]
 
@@ -427,7 +427,7 @@ Reply with a letter (or several). Skip to move on.
 
 Rules:
 - Remove the completed letter from the list — never re-offer a pick already delivered.
-- `RECOMMENDATION:` names the single most valuable remaining pick given what just happened (e.g., after Pre-mortem → recommend Sell-up; after Deep dive → recommend Pre-mortem).
+- `RECOMMENDATION:` names the single most valuable remaining pick given what just happened (e.g., after Pre-mortem → recommend Deep dive; after Deep dive → recommend Pre-mortem).
 - If only one pick remains, still show it with the RECOMMENDATION line.
 - If all picks are exhausted, close with: *"All next steps covered. Type a new decision or follow-up."*
 - The re-surface loop continues until picks are exhausted or the user skips/starts a new decision.
@@ -487,9 +487,9 @@ C) **[Situational label]** — [≤2 sentences]
 
 Next steps:
 D) Pre-mortem — stress-test before committing
-E) Sell-up — reframe for leadership / investors
-F) Deep dive — full Five Truths + 10-section
-G) Roadmap — stack against other bets
+E) Deep dive — full Five Truths + 10-section
+F) Roadmap — stack against other bets
+G) Sell-up — reframe for leadership / investors
 H) Something else — one sentence
 [I) New evidence — share what you found, I'll show what shifts]
 
