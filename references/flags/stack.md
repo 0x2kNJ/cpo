@@ -72,6 +72,16 @@ Coverage: [N]/9 stages covered
 
 If any stage is missing, add one line: *"Gaps in [stage names]. These stages work manually — the stack is strongest when all stages have skills."* No install instructions — just visibility.
 
+## CPO-aware detection
+
+A skill is `[✓ CPO-aware]` if its SKILL.md contains a `CPO Handoff Request` block or references `/cpo --decide`. To scan:
+
+```bash
+grep -rl "CPO Handoff Request\|cpo --decide" ~/.claude/skills/ ~/.claude/plugins/cache/ 2>/dev/null
+```
+
+When running `--stack`, append `[✓ CPO-aware]` next to any skill detected by this scan. This indicates the skill implements the `--decide` handoff contract and can route decisions back to CPO.
+
 ## Discovering unknown complementary skills
 
 If you detect a skill that doesn't fit any of the workflow stages above but seems potentially useful alongside `/cpo` (e.g., a design skill, a documentation skill, a scheduling skill), note it silently. When the user runs `--stack`, append a section:

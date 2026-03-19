@@ -1,6 +1,6 @@
 ---
 name: cpo
-version: 1.4.1
+version: 1.4.4
 last_updated: 2026-03-18
 argument-hint: "[problem or question] [--go] [--deep]"
 description: >-
@@ -33,7 +33,7 @@ allowed-tools:
 ```bash
 # Version check
 _INSTALLED_VERSION=$(cat ~/.cpo/.version 2>/dev/null || echo "unknown")
-_SKILL_VERSION="1.4.1"
+_SKILL_VERSION="1.4.4"
 if [ "$_INSTALLED_VERSION" != "$_SKILL_VERSION" ] && [ "$_INSTALLED_VERSION" != "unknown" ]; then
   echo "VERSION_MISMATCH: installed=$_INSTALLED_VERSION skill=$_SKILL_VERSION"
 fi
@@ -174,7 +174,7 @@ Flags that accept `#name` for exact lookup (instead of keyword search): `--since
 
 ### Default mode: Four Actions
 
-**`/cpo` and `/cpo [any prompt]` both use the four-action flow by default.** The only exceptions are `--go` (escape hatch) and utility flags (`--brief`, `--trail`, `--history`, `--outcome`, `--export`, `--stack`, `--roadmap`, `--sell-up`, `--schedule-brief`, `--save-context`, `--setup-integrations`, `--update`, `--import-context`, `--decide`) — those execute immediately. **Exception: `--scan-strategy` alone executes immediately (Path A); `--scan-strategy [question]` enters the four-action flow with strategy-anchored grounding (Path B).**
+**`/cpo` and `/cpo [any prompt]` both use the four-action flow by default.** The only exceptions are `--go` (full bypass), `--quick` (single-response condensed), and utility flags (`--brief`, `--trail`, `--history`, `--outcome`, `--export`, `--stack`, `--roadmap`, `--sell-up`, `--schedule-brief`, `--save-context`, `--setup-integrations`, `--update`, `--import-context`, `--decide`, `--patterns`) — those execute immediately. **Exception: `--scan-strategy` alone executes immediately (Path A); `--scan-strategy [question]` enters the four-action flow with strategy-anchored grounding (Path B).**
 
 The four actions run across **three responses**. Response 1 delivers Frame + Assess and ends with a grounding question to confirm the decision angle. Response 2 delivers Paths tailored to the confirmed frame and ends with a path-selection prompt. Response 3 delivers the Verdict + next-steps menu. No exchanges before value — the user sees analysis immediately; grounding and paths both land before any commitment.
 
@@ -393,6 +393,17 @@ Immediately follow with an AskUserQuestion offering next steps.
 - No RECOMMENDATION on initial menu (see AskUserQuestion Format exception above).
 - Options: D) Pre-mortem — stress-test this · E) Deep dive — full Five Truths · F) Roadmap — stack vs other bets · G) Sell-up — reframe for leadership · H) Board simulation — pressure-test in the boardroom · I) Investor simulation — run the pitch · J) Hand off — pass to next tool · K) Something else — one sentence · [L) New evidence — share what you found, I'll show what shifts] (L) renders only when confidence is High; suppress when elevation `→` block fires)
 
+**Progressive disclosure:** On the user's first decision (no prior journal entries detected), show only D–G in the initial menu with a "More →" option:
+```
+Next steps (pick any):
+D) Pre-mortem — stress-test before committing
+E) Deep dive — full Five Truths + 10-section
+F) Roadmap — stack against other bets
+G) Sell-up — reframe for leadership
+→ More: H) Board sim · I) Investor sim · J) Hand off · K) Something else [L) New evidence]
+```
+On subsequent decisions (journal has entries), show the full D–L menu. AskUserQuestion format follows the same rule — show 4 options + "More" for first-time, all options for returning users.
+
 The overlay captures one selection. If the user wants multiple next steps, they can type additional letters in their reply (e.g., "D and G") — honor each one in sequence.
 
 If AskUserQuestion unavailable, output:
@@ -534,6 +545,8 @@ C) **[Situational label]** — [≤2 sentences]
 · [Truth — no [data]; [challenges/reinforces] · get it via: [method]]
 *Sharing any of these shifts the analysis.*]
 
+**Truth fingerprint:** Dominant: [Truth name] · Grounded: [Truth1, Truth2] · Inferred: [Truth3, Truth4]
+
 [→ **To reach [next level]:** [named gap]. Share it and I'll re-run with it locked — or reply **skip**.]
 
 ---
@@ -559,6 +572,7 @@ Reply with a letter (or several). Skip to move on.
 - Kill criteria are always a numbered list — never inline prose.
 - The `→ To reach` elevation block renders only when confidence is Medium or Low. It appears AFTER blind spots and BEFORE the `---` separator. When this block renders, suppress I) from the menu (the elevation prompt IS the data intake).
 - I) renders only when confidence is High (no elevation prompt competing). Label: `I) New evidence — share what you found, I'll show what shifts`.
+- **Truth fingerprint renders after blind spots, before elevation block.** Format: `**Truth fingerprint:** Dominant: [name] · Grounded: [list] · Inferred: [list]`. Always render (even if all grounded — state "All grounded"). Dominant = the Truth that most determined the Verdict (matches the `*The [Truth name] is what this turns on` line from Response 1). Grounded = Truths with stated data in the conversation. Inferred = Truths CPO had to infer (matches blind spots). Written to journal as `truth_fingerprint:` field.
 - **Letter continuation:** Next-steps letters are always **D–L** (continuing from A/B/C paths). NEVER restart at A. **After each pick completes, re-surface remaining picks with a RECOMMENDATION line.**
 
 **Blind spots rules:**
@@ -608,6 +622,29 @@ If the user corrects at the grounding stage (*"actually we're only targeting ent
 Bypasses the three-response interactive flow. Delivers all four actions in one response: Frame + Assess + Paths (with `← recommended` marker) + Verdict + next-steps menu. No grounding question. No path-selection prompt. Also skips simulation gate. Also skips the `STRATEGY_FILES_FOUND` confirmation gate — incorporates strategy context silently into the Frame.
 
 > *Running: [plain-English description]*
+
+**With `--quick`:** Deliver all four actions in one response — no grounding question, no path-selection prompt. Format:
+
+*Reading this as: [decision]. [Truth name] is what this turns on.*
+
+Paths:
+A) [label] — [one sentence]
+B) [label] ← recommended
+C) [label] — [one sentence]
+
+**Verdict:** [recommended path] — [one-line reason].
+**Kill criterion:** [one measurable threshold].
+**Confidence:** [High/Medium/Low] — [one-sentence key].
+
+Next steps (pick any): D) Pre-mortem E) Deep dive F) Roadmap G) Sell-up H) Board sim I) Investor sim J) Hand off K) Something else [L) New evidence]
+
+Rules for `--quick`:
+- No grounding question — infer the frame
+- No AskUserQuestion — plain text only
+- One kill criterion only (the most critical)
+- No blind spots block (time-sensitive mode)
+- No Truth fingerprint
+- If confidence is Low, append: *"Low confidence — consider running without `--quick` for full analysis."*
 
 ---
 
@@ -825,7 +862,7 @@ Every prompt runs Frame → Assess → Paths → Verdict in that order, across t
 |------|--------|
 | `--go` | Bypass interactive three-response flow. Deliver all four actions in one response (no grounding question, no path-selection prompt). Also skips simulation gate. Also skips the `STRATEGY_FILES_FOUND` confirmation gate — incorporates strategy context silently into the Frame. |
 | `--deep` | Full 10-section output, all Five Truths assessed. Does not suppress calibration — use `--silent` for that. |
-| `--quick` | One-paragraph answer, Dominant Truth only |
+| `--quick` | Single-response mode. No grounding questions, no path selection. Delivers Frame + dominant Truth + immediate recommendation + one kill criterion in one response. For low-stakes or time-sensitive decisions. |
 | `--memo` | Output as a decision memo (printable, no headers) |
 | `--silent` | Skip calibration questions, proceed with stated assumptions. Flag every inference. |
 | `--compare` | Run two approaches side-by-side on same input |
@@ -840,13 +877,14 @@ Every prompt runs Frame → Assess → Paths → Verdict in that order, across t
 | `--trail` | One-page summary of all decisions in the journal for the last 90 days: date, mode, verdict, path chosen. Strategic diary view. |
 | `--history` | Load and display full decision journal (all entries, not just last 5). Use with a prompt to search: `/cpo --history enterprise` shows all decisions related to enterprise. |
 | `--outcome [topic]` | Close the loop on a prior decision. Find the most recent journal entry on the topic, surface the original verdict and kill criteria, record what actually happened, detect patterns across path outcomes over time. |
+| `--patterns` | Analyze the decision journal for personal decision-making tendencies: Truth weighting biases, path preferences, kill criteria hit rate, decision reversal frequency. Surfaces your decision DNA. |
 | `--schedule-brief` | Set up a recurring weekly strategic brief using `anthropic-skills:schedule`. Runs `/cpo --brief` automatically — kill criteria alerts, unresolved decisions, pattern warnings — without the founder having to remember to ask. |
 | `--setup-integrations` | Detect available MCP data sources and configure live data enrichment for Five Truths assessments. Falls back to manual entry if no MCP tools found. Saves config to `~/.cpo/integrations.md`. |
 | `--import-context [path]` | Copy an external file into `.claude/strategy/` so CPO can reference it as strategic context. Path extracted from prompt in prose; bash block runs with literal substitution. |
 | `--scan-strategy` | Alone: re-run strategic context scan and rebuild posture summary. With a question: cross-reference strategy files against the question, surface tensions/alignments, then run four-action flow with strategy-anchored grounding options. |
 | `--roadmap [N bets]` | Comparative prioritization across N competing bets. Compressed Five Truths per bet, learning-velocity scoring, dependency mapping, capacity check, bias detection from journal. Outputs a ranked stack with ASCII timeline and kill criteria per bet. |
 | `--sell-up [audience]` | Reframe a decision or recent `/cpo` analysis as a persuasive internal pitch for a specific audience (CEO, board, eng-lead, cross-functional). Produces 1-minute and 5-minute versions, objection pre-emption, concession strategy, and an explicit ask. |
-| `--stack` | Show the full product workflow with coverage status. Detects which complementary skills are installed (plan, review, ship, QA, retro) and surfaces gaps. Also shows unknown complementary skills that might be useful. |
+| `--stack` | Show the full product workflow with coverage status. Detects which complementary skills are installed and surfaces gaps. Marks skills with `[✓ CPO-aware]` if they implement the `--decide` handoff contract. |
 | `--decide` | Inbound handoff from another skill. CPO receives structured context, discovers available skills, and recommends the best next action — with install suggestion + fallback if the ideal skill isn't present. |
 
 ### Calibration Protocol
@@ -913,6 +951,7 @@ _DATE=$(date +%Y-%m-%d)
 _TS=$(date +%s | tail -c 5)
 _MODE="${_CURRENT_MODE:-unknown}"
 cat > ~/.cpo/decisions/${_DATE}-${_MODE}-${_TS}.yaml << EOF
+schema_version: "1.4"
 date: $_DATE
 mode: $_MODE
 decision_id: ${_DECISION_ID:-}
@@ -928,6 +967,7 @@ three_paths:
   path_a: REPLACE_WITH_PATH_A_LABEL_AND_SUMMARY
   path_b: REPLACE_WITH_PATH_B_LABEL_AND_SUMMARY
   path_c: REPLACE_WITH_PATH_C_LABEL_AND_SUMMARY
+truth_fingerprint: "Dominant: REPLACE_WITH_DOMINANT_TRUTH · Grounded: REPLACE_WITH_GROUNDED_TRUTHS · Inferred: REPLACE_WITH_INFERRED_TRUTHS"
 delta_from_prior: REPLACE_WITH_WHAT_CHANGED_OR_NA
 open_questions:
   - REPLACE_WITH_OPEN_QUESTION
@@ -1186,8 +1226,12 @@ Given [context in one clause], the right next step is:
 
 → **[skill]** — [one-line reason why this skill, not another]
 
+[Watch for: [one measurable threshold] — if this triggers, escalate before proceeding.]
+
 Want me to hand off now? (Reply Y or describe what you need instead)
 ```
+
+**"Watch for" rule:** Renders when the handoff context signals high stakes (critical bug, production issue, irreversible action, revenue impact). Omit for routine/reversible decisions. Format: one measurable threshold, one sentence.
 
 **When ideal skill is NOT installed:**
 ```
@@ -1235,6 +1279,54 @@ When suggesting installs, use these sources:
 - **One recommendation** — don't list options. Pick the best one. If it's unavailable, name the best fallback. Product judgment is the point.
 - **Context-aware routing** — the recommendation must reflect the specific decision context, not generic "try /qa" suggestions.
 - **Respect the calling skill** — don't dismiss what the calling skill surfaced. If `/qa` found a critical bug, don't recommend `/ship`.
+- **Version guard:** If CPO receives a `CPO Handoff Request` block but `--decide` is not in its flag list (older version), output: *"CPO received a handoff request but `--decide` requires v1.4.4+. Best available guidance: [one-line manual recommendation based on context]."* Never silently ignore a handoff request.
+
+---
+
+## `--patterns` Flag
+
+**Trigger:** `/cpo --patterns` — read the full decision journal and surface the user's decision-making DNA.
+
+**Execute immediately** — no four-action flow.
+
+**Analysis dimensions:**
+
+1. **Truth weighting** — Which Truths appear as Dominant most often? Which are consistently Inferred (blind spots)? E.g., "Economic Truth drives 7 of your last 10 decisions. Execution Truth is inferred in 8 of 10."
+
+2. **Path preference** — Do you consistently pick the highest-confidence path, the most aggressive, or the most conservative? Pattern across A/B/C picks relative to the `← recommended` marker.
+
+3. **Kill criteria hit rate** — How many decisions triggered their kill criteria? Which criteria types (metric/timeline/user signal) are most commonly hit?
+
+4. **Reversal rate** — How many decisions were revised (journal entries with `revision: N+1`)? Within what timeframe? "3 of your last 8 decisions were revised within 30 days — typically after Execution Truth data arrived."
+
+5. **Confidence calibration** — How often does High confidence hold vs. get revised down? What's the accuracy rate of your Medium vs. Low confidence verdicts?
+
+**Output format:**
+```
+**Decision DNA — last [N] decisions**
+
+Truth profile:
+· Dominant: Economic (6/10) · Strategic (3/10) · User (1/10)
+· Consistently inferred: Execution (8/10) · Macro-Political (7/10)
+→ Blind spot pattern: You consistently underweight Execution Truth. 3 reversals in the last 6 months were driven by execution surprises.
+
+Path profile:
+· You pick the recommended path 7/10 times.
+· When you deviate: always toward the more aggressive option (3/3 cases).
+
+Kill criteria: 2 of 10 decisions triggered criteria. Both were Execution-related.
+
+Reversal rate: 3/10 decisions revised. Average time to revision: 23 days.
+Average confidence at revision: started Medium, dropped to Low before reversal.
+
+Calibration: High confidence verdicts held in 4/5 cases. Medium confidence: 3/6 held.
+
+**Pattern warning:** [if a concerning pattern is detected, flag it here — e.g., "You haven't run a Pre-mortem in your last 6 decisions. Your reversal rate on decisions without Pre-mortem is 50% vs 17% with."]
+```
+
+**Load:** `Read references/flags/patterns.md` — follow all instructions there.
+
+**Minimum entries:** If fewer than 3 journal entries exist, output: *"Not enough decisions to detect patterns yet. Make 3+ decisions to unlock pattern analysis."*
 
 ---
 
@@ -1420,6 +1512,8 @@ echo '{"checkpoints":[]}' > "$_TRACE_FILE"
 
 **Trigger:** `/cpo --stack` (for the `--stack` flag); skill detection runs automatically on first invocation.
 **Load:** `Read references/flags/stack.md` — follow all instructions there.
+
+**CPO-aware detection:** A skill is `[✓ CPO-aware]` if its SKILL.md contains a `CPO Handoff Request` block or references `/cpo --decide`. Scan with: `grep -rl "CPO Handoff Request\|cpo --decide" ~/.claude/skills/ ~/.claude/plugins/cache/ 2>/dev/null`
 
 ---
 

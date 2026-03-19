@@ -670,6 +670,6 @@ Yes. CPO compounds context over time through its shared local state and decision
 
 ## Version · License
 
-Current: **v1.4.1** — [view changelog](CHANGELOG.md)
+Current: **v1.4.4** — [view changelog](CHANGELOG.md)
 
 MIT. Free forever. Go make better product decisions.

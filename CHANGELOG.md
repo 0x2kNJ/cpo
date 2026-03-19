@@ -4,6 +4,23 @@ All notable changes documented here. Follows [Keep a Changelog](https://keepacha
 
 ---
 
+## [1.4.4] — 2026-03-18
+
+8 improvements: Truth Fingerprint tracking, `--decide` version guard, `--stack` CPO-aware detection, kill criterion in `--decide` outputs, `--patterns` flag (Decision DNA), `--quick` mode, `references/handoff-contract.md`, progressive D–L menu disclosure for first-time users.
+
+### Added
+
+- **Truth Fingerprint:** Response 3 now renders `**Truth fingerprint:** Dominant · Grounded · Inferred` after blind spots. Written to journal as `truth_fingerprint:` field. Journal schema bumped to `schema_version: "1.4"`.
+- **`--decide` version guard:** If CPO receives a `CPO Handoff Request` block but `--decide` is not in its flag list (older version), outputs a graceful fallback recommendation instead of silently ignoring the handoff.
+- **`--stack` CPO-aware indicator:** Skills that implement the `--decide` handoff contract (contain `CPO Handoff Request` or reference `/cpo --decide`) are now marked `[✓ CPO-aware]` in stack output. Detection via grep scan.
+- **Kill criterion in `--decide` outputs:** High-stakes handoffs (critical bugs, production issues, irreversible actions, revenue impact) now append a `Watch for:` line with one measurable threshold before the hand-off confirmation.
+- **`--patterns` flag:** New Decision DNA analysis — scans decision journal for Truth weighting bias, path preference, kill criteria hit rate, reversal rate, and confidence calibration. Outputs plain-language pattern summary with one behavioral "Watch for."
+- **`--quick` mode:** Single-response condensed output — all four actions in one response, no grounding question, one kill criterion, no blind spots, no Truth fingerprint. Low-confidence warning appended when needed.
+- **`references/handoff-contract.md`:** Full Skill Handoff Contract documentation for skill authors — format spec, field definitions, anti-patterns, checklist.
+- **Progressive D–L menu disclosure:** First-time users (preamble returned `NO_DECISIONS`) see condensed D–G menu with `More →` inline. Returning users see full D–L menu.
+
+---
+
 ## [1.4.1] — 2026-03-18
 
 Second panel review pass (Gary Tan · Mike Krieger · Boris Cherny). 7 bug fixes, 2 new features, Bold/Balanced/Conservative contamination cleanup.

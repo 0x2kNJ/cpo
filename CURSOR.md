@@ -34,7 +34,7 @@ Type `cpo help` or `cpo ?` to see a full overview of what it can do.
 ```bash
 # Version check
 _INSTALLED_VERSION=$(cat ~/.cpo/.version 2>/dev/null || echo "unknown")
-_SKILL_VERSION="1.4.1"
+_SKILL_VERSION="1.4.4"
 if [ "$_INSTALLED_VERSION" != "$_SKILL_VERSION" ] && [ "$_INSTALLED_VERSION" != "unknown" ]; then
   echo "VERSION_MISMATCH: installed=$_INSTALLED_VERSION skill=$_SKILL_VERSION"
 fi
@@ -186,7 +186,7 @@ Flags that accept `#name` for exact lookup (instead of keyword search): `--since
 
 ### Default mode: Four Actions
 
-**All prompts use the four-action flow by default.** Exceptions: `--go` (escape hatch) and utility flags (`--brief`, `--trail`, `--history`, `--outcome`, `--export`, `--stack`, `--roadmap`, `--sell-up`, `--schedule-brief`, `--save-context`, `--setup-integrations`, `--update`, `--import-context`, `--decide`) execute immediately. **Exception: `--scan-strategy` alone executes immediately (Path A); `--scan-strategy [question]` enters the four-action flow with strategy-anchored grounding (Path B).**
+**All prompts use the four-action flow by default.** Exceptions: `--go` (escape hatch), `--quick` (single-response condensed), and utility flags (`--brief`, `--trail`, `--history`, `--outcome`, `--export`, `--stack`, `--roadmap`, `--sell-up`, `--schedule-brief`, `--save-context`, `--setup-integrations`, `--update`, `--import-context`, `--decide`, `--patterns`) execute immediately. **Exception: `--scan-strategy` alone executes immediately (Path A); `--scan-strategy [question]` enters the four-action flow with strategy-anchored grounding (Path B).**
 
 The four actions run across **three responses**. Response 1 delivers Frame + Assess and ends with a grounding question to confirm the decision angle. Response 2 delivers Paths tailored to the confirmed frame and ends with a path-selection prompt. Response 3 delivers the Verdict + next-steps menu. No exchanges before value — the user sees analysis immediately; grounding and paths both land before any commitment.
 
@@ -511,6 +511,8 @@ Reply A, B, or C. Or correct the Frame if it's off.
 · [Truth — no [data]; [challenges/reinforces] · get it via: [method]]
 *Sharing any of these shifts the analysis.*]
 
+**Truth fingerprint:** Dominant: [Truth name] · Grounded: [Truth1, Truth2] · Inferred: [Truth3, Truth4]
+
 [→ **To reach [next level]:** [named gap]. Share it and I'll re-run with it locked — or reply **skip**.]
 
 ---
@@ -520,8 +522,11 @@ D) Pre-mortem — stress-test before committing
 E) Deep dive — full Five Truths + 10-section
 F) Roadmap — stack against other bets
 G) Sell-up — reframe for leadership / investors
-H) Something else — one sentence
-[I) New evidence — share what you found, I'll show what shifts]
+H) Board simulation — pressure-test in the boardroom
+I) Investor simulation — run the pitch, field the hard questions
+J) Hand off — pass decision context to the next tool
+K) Something else — one sentence
+[L) New evidence — share what you found, I'll show what shifts]
 
 Reply with a letter (or several). Skip to move on.
 ```
@@ -532,6 +537,7 @@ Reply with a letter (or several). Skip to move on.
 - The `→ To reach` elevation block renders only when confidence is Medium or Low. It appears AFTER blind spots and BEFORE the `---` separator. When this block renders, suppress L) from the menu (the elevation prompt IS the data intake).
 - L) renders only when confidence is High (no elevation prompt competing). Label: `L) New evidence — share what you found, I'll show what shifts`.
 - **Letter continuation:** Next-steps letters are always **D–L** (continuing from A/B/C paths). NEVER restart at A. If you catch yourself writing A) Pre-mortem, STOP — it must be D).
+- **Truth fingerprint renders after blind spots, before elevation block.** Format: `**Truth fingerprint:** Dominant: [name] · Grounded: [list] · Inferred: [list]`. Always render (even if all grounded — state "All grounded"). Written to journal as `truth_fingerprint:` field.
 
 **Structural rules:**
 - Response 1 Line 1 always starts with `*I'm reading this as:`
@@ -546,9 +552,11 @@ Reply with a letter (or several). Skip to move on.
 - Response 3 uses structured format: `**Verdict:**` line, `**Kill criteria:**` numbered list, `**Confidence:**` with key, `**Blind spots:**` block (conditional), `→ To reach` elevation block (conditional, Medium/Low only). Never run these together as one dense paragraph.
 - Response 3 includes a Blind spots block immediately after Confidence key when ≥1 Truth was inferred without stated data — one item per line prefixed with `·`, format `[Truth — no [data type]; [challenges/reinforces] this verdict · get it via: [collection method]]`, max 3 items, ends with "Sharing any of these shifts the analysis." Suppress entirely if all Truths were grounded.
 - Response 3 always includes the next-steps menu D–L
+- **Progressive disclosure:** On the user's first decision (preamble returned `NO_DECISIONS`), show only D–G in the initial menu with a "More →" option: `D) Pre-mortem E) Deep dive F) Roadmap G) Sell-up → More: H) Board sim · I) Investor sim · J) Hand off · K) Something else [L) New evidence]`. Returning users (any prior journal entries) see the full D–L menu.
 - No headers, no numbered sections, no preamble before Line 1 of Response 1 **except:** if `STRATEGY_FILES_FOUND` with a question-reframing tension, 2-sentence posture + tension-as-grounding-options precede Line 1 — the user's angle pick IS the confirmation; no separate "is this right?" gate. If no tension found: posture folds silently into Line 1.
 - With `--deep`: Response 1 Lines 1–2 unchanged. After paths in Response 2, insert full 10-section output before the path-selection prompt. Response 3 Verdict unchanged.
 - With `--go`: bypass the three-response flow — deliver all four actions in one response (no grounding question, no text footer). Paths use `A) B) C)` format. Mark recommended path with `← recommended`. Append plain text next-steps list D–L at the end.
+- With `--quick`: deliver all four actions in one response — no grounding question, no path-selection prompt. No blind spots block. One kill criterion only. No Truth fingerprint. If confidence is Low, append: *"Low confidence — consider running without `--quick` for full analysis."*
 
 **Blind spots rules:**
 - Render only when ≥1 Truth was primarily inferred during Assess (tracked silently via blind spots tracking)
@@ -580,6 +588,29 @@ If the user corrects at the grounding stage (*"actually we're only targeting ent
 Bypasses the three-response interactive flow. Delivers all four actions in one response: Frame + Assess + Paths (with `← recommended` marker) + Verdict + next-steps menu. No grounding question. No path-selection prompt. Also skips simulation gate.
 
 > *Running: [plain-English description]*
+
+---
+
+### `--quick` mode
+
+**With `--quick`:** Deliver all four actions in one response — no grounding question, no path-selection prompt. Format:
+*Reading this as: [decision]. [Truth name] is what this turns on.*
+Paths:
+A) [label] — [one sentence]
+B) [label] ← recommended
+C) [label] — [one sentence]
+**Verdict:** [recommended path] — [one-line reason].
+**Kill criterion:** [one measurable threshold].
+**Confidence:** [High/Medium/Low] — [one-sentence key].
+Next steps (pick any): D) Pre-mortem E) Deep dive F) Roadmap G) Sell-up H) Board sim I) Investor sim J) Hand off K) Something else [L) New evidence]
+
+Rules for `--quick`:
+- No grounding question — infer the frame
+- No AskUserQuestion — plain text only
+- One kill criterion only (the most critical)
+- No blind spots block (time-sensitive mode)
+- No Truth fingerprint
+- If confidence is Low, append: *"Low confidence — consider running without `--quick` for full analysis."*
 
 ---
 
@@ -813,7 +844,7 @@ In compact mode: identify the **Dominant Truth** and reason from it. In `--deep`
 |------|--------|
 | `--go` | Bypass interactive three-response flow. Deliver all four actions in one response (no grounding question, no path-selection prompt). Also skips simulation gate. Also skips the `STRATEGY_FILES_FOUND` confirmation gate — incorporates strategy context silently into the Frame. |
 | `--deep` | Expand Assess to all five Truths. Full 10-section output. Does not suppress calibration — use `--silent` for that. |
-| `--quick` | One-paragraph answer, Dominant Truth only |
+| `--quick` | Single-response condensed answer — all four actions in one response, no grounding question, one kill criterion, no blind spots. |
 | `--memo` | Output as a decision memo (printable, no headers) |
 | `--silent` | Skip calibration questions, proceed with stated assumptions. Flag every inference. |
 | `--compare` | Run two approaches side-by-side on same input |
@@ -833,8 +864,9 @@ In compact mode: identify the **Dominant Truth** and reason from it. In `--deep`
 | `--scan-strategy` | Alone: re-run strategic context scan and rebuild posture summary. With a question: cross-reference strategy files against the question, surface tensions/alignments, then run four-action flow with strategy-anchored grounding options. |
 | `--roadmap [N bets]` | Comparative prioritization across N competing bets. |
 | `--sell-up [audience]` | Reframe a decision as a persuasive internal pitch for a specific audience. |
-| `--stack` | Show the full product workflow with coverage status. |
+| `--stack` | Show the full product workflow with coverage status. Detects which complementary skills are installed and surfaces gaps. Marks skills with `[✓ CPO-aware]` if they implement the `--decide` handoff contract. |
 | `--decide` | Inbound handoff from another skill. CPO receives structured context, discovers available skills, and recommends the best next action — with install suggestion + fallback if the ideal skill isn't present. |
+| `--patterns` | Analyze the decision journal for personal decision-making tendencies: Truth weighting biases, path preferences, kill criteria hit rate, decision reversal frequency. Surfaces your decision DNA. |
 
 ### Calibration Protocol
 
@@ -876,6 +908,7 @@ _DATE=$(date +%Y-%m-%d)
 _TS=$(date +%s | tail -c 5)
 _MODE="${_CURRENT_MODE:-unknown}"
 cat > ~/.cpo/decisions/${_DATE}-${_MODE}-${_TS}.yaml << EOF
+schema_version: "1.4"
 date: $_DATE
 mode: $_MODE
 decision_id: ${_DECISION_ID:-}
@@ -891,6 +924,7 @@ three_paths:
   path_a: REPLACE_WITH_PATH_A_LABEL_AND_SUMMARY
   path_b: REPLACE_WITH_PATH_B_LABEL_AND_SUMMARY
   path_c: REPLACE_WITH_PATH_C_LABEL_AND_SUMMARY
+truth_fingerprint: "Dominant: REPLACE_WITH_DOMINANT_TRUTH · Grounded: REPLACE_WITH_GROUNDED_TRUTHS · Inferred: REPLACE_WITH_INFERRED_TRUTHS"
 delta_from_prior: REPLACE_WITH_WHAT_CHANGED_OR_NA
 open_questions:
   - REPLACE_WITH_OPEN_QUESTION
@@ -1061,6 +1095,15 @@ Full templates at `~/.claude/skills/cpo/references/modes/[mode].md` — load wit
 
 ---
 
+## `--patterns` Flag
+
+**Trigger:** `--patterns` — analyze the decision journal for personal decision-making tendencies.
+**Load:** `cat ~/.claude/skills/cpo/references/flags/patterns.md`
+
+Analyzes five dimensions: Truth weighting bias (which Truths dominate verdicts), path preference (A/B/C frequency), kill criteria hit rate (how often kill criteria triggered vs. decisions that proceeded), reversal rate (decisions reopened within 30 days), confidence calibration (Low/Medium/High distribution vs. outcomes). Surfaces decision DNA in plain language.
+
+---
+
 ## Domain Overlays
 
 | Vertical | Load |
@@ -1146,9 +1189,12 @@ Parse context → run discovery → match need to capability (product judgment, 
 ```
 **CPO → [From] decision**
 Given [context in one clause], the right next step is:
-→ **[skill]** — [one-line reason]
-Want me to hand off now?
+→ **[skill]** — [one-line reason why this skill, not another]
+[Watch for: [one measurable threshold] — if this triggers, escalate before proceeding.]
+Want me to hand off now? (Reply Y or describe what you need instead)
 ```
+
+**"Watch for" rule:** Renders when the handoff context signals high stakes (critical bug, production issue, irreversible action, revenue impact). Omit for routine/reversible decisions. Format: one measurable threshold, one sentence.
 
 **Ideal skill NOT installed:**
 ```
@@ -1180,6 +1226,7 @@ In the meantime: [specific manual action — never leave stranded]
 - One recommendation only — pick the best, don't list options
 - Context-aware — recommendation must reflect the specific fork, not generic suggestions
 - Respect the calling skill — if `/qa` found a critical bug, don't recommend `/ship`
+- **Version guard:** If CPO receives a `CPO Handoff Request` block but `--decide` is not in its flag list (older version), output: *"CPO received a handoff request but `--decide` requires v1.4.4+. Best available guidance: [one-line manual recommendation based on context]."* Never silently ignore a handoff request.
 
 ---
 
@@ -1245,6 +1292,8 @@ Key rules (see file for full table):
 
 **Trigger:** `--stack` — shows the full product workflow from strategy through ship/QA/retro/outcome.
 **Load:** `cat ~/.claude/skills/cpo/references/flags/stack.md`
+
+**CPO-aware detection:** A skill is `[✓ CPO-aware]` if its SKILL.md contains a `CPO Handoff Request` block or references `/cpo --decide`. Scan with: `grep -rl "CPO Handoff Request\|cpo --decide" ~/.claude/skills/ ~/.claude/plugins/cache/ 2>/dev/null`
 
 ---
 
