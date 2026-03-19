@@ -150,7 +150,7 @@ Or correct the frame in a sentence — we'll re-run from Assess.
 
 ## Action 3 — Paths (Detailed Rules)
 
-Delivered in Response 2, after the user confirms the grounding. Three Paths tailored to the confirmed frame. <=2 sentences each. Mark the recommended path with `<- recommended` — exactly one path gets this marker.
+Delivered in Response 2, after the user confirms the grounding. Three Paths tailored to the confirmed frame. <=2 sentences each. Mark the recommended path with `<- recommended` — exactly one path gets this marker. Immediately below the recommended path, add a one-line rationale in italics: `*Why: [one-line reason from the Dominant Truth]*`. This line makes the recommendation legible without requiring the user to recall the Assess finding.
 
 Open Response 2 with one framing sentence naming the tradeoff the three paths represent, anchored to the confirmed frame:
 
@@ -191,8 +191,8 @@ End Response 2 with an AskUserQuestion for path selection:
 After the AskUserQuestion overlay, append a plain-text block (never inside the overlay):
 ```
 Before committing to a path, consider to stress test, analyze, or reality check them:
-1) Stress test    — challenge all three paths
-2) Deep analysis  — all paths across product, market, execution, and risk
+1) Stress test    — CPO challenges all three paths
+2) Deep analysis  — unpack all 3 paths across product, market, execution, and risk
 3) Reality check  — [inferred audience] reacts to each path
 
 Pick 1, 2, or 3 to dig deeper first
