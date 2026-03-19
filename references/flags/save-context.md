@@ -10,9 +10,11 @@
 3. `--save-context` passed? → Run immediately, collect all 5 fields, save.
 4. First interaction? → Infer from prompt first, ask ONE question max. Infer remaining fields mid-analysis. Do not ask for them — only `--save-context` triggers full collection.
 
-**Collection:** One field per AskUserQuestion: Stage → Business model → Core constraint → Top 3 priorities → Biggest open question.
+**Collection:** One field per AskUserQuestion: Stage → Business model → Core constraint → Top 3 priorities → Biggest open question → Operating bias.
 
-After all 5, save:
+For the operating bias question, ask: *"When you're stuck, what's your natural first move? A) Build or ship something to generate signal · B) Research, talk to users, or gather data first · C) Reach out to partners, customers, or advisors to open a conversation"*. Map A → `build-first`, B → `research-first`, C → `relationship-first`. This field powers the `--status` Action so recommendations match how you actually operate.
+
+After all 6, save:
 
 ```bash
 mkdir -p ~/.cpo
@@ -23,6 +25,7 @@ Business model: [answer]
 Core constraint: [answer]
 Top priorities: [answer]
 Open question: [answer]
+Operating bias: [build-first | research-first | relationship-first]
 Last updated: [date]
 EOF
 echo "$_SKILL_VERSION" > ~/.cpo/.version

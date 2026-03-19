@@ -28,6 +28,9 @@ Preparing for a board meeting?
 Need to build the case upward?
 → `/cpo --sell-up CEO`
 
+Want a right-now executive snapshot?
+→ `/cpo --status`
+
 Want a weekly strategic digest?
 → `/cpo --brief`
 
@@ -198,7 +201,7 @@ Run this once so CPO knows your stage and business model — it will never ask a
 /cpo --save-context
 ```
 
-CPO will ask 5 quick questions and save the answers to `~/.cpo/context.md`. Every future session loads this automatically. Without it, CPO will ask one calibration question at the start of GTM, roadmap, and strategy prompts.
+CPO will ask 6 quick questions and save the answers to `~/.cpo/context.md`. Every future session loads this automatically. The 6th question captures your **operating bias** (build-first, research-first, or relationship-first) — this powers `--status` so action recommendations match how you actually operate, not generic startup advice. Without it, CPO will ask one calibration question at the start of GTM, roadmap, and strategy prompts.
 
 ### 5) Stop there
 
@@ -473,7 +476,7 @@ CPO supports 20 core modes. Invoke them with natural language — CPO routes aut
 
 ### Flags
 
-CPO supports 27 flags for shaping how it reasons and communicates.
+CPO supports 28 flags for shaping how it reasons and communicates.
 
 | Flag | Example | What it does |
 |:---|:---|:---|
@@ -485,7 +488,8 @@ CPO supports 27 flags for shaping how it reasons and communicates.
 | `--compare` | `/cpo --compare option-a vs option-b` | Runs two approaches side-by-side on the same input. |
 | `--roadmap` | `/cpo --roadmap 4 bets` | Comparative prioritization across N bets — Five Truths per bet, ASCII timeline, kill criteria per bet. |
 | `--sell-up` | `/cpo --sell-up CEO` | Reframes any decision as an internal pitch. 1-min + 5-min version, objection pre-emption, explicit ask. |
-| `--save-context` | `/cpo --save-context` | Saves company context — stage, model, constraint, priorities. Loads automatically every session. |
+| `--status` | `/cpo --status` | Executive snapshot — force-ranks to ONE red line (the thing blocking velocity). Grounded in decision journal history, kill criteria proximity, and your operating style. Add `--verbose` to see the full synthesis trace. |
+| `--save-context` | `/cpo --save-context` | Saves company context — stage, model, constraint, priorities, and operating bias. Loads automatically every session. |
 | `--context` | `/cpo --context series-a` | Loads a named context from `~/.cpo/contexts/[name].md`. For consultants or multi-company use. |
 | `--no-context` | `/cpo --no-context` | Ignores saved context. Reasons from the current prompt only. |
 | `--focus` | `/cpo --focus burn-rate` | Simulation modes only — jumps directly to targeted pressure on one topic. |
@@ -527,7 +531,8 @@ CPO uses shared local state so it can compound context over time. Everything liv
 
 | Path | What it stores | Why it matters |
 |:---|:---|:---|
-| `~/.cpo/context.md` | Company profile — stage, model, constraint, priorities | Keeps answers grounded in your actual company. Loads every session. |
+| `~/.cpo/context.md` | Company profile — stage, model, constraint, priorities, operating bias | Keeps answers grounded in your actual company. Loads every session. The `operating_bias` field powers `--status` action recommendations. |
+| `~/.cpo/last-status.yaml` | Last `--status` run — red line, action, at-risk decision | Enables delta detection: next `--status` run shows whether the red line changed and why. |
 | `~/.cpo/decisions/` | Decision journal — one YAML per major analysis (schema v1.5: includes Truth fingerprint, status, kill criteria) | Builds a searchable strategic history. Foundation for `--brief`, `--trail`, `--since`, `--drift`, `--invalidate`. |
 | `~/.cpo/simulations/` | Boardroom and investor roundtable transcripts | Preserves full simulation sessions |
 | `~/.cpo/exports/` | Exported memos and analyses — dated and slugged | Makes outputs portable and shareable |
@@ -722,6 +727,6 @@ Logic drift is when a series of individually reasonable decisions quietly moves 
 
 ## Version · License
 
-Current: **v1.4.6** — [view changelog](CHANGELOG.md)
+Current: **v2.2.0** — [view changelog](CHANGELOG.md)
 
 MIT. Free forever. Go make better product decisions.
