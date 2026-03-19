@@ -9,6 +9,7 @@ allowed-tools:
   - Bash
   - Read
   - AskUserQuestion
+  - ToolSearch
 ---
 
 # CPO — Strategic Product Advisor
@@ -16,6 +17,8 @@ allowed-tools:
 ## Preamble (run first, once per session)
 
 **Session rule:** Run exactly once — on the first invocation this conversation. On follow-up questions, skip entirely and use context already established.
+
+**AskUserQuestion fetch (run immediately, before anything else):** Call `ToolSearch` with `query: "select:AskUserQuestion"` to load the AskUserQuestion tool schema into context. This ensures choice popups render in Cursor and other IDEs — without this fetch, all choice prompts silently fall back to plain text.
 
 **Decision object detection (runs after the preamble bash, in prose):**
 1. Scan the user's prompt for the first token matching `#[a-z0-9-]+`. If found, extract the name (strip the `#`). Call it DECISION_ID.
