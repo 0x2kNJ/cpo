@@ -4,6 +4,24 @@ All notable changes documented here. Follows [Keep a Changelog](https://keepacha
 
 ---
 
+## [1.9.2] — 2026-03-19
+
+**Gate markers into SKILL.md — `/cpo` now self-enforcing without setup.**
+
+Added two ⛔ GATE markers + self-check questions directly into the output format section of SKILL.md (at Response 1 and Response 2 boundaries). These were previously only in CURSOR.md, which users never loaded. Now the enforcement travels with the skill — typing `/cpo` in Cursor Composer loads SKILL.md, and SKILL.md contains the gates. No `@CURSOR.md`, no `.cursorrules`, no setup required.
+
+### Added
+
+- ⛔ **GATE 1** after Response 1 template: "Do not generate paths. Self-check: has the user replied with a grounding choice?"
+- ⛔ **GATE 2** after Response 2 template: "Do not generate the Verdict. Do not render D-M options. Self-check: has the user replied with a path choice or pre-commitment pick?"
+- Version bumped to 1.9.2 in preamble bash
+
+### Architecture note
+
+SKILL.md is now the single source of truth for gate enforcement. CURSOR.md remains as a setup guide for users who want to load it explicitly via `@CURSOR.md` or `.cursorrules`, but its enforcement content is no longer needed there — SKILL.md covers it.
+
+---
+
 ## [1.9.1] — 2026-03-19
 
 **Revert v1.9.0 architecture rewrite.** The v1.9.0 complete rewrite of CURSOR.md removed inline ⛔ GATE markers and self-check questions that were the behavioral cues making gate enforcement work in Cursor Composer. The rewrite replaced them with abstract rules at the top of the document, which models ignored entirely — producing identical broken output (all phases merged, no gates, wrong Truth names). Reverted to v1.8.12 content which has the inline markers that were working.
