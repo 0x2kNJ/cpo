@@ -4,6 +4,19 @@ All notable changes documented here. Follows [Keep a Changelog](https://keepacha
 
 ---
 
+## [1.8.5] — 2026-03-19
+
+Patch: challenge block UX fix — D/E/F reordered above commit prompt, call-to-action updated.
+
+### Fixed
+
+- **Challenge block reordered above commit prompt (CURSOR.md + SKILL.md):** The D/E/F pre-commitment challenge block was appended AFTER the "Reply A, B, or C" prompt, making D/E/F look like post-commitment options. Fixed by moving the challenge block FIRST, with the commit prompt incorporated at the bottom of the same block. Layout rule added: "The challenge block (D/E/F) always appears BEFORE the commit prompt — never appended after it."
+- **Call-to-action updated to include D/E/F explicitly (both files):** "Reply A, B, or C — or correct the Frame if it's off" gave no affordance for D/E/F. Replaced with: "Reply A, B, or C to commit — or D/E/F to dig deeper first. Correct the Frame if it's off."
+- **Header renamed to remove ambiguity (both files):** "Want to dig deeper before committing?" read as an optional addendum. Replaced with "Not ready to commit? Dig deeper first:" which signals pre-commitment intent clearly and positions D/E/F as tools to reach commit confidence, not post-commit analysis.
+- **SKILL.md AskUserQuestion unavailable fallback updated:** Same three fixes applied to the plain-text fallback path.
+
+---
+
 ## [1.8.4] — 2026-03-19
 
 Patch: remaining panel items — confidence key definition inline, self-check assertions at both gates.

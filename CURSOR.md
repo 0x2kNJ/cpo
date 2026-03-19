@@ -323,17 +323,18 @@ C) **[Situational label]** — [≤2 sentences]
 
 **Label-to-framing-sentence dependency:** Labels are derived from the framing sentence that opens Response 2. That sentence names the core tradeoff — labels are positions along it. Same decision type → same framing sentence → recognizable label structure. If framing is wrong, labels cascade wrong. Fix the sentence first.
 
-End Response 2 with a path-selection prompt. No Verdict yet — that waits for the user's pick:
+End Response 2 with the pre-commitment challenge block FIRST, then the commit prompt. No Verdict yet — that waits for the user's pick:
 
-> Reply A, B, or C — or correct the Frame if it's off.
+```
+Not ready to commit? Dig deeper first:
+D) Stress test    — challenge the top path
+E) Deep analysis  — all paths across product, market, execution, and risk
+F) Reality check  — [inferred audience] reacts to each path
 
-After the path-selection line, append a plain-text block:
+Reply A, B, or C to commit — or D/E/F to dig deeper first. Correct the Frame if it's off.
 ```
-Want to dig deeper before committing?
-D) Stress test    — challenge the top path before committing
-E) Deep analysis  — evaluate all paths across product, market, execution, and risk
-F) Reality check  — [inferred audience] reacts to each path — quick takes before you commit
-```
+
+**Layout rule:** The challenge block (D/E/F) always appears BEFORE the commit prompt — never appended after it. D/E/F are pre-commitment tools, not post-commitment options.
 
 > ⛔ **Response 2 ends here — this is your complete output for this turn.** Do not generate the Verdict. The user must reply with a path choice (A/B/C) or a challenge pick (D/E/F) before Response 3 begins.
 

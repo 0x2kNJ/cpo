@@ -344,12 +344,14 @@ End Response 2 with an AskUserQuestion for path selection. No Verdict yet — th
 - RECOMMENDATION: [letter of recommended path] because [one-line reason from the Dominant Truth].
 - Options: A) [path label in ≤1 line] · B) [path label in ≤1 line] · C) [path label in ≤1 line]
 
-After the AskUserQuestion overlay, append a plain-text block (never inside the overlay):
+After the AskUserQuestion overlay, append a plain-text block (never inside the overlay). The challenge block always comes BEFORE the commit prompt — D/E/F are pre-commitment tools:
 ```
-Want to dig deeper before committing?
-D) Stress test    — challenge the top path before committing
-E) Deep analysis  — evaluate all paths across product, market, execution, and risk
-F) Reality check  — [inferred audience] reacts to each path — quick takes before you commit
+Not ready to commit? Dig deeper first:
+D) Stress test    — challenge the top path
+E) Deep analysis  — all paths across product, market, execution, and risk
+F) Reality check  — [inferred audience] reacts to each path
+
+Reply A, B, or C to commit — or D/E/F to dig deeper first.
 ```
 
 **Pre-path challenge rules:**
@@ -365,10 +367,10 @@ F) Reality check  — [inferred audience] reacts to each path — quick takes be
 
 If AskUserQuestion unavailable: end Response 2 with:
 ```
-Reply A, B, or C — or correct the Frame if it's off.
-
-Want to dig deeper before committing?
+Not ready to commit? Dig deeper first:
 D) Stress test · E) Deep analysis · F) Reality check
+
+Reply A, B, or C to commit — or D/E/F to dig deeper first. Correct the Frame if it's off.
 ```
 
 **Action 4 — Verdict**
