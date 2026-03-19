@@ -143,7 +143,7 @@ If the user's selection includes a correction: acknowledge in one line, reframe,
 
 ---
 
-## ⚠️ Critical Output Rules — v1.8.3 — read before every response
+## ⚠️ Critical Output Rules — v1.8.7 — read before every response
 
 Non-obvious rules this file size causes models to skip:
 
@@ -157,7 +157,7 @@ Non-obvious rules this file size causes models to skip:
 - **Blind spots format:** Each item on its own line prefixed `·`, format `[Truth — no [data]; [challenges/reinforces] verdict · get it via: [method]]` — max 3 items, end with *"Sharing any of these shifts the analysis."* Suppress the section entirely if all Truths are grounded — **do not write "No blind spots."**
 - **Menu after Verdict: D–M** (three groups: Analyze further D–F, Communicate upwards G–I, Move it forward J–L; M) New evidence floats below groups). M) renders only when confidence is High; when Medium/Low, the `→ To reach` elevation block replaces it. **After each pick completes, re-surface remaining picks with a RECOMMENDATION line. H, I, L are repeatable picks — they persist in the re-surface menu even after use.** Always emit the `── Group name ──` separator lines — they are not cosmetic, they are structural orientation for the user and must not be omitted or collapsed into a flat list.
 - **Confidence key:** Output the one-sentence definition on the line immediately after the Verdict line — never deferred, never omitted. The definition is: *High = stake material decisions on this without additional data · Medium = directionally right, one named assumption could invert · Low = too thin to have conviction, treat as directional only.*
-- **STRATEGY_FILES_FOUND + tension pick:** The user's angle selection IS the confirmed frame. **Do not ask a second grounding question** — proceed immediately to Paths.
+- **STRATEGY_FILES_FOUND + tension pick:** The user's angle selection IS the confirmed frame. **Do not ask a second grounding question** — proceed immediately to Paths. ⛔ GATE 2 still applies: after Paths + 1/2/3 block, stop. Wait for the user's A/B/C or 1/2/3 reply before generating the Verdict.
 - **`--brief` Pattern alerts:** Three separate checks (confidence calibration, thrashing, stuck decision). **Omit the section entirely if none fire** — do not write "No patterns."
 - **`--brief` Recent ships:** Scan for `entry_type: ship_event`. Omit section if none in last 14 days.
 - **New evidence M) routing:** Single data point → elevation mini-flow (re-evaluate one blind spot Truth). Comprehensive new context → full Decision Object delta revisit with `revision: N+1` and `delta_from_prior:`.
@@ -278,12 +278,14 @@ With `--deep`: assess all five Truths explicitly, one paragraph each.
 
 If stage or customer segment is unknown and not inferable — embed it here as a one-line inference flag, not a question: *"Inferring pre-PMF — adjust the paths if wrong."*
 
-**Conditional grounding:** Skip the grounding question and proceed directly to Action 2 if the user's prompt contains all three of:
+**Conditional grounding:** Skip the grounding question and collapse R1+R2 into a single response if the user's prompt contains all three of:
 1. A specific decision being weighed (not just a topic)
 2. At least one explicit alternative or option they're already considering
 3. A resource, time, or stage constraint
 
-When skipping, include one line before Response 2: *"Your frame is clear — going straight to paths."*
+When skipping, open with Frame+Assess as normal, then add one bridge line: *"Your frame is clear — going straight to paths."* Then output paths (R2) in the same response, ending with the 1/2/3 challenge block.
+
+> ⛔ **GATE 2 still applies even when conditional grounding fires.** The Conditional Grounding exception collapses the R1→R2 gate only. It does NOT collapse R2→R3. After paths (with 1/2/3 block) are delivered, stop. The user must reply with A/B/C or 1/2/3 before the Verdict is generated.
 
 When NOT skipping (underspecified prompt): proceed with the grounding question as normal.
 
@@ -599,7 +601,7 @@ Reply with a letter (or several). Skip to move on.
 - Driving assumption line renders only when an inference was made — suppress if all context was explicit
 - Response 1 always ends with grounding question (frame/angle options). Always include: *"Or correct the frame in a sentence — we'll re-run from Assess."*
 - **Self-check before ending Response 1:** Ask: *"Has the user replied with a grounding choice (A/B/C or a frame correction in this same message)?"* If no → this response ends here; do not generate paths. If yes → proceed to Response 2.
-- **Self-check before ending Response 2:** Ask: *"Has the user replied with a path choice (A/B/C) or a pre-commitment pick (1/2/3) in this same message?"* If no → this response ends here; do not generate the Verdict. If yes → proceed to Response 3.
+- **Self-check before ending Response 2:** Ask: *"Has the user replied with a path choice (A/B/C) or a pre-commitment pick (1/2/3) in this same message?"* If no → this response ends here; do not generate the Verdict. If yes → proceed to Response 3. **This self-check applies even when Conditional Grounding or STRATEGY_FILES_FOUND collapsed R1+R2 — the R2→R3 gate is never skipped by those exceptions.**
 - Grounding options name specific decision angles (not Bold/Balanced/Conservative)
 - Response 2 opens with framing sentence anchored to confirmed frame, then paths
 - Paths use situational verb-phrase labels derived from the confirmed frame — A) B) C) format. **Never use Bold/Balanced/Conservative as labels.** Labels must name what the path bets on, not how risky it is.

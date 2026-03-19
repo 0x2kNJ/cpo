@@ -4,6 +4,19 @@ All notable changes documented here. Follows [Keep a Changelog](https://keepacha
 
 ---
 
+## [1.8.7] — 2026-03-19
+
+Hotfix: GATE 2 was bypassed by Conditional Grounding and STRATEGY_FILES_FOUND exceptions.
+
+### Fixed
+
+- **Root cause — Conditional Grounding exception collapsed all gates (CURSOR.md):** The spec said "skip the grounding question and proceed directly to Paths" with a bridge line "Your frame is clear — going straight to paths." Cursor models read this as licence to run R1+R2+R3 in one pass when context was rich. The exception only ever intended to collapse the R1→R2 gate (grounding question skipped), NOT the R2→R3 gate (path choice still required). Fixed by rewriting the Conditional Grounding section: "This collapses the R1+R2 gate only — GATE 2 still requires a user reply."
+- **STRATEGY_FILES_FOUND exception same vulnerability (CURSOR.md Critical Output Rules):** "Proceed immediately to Paths" had no GATE 2 re-assertion at the exception site. Added inline: "⛔ GATE 2 still applies: after Paths + 1/2/3 block, stop. Wait for user reply."
+- **Self-check 2 reinforced for exception paths:** Added explicit note: "This self-check applies even when Conditional Grounding or STRATEGY_FILES_FOUND collapsed R1+R2 — the R2→R3 gate is never skipped by those exceptions."
+- **Critical Output Rules version tag updated:** v1.8.3 → v1.8.7.
+
+---
+
 ## [1.8.6] — 2026-03-19
 
 Patch: pre-commitment challenge tools renamed 1/2/3 (was D/E/F); explicit skip path added to CTA.
