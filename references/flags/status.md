@@ -55,6 +55,7 @@ ls -t .claude/strategy/*.md 2>/dev/null | head -3
 - **Force-rank to ONE red line.** If you cannot pick one, the red line is: "No clear critical path — run `/cpo --roadmap` to force-rank competing priorities."
 - The red line is forward-looking: what unblocks the most downstream work? Not what's most urgent, not what's most important — what creates the most velocity when resolved.
 - **Action must be concrete.** "Decide whether to pursue enterprise" is concrete. "Think about enterprise strategy" is not. Prefer verbs: ship, decide, kill, test, commit, cut.
+- **Action must be calibrated to what's been built and how the founder operates.** Read the git log and context before writing the Action. If recent commits show heavy building/shipping velocity, the Action should leverage what's been built (e.g., "demo the PoC to [target]", "ship a working prototype that proves [X]") — not pivot to a generic playbook motion that ignores the work. If the founder is a builder, the fastest path to signal is usually through the product, not cold outreach. Match the Action to the founder's demonstrated strengths and existing momentum.
 - Do not run Five Truths. Do not produce paths. Do not write a journal entry. This is a read, not an analysis.
 - If strategy files exist, the red line should be consistent with the strategic posture. If it contradicts, flag: *"Note: this conflicts with [strategy file] — may need a `/cpo --scan-strategy` refresh."*
 
