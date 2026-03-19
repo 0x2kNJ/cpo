@@ -186,7 +186,7 @@ A) **[Situational label]** — [≤2 sentences]
 B) **[Situational label]** — [≤2 sentences]  ← recommended
 C) **[Situational label]** — [≤2 sentences]
 
-Before committing — stress test, analyze, or reality check:
+Before committing to a path, consider to stress test, analyze, or reality check them:
 1) Stress test    — challenge all three paths
 2) Deep analysis  — all paths across product, market, execution, and risk
 3) Reality check  — [inferred audience] reacts to each path

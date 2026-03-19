@@ -190,7 +190,7 @@ End Response 2 with an AskUserQuestion for path selection:
 
 After the AskUserQuestion overlay, append a plain-text block (never inside the overlay):
 ```
-Not ready to commit? Dig deeper first:
+Before committing to a path, consider to stress test, analyze, or reality check them:
 1) Stress test    — challenge all three paths
 2) Deep analysis  — all paths across product, market, execution, and risk
 3) Reality check  — [inferred audience] reacts to each path
