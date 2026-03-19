@@ -316,22 +316,23 @@ C) **[Situational label]** — [≤2 sentences]
 
 End Response 2 with a path-selection prompt. No Verdict yet — that waits for the user's pick:
 
-> Reply A, B, or C. Or correct the Frame if it's off.
+> Reply A, B, or C — or correct the Frame if it's off.
 
-After the path-selection line, append a plain-text challenge block:
+After the path-selection line, append a plain-text block:
 ```
-Challenge before committing:
-D) Pre-mortem — assume the top path fails, why?
-E) Deep dive — full Five Truths across all paths
-G) Leadership reaction — how does each path land with your c-suite?
-H) Board simulation — how would the board react?
-I) Investor simulation — run the paths past investors
+Want to dig deeper before committing?
+D) Stress test    — challenge the top path before committing
+E) Deep analysis  — evaluate all paths across product, market, execution, and risk
+F) Reality check  — [inferred audience] reacts to each path — quick takes before you commit
 ```
 
 **Pre-path challenge rules:**
 - Challenge options run against **all three paths**, not just the recommended one
 - When a challenge completes, re-surface the path-selection prompt (with challenge block) and continue
 - After the user picks a path (A/B/C), proceed to Action 4 (Verdict); journal write happens after Verdict as usual
+- **G/H/I (Sell-up, Board simulation, Investor simulation) are post-verdict options only** — never render in the pre-path challenge block.
+
+**F) Reality check — inference rule:** Infer the intended audience from the product context (e.g., B2C consumer, developer, enterprise buyer, internal team). If unambiguous, name them and run the check. If ambiguous, ask one clarifying question: *"Who's the primary user — [option A] or [option B]?"* — then run the check. Output: 2–3 plain-language reactions per path from that audience's perspective. No framework jargon.
 - **`--go` suppresses the challenge block entirely.** Do not render it when `--go` is present.
 - **`--quick` suppresses the challenge block entirely.**
 
@@ -396,15 +397,15 @@ Immediately follow with the next-steps menu.
 
 ```
 Next steps (pick any):
-D) Pre-mortem — stress-test this plan before committing
-E) Deep dive — full Five Truths + 10-section output
-F) Roadmap — stack this next to other bets (/cpo --roadmap)
-G) Sell-up — reframe for CEO, board, or eng lead
-H) Board simulation — pressure-test live in the boardroom
-I) Investor simulation — run the pitch, field the hard questions
-J) Hand off — pass decision context to the next tool
+D) Stress test    — challenge the verdict before committing
+E) Deep analysis  — product, market, execution, and risk breakdown
+F) Roadmap        — stack this next to other bets (/cpo --roadmap)
+G) Sell-up        — reframe for CEO, board, or eng lead
+H) Board sim      — pressure-test live in the boardroom
+I) Investor sim   — run the pitch, field the hard questions
+J) Hand off       — pass decision context to the next tool
 K) Something else — one sentence
-[L) New evidence — share what you found, I'll show what shifts]
+[L) New evidence  — share what you found, I'll show what shifts]
 
 Reply with a letter (or several). Skip to move on.
 ```
@@ -424,7 +425,7 @@ Reply with a letter (or several). Skip to move on.
 Rules:
 - **Non-repeatable picks (D, E, F, G, K):** Remove from list after completion — never re-offer.
 - **Repeatable picks (H, I, J):** Persist in the re-surface menu even after use — simulations and handoffs can run multiple times as the decision iterates.
-- `RECOMMENDATION:` names the single most valuable remaining pick. **Simulation-informed RECOMMENDATION:** after H or I completes, name what was challenged and map to the pick that addresses it (board challenged unit economics → recommend E: Deep dive; investors challenged narrative → recommend D: Pre-mortem; either challenged go-to-market → recommend F: Roadmap).
+- `RECOMMENDATION:` names the single most valuable remaining pick. **Simulation-informed RECOMMENDATION:** after H or I completes, name what was challenged and map to the pick that addresses it (board challenged unit economics → recommend E: Deep analysis; investors challenged narrative → recommend D: Stress test; either challenged go-to-market → recommend F: Roadmap).
 - If only one pick remains, still show it with the RECOMMENDATION line.
 - If all non-repeatable picks are exhausted, offer H/I/J with RECOMMENDATION. When truly all exhausted: *"All next steps covered. Type a new decision or follow-up."*
 - The re-surface loop continues until picks are exhausted or the user skips/starts a new decision.
@@ -507,14 +508,12 @@ A) **[Situational label]** — [≤2 sentences]
 B) **[Situational label]** — [≤2 sentences]  ← recommended
 C) **[Situational label]** — [≤2 sentences]
 
-Reply A, B, or C. Or correct the Frame if it's off.
+Reply A, B, or C — or correct the Frame if it's off.
 
-Challenge before committing:
-D) Pre-mortem — assume the top path fails, why?
-E) Deep dive — full Five Truths across all paths
-G) Leadership reaction — how does each path land with your c-suite?
-H) Board simulation — how would the board react?
-I) Investor simulation — run the paths past investors
+Want to dig deeper before committing?
+D) Stress test    — challenge the top path before committing
+E) Deep analysis  — evaluate all paths across product, market, execution, and risk
+F) Reality check  — [inferred audience] reacts to each path — quick takes before you commit
 ```
 
 **Response 3 — Verdict + next steps (delivered after user picks a path):**
@@ -542,15 +541,15 @@ I) Investor simulation — run the paths past investors
 ---
 
 Next steps:
-D) Pre-mortem — stress-test before committing
-E) Deep dive — full Five Truths + 10-section
-F) Roadmap — stack against other bets
-G) Sell-up — reframe for leadership / investors
-H) Board simulation — pressure-test in the boardroom
-I) Investor simulation — run the pitch, field the hard questions
-J) Hand off — pass decision context to the next tool
+D) Stress test    — challenge the verdict before committing
+E) Deep analysis  — product, market, execution, and risk breakdown
+F) Roadmap        — stack against other bets
+G) Sell-up        — reframe for leadership / investors
+H) Board sim      — pressure-test in the boardroom
+I) Investor sim   — run the pitch, field the hard questions
+J) Hand off       — pass decision context to the next tool
 K) Something else — one sentence
-[L) New evidence — share what you found, I'll show what shifts]
+[L) New evidence  — share what you found, I'll show what shifts]
 
 Reply with a letter (or several). Skip to move on.
 ```
@@ -572,11 +571,11 @@ Reply with a letter (or several). Skip to move on.
 - Response 2 opens with framing sentence anchored to confirmed frame, then paths
 - Paths use situational verb-phrase labels derived from the confirmed frame — A) B) C) format. **Never use Bold/Balanced/Conservative as labels.** Labels must name what the path bets on, not how risky it is.
 - Exactly one path carries `← recommended` marker
-- Response 2 always ends with path-selection prompt followed by plain-text challenge block (D/E/H/I). Challenge block suppressed when `--go` or `--quick` is present.
+- Response 2 always ends with path-selection prompt followed by plain-text challenge block (D/E/F). Challenge block suppressed when `--go` or `--quick` is present.
 - Response 3 uses structured format: `**Verdict:**` line, `**Kill criteria:**` numbered list, `**Confidence:**` with key, `**Blind spots:**` block (conditional), `→ To reach` elevation block (conditional, Medium/Low only). Never run these together as one dense paragraph.
 - Response 3 includes a Blind spots block immediately after Confidence key when ≥1 Truth was inferred without stated data — one item per line prefixed with `·`, format `[Truth — no [data type]; [challenges/reinforces] this verdict · get it via: [collection method]]`, max 3 items, ends with "Sharing any of these shifts the analysis." Suppress entirely if all Truths were grounded.
 - Response 3 always includes the next-steps menu D–L
-- **Progressive disclosure:** On the user's first decision (preamble returned `NO_DECISIONS`), show only D–G in the initial menu with a "More →" option: `D) Pre-mortem E) Deep dive F) Roadmap G) Sell-up → More: H) Board sim · I) Investor sim · J) Hand off · K) Something else [L) New evidence]`. Returning users (any prior journal entries) see the full D–L menu.
+- **Progressive disclosure:** On the user's first decision (preamble returned `NO_DECISIONS`), show only D–G in the initial menu with a "More →" option: `D) Stress test E) Deep analysis F) Roadmap G) Sell-up → More: H) Board sim · I) Investor sim · J) Hand off · K) Something else [L) New evidence]`. Returning users (any prior journal entries) see the full D–L menu.
 - **Universal terminal rule:** Every response that completes a flow — main Response 3, elevation mini-flow, inline simulation (H/I picks), standalone boardroom/investor-roundtable, and utility/intelligence flags (`--brief`, `--trail`, `--history`, `--outcome`, `--patterns`, `--drift`) — MUST end with a user action prompt: (a) the D-L menu (plain text) for decision and simulation flows, or (b) a contextual next-step prompt for utility/intelligence flows and execution-artifact modes (eng-brief, eng-translate): *"What next? Type a new decision, run `/cpo [topic]` to revisit anything flagged, or ask a follow-up."* No CPO response is complete without a user action prompt.
 - **Final check (Cursor — fires before every response):** Before delivering any response, verify the last substantive element is a user action prompt (D-L menu or contextual next-step). If it is not, append the appropriate prompt before delivering. This check fires on every response in every mode without exception.
 - No headers, no numbered sections, no preamble before Line 1 of Response 1 **except:** if `STRATEGY_FILES_FOUND` with a question-reframing tension, 2-sentence posture + tension-as-grounding-options precede Line 1 — the user's angle pick IS the confirmation; no separate "is this right?" gate. If no tension found: posture folds silently into Line 1.
@@ -628,7 +627,7 @@ C) [label] — [one sentence]
 **Verdict:** [recommended path] — [one-line reason].
 **Kill criterion:** [one measurable threshold].
 **Confidence:** [High/Medium/Low] — [one-sentence key].
-Next steps (pick any): D) Pre-mortem E) Deep dive F) Roadmap G) Sell-up H) Board sim I) Investor sim J) Hand off K) Something else [L) New evidence]
+Next steps (pick any): D) Stress test E) Deep analysis F) Roadmap G) Sell-up H) Board sim I) Investor sim J) Hand off K) Something else [L) New evidence]
 
 Rules for `--quick`:
 - No grounding question — infer the frame
