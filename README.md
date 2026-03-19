@@ -11,6 +11,47 @@ If this helps you make better product decisions, ⭐ the repo.
 
 ---
 
+## The vision
+
+CPO's end goal is to orchestrate an entire product organization — not just advise on one decision, but manage the full surface area of product judgment across time: what to build, when to pivot, how to communicate, and when to kill.
+
+A human PM can hold a handful of decisions in working memory. CPO holds all of them — with full context, cross-referenced assumptions, and mechanical decay tracking — and surfaces the one thing that matters most right now.
+
+This is not about replacing product leaders. It is about giving them capabilities that are structurally impossible without persistent memory, cross-decision reasoning, and automated integrity checks running on every write.
+
+**Where CPO is today:** a strategic advisor that frames decisions, pressure-tests them across five dimensions, logs them in a persistent journal, and compounds context over time. Every session starts smarter than the last.
+
+**Where CPO is going:** a product operating system that can detect when your strategy is drifting before you notice, surface the one decision blocking everything else, tell you which of your past predictions were wrong, and orchestrate handoffs to the right execution tools at the right time — automatically.
+
+---
+
+## What makes CPO different
+
+These are capabilities that do not exist in traditional PM workflows — not because PMs lack skill, but because the capabilities require persistent memory, cross-decision computation, and automated integrity checks that humans cannot maintain manually at scale.
+
+### 1. Spec Coherence Validator
+Every time a new decision is logged, CPO automatically checks it against all active decisions for contradictions, assumption collisions, and kill criteria conflicts — scoped to related topics, not false positives across unrelated domains. A human PM cannot re-read every prior decision before making a new one. CPO does it on every write.
+
+### 2. Decision Dependency Graph (`--graph`)
+Maps which decisions depend on which other decisions. Identifies the bottleneck decision blocking the most downstream work. Scores bottlenecks by fan-out, staleness, and confidence. A human PM tracks dependencies in their head or a spreadsheet that goes stale the moment it's written. CPO computes the graph live from the actual decision content.
+
+### 3. Kill Criterion Countdown (`--kills`)
+Cross-cutting dashboard of every active kill criterion across all decisions, with days remaining, urgency classification (triggered / approaching / active / undated / external), and cross-reference with the dependency graph. When a bottleneck decision also has an approaching kill criterion, CPO surfaces the compounding risk. No PM manually maintains a countdown timer across 15 active decisions.
+
+### 4. Consequence Tracking as Prediction Market
+At decision time, CPO auto-generates 2–3 falsifiable predictions about what should change if the recommended path succeeds. Each has a check date derived from kill criteria timeframes. When the date arrives, `--brief` and `--status` surface the prediction for verification. Over time, this creates a track record of whether your decision framework actually predicts outcomes — a personal prediction market that compounds institutional learning.
+
+### 5. Session Replay (Hindsight Bias Guard)
+When you close the loop on a decision with `--outcome`, CPO first reconstructs what you knew at the time — Truth fingerprint, open questions, kill criteria, paths considered, predictions made — before asking what happened. This prevents the single most common cognitive bias in retrospectives: judging past decisions with information you didn't have. No PM workflow does this automatically.
+
+### 6. Decision Decay Index
+Every active decision gets a mechanical decay score based on age, number of inferred assumptions, and confidence level. Decisions with a `shelf_life` field (for long-horizon bets like annual strategy) use that instead of the default 30-day divisor. `--brief` and `--status` surface Stale and Degraded decisions before the founder has to remember to check. Assumptions rot silently — CPO makes the rot visible.
+
+### 7. Founder Pattern Drift
+With 10+ logged decisions, CPO computes rolling-window behavioral analysis: comparing your last 10 decisions against prior ones across 5 dimensions — Truth weighting bias, path preference, confidence calibration, reversal rate, and kill criteria usage. It tells you how your decision-making style is evolving — intentional growth or unconscious habit change. No human PM has the data fidelity to do this for themselves.
+
+---
+
 ## Start here
 
 New idea — where's the opportunity?
@@ -128,10 +169,15 @@ Before making a recommendation, it explores **Three Paths** — situational labe
 
 It also:
 - labels claims as **fact / assumption / inference / judgment**
-- defines **kill criteria upfront**
+- defines **kill criteria upfront** — each with a named metric, specific threshold, and timeframe
 - records a **Truth fingerprint** on every decision (Dominant · Grounded · Inferred)
+- auto-generates **falsifiable predictions** at decision time and tracks them to verification
+- checks every new decision against all active ones for **coherence** — contradictions, assumption collisions, kill criteria conflicts
 - remembers company context across sessions
 - logs major decisions in a searchable, addressable journal
+- computes **dependency graphs** across decisions to find bottlenecks
+- tracks **kill criterion countdowns** with urgency classification
+- measures **decision decay** — surfacing stale assumptions before they become expensive
 - lets you retire superseded decisions with `--invalidate` and detect **logic drift** with `--drift`
 - simulates investor and board conversations in real time
 - acts as a **decision layer for your full skill stack** via `--decide` handoffs
@@ -280,13 +326,22 @@ That makes the reasoning auditable instead of persuasive-by-default.
 
 ### 4) Kill criteria
 
-Before recommending a path, CPO defines what would make the bet fail. That means you know:
+Before recommending a path, CPO defines what would make the bet fail — each with a named metric, specific threshold, and timeframe. That means you know:
 - what must be true
 - what to monitor
 - what would trigger re-scope
 - when to stop
 
-### 5) Persistent memory
+### 5) Structural integrity
+
+CPO doesn't just log decisions — it validates them:
+- **Coherence checks** catch contradictions between new and prior decisions at write time
+- **Dependency graphs** map which decisions block which others
+- **Decay tracking** surfaces assumptions that are aging past their validity window
+- **Consequence tracking** auto-generates predictions and checks them against reality
+- **Pattern analysis** reveals your decision-making tendencies over time
+
+### 6) Persistent memory
 
 CPO maintains shared state across sessions, including:
 - company context
@@ -308,6 +363,9 @@ So each decision starts with more context than the last one.
 | Investor prep | Simulates pushback, weak spots, and narrative gaps |
 | Board prep | Stress-tests the plan and likely questions |
 | Executive alignment | Builds the case upward with structured reasoning |
+| Decision follow-up | Tracks outcomes, verifies predictions, detects pattern drift |
+| Kill monitoring | Countdown timers on every active kill criterion |
+| Bottleneck identification | Dependency graph showing what's blocking velocity |
 
 ---
 
@@ -369,9 +427,10 @@ Instead of arguing in circles, the team got to a decision they could defend: pro
 **What CPO returned**
 - summarized active decisions and unresolved follow-ups
 - highlighted kill criteria that were getting close
+- surfaced consequence predictions due for verification
+- flagged decision decay on aging assumptions
 - surfaced repeated patterns in decision-making, including overcommitting before validating demand
 - flagged strategic drift between current roadmap work and stated company priorities
-- turned the week's decision history into a concise executive brief
 
 **Why it mattered**
 The weekly brief helped leadership step back from day-to-day motion and see where focus was slipping, where bets were aging, and which decisions needed attention before they became expensive.
@@ -465,7 +524,7 @@ CPO supports 20 core modes. Invoke them with natural language — CPO routes aut
 | ★ Go / No-Go (`ceo`) | `/cpo should we do this` | Verdict: proceed, pause, re-scope, or kill — with Three Paths and kill criteria | High-stakes decisions |
 | ★ Investor Simulation (`investor-roundtable`) | `/cpo simulate an investor meeting` | Live 5-round investor debate, 5 archetypes, distinct voices, verdict per archetype | Fundraising meetings |
 | ★ Board Simulation (`boardroom`) | `/cpo simulate the board` | Live multi-turn board meeting with speaking archetypes + post-meeting debrief | Board prep |
-| ★ Weekly Brief (`--brief`) | `/cpo --brief` | Summarizes active decisions, kill criteria, risks, and strategic drift | Weekly leadership cadence |
+| ★ Weekly Brief (`--brief`) | `/cpo --brief` | Kill criteria, consequence checks, decision decay, pattern alerts, strategic drift | Weekly leadership cadence |
 | Prioritization (`sequence`) | `/cpo what should we prioritize` | Orders the roadmap by leverage, reversibility, and strategic unlock | Roadmaps, portfolio choices |
 | Assumption Audit (`discovery`) | `/cpo what are our riskiest assumptions` | Surfaces bets most likely to be wrong before you commit | Discovery planning, diligence |
 | GTM Design (`gtm`) | `/cpo how do we go to market` | ICP, channels, growth loop, retention — full go-to-market design | Launch planning, GTM motion |
@@ -504,16 +563,16 @@ CPO supports 30 flags for shaping how it reasons and communicates.
 | `--no-context` | `/cpo --no-context` | Ignores saved context. Reasons from the current prompt only. |
 | `--focus` | `/cpo --focus burn-rate` | Simulation modes only — jumps directly to targeted pressure on one topic. |
 | `--since` | `/cpo --since last-time` | Temporal delta — leads with what changed since a prior baseline. Pulls from decision journal. |
-| `--brief` | `/cpo --brief` | Proactive weekly intelligence brief. Kill criteria alerts, unresolved decisions, pattern warnings. |
+| `--brief` | `/cpo --brief` | Weekly intelligence brief. Kill criteria, consequence checks, decision decay, pattern alerts. |
 | `--trail` | `/cpo --trail` | 90-day strategic diary — all journal entries, one page. |
 | `--history` | `/cpo --history enterprise` | Full decision journal. Optional keyword filter or exact `#name` lookup. |
-| `--outcome` | `/cpo --outcome enterprise-pause` | Closes the loop on a prior decision. Records what happened. Detects path patterns over time. |
-| `--patterns` | `/cpo --patterns` | Decision DNA — scans the journal for Truth weighting bias, path preference, kill criteria hit rate, reversal rate, and confidence calibration. Surfaces behavioral patterns. |
+| `--outcome` | `/cpo --outcome enterprise-pause` | Closes the loop with Session Replay (hindsight bias guard). Records what happened. Verifies predictions. Detects path patterns over time. |
+| `--patterns` | `/cpo --patterns` | Decision DNA — Truth weighting bias, path preference, kill criteria hit rate, reversal rate, confidence calibration. Rolling-window drift with 10+ decisions. |
 | `--invalidate` | `/cpo --invalidate #pricing` | Marks a past decision as retired. Annotates with date and reason. Future context loads skip it; `--history` always shows it. |
 | `--invalidate-all` | `/cpo --invalidate-all` | Bulk invalidation — mark all active journal entries as invalidated. Optional `#name` filter to scope to one decision. Requires YES confirmation. Add `--hard` to permanently delete YAML files (irreversible). |
 | `--drift` | `/cpo --drift` | Logic drift detection — scans the last 10 decisions for structural contradictions: unacknowledged Truth fingerprint shifts, verdict reversals, or kill criteria degradation. |
-| `--graph` | `/cpo --graph` | Decision dependency graph — identifies bottleneck decisions blocking the most downstream work, transitive chains, and orphaned decisions with no connections. |
-| `--kills` | `/cpo --kills` | Kill criteria countdown dashboard — cross-cutting view of ALL active kill criteria with days remaining, grouped by urgency (triggered / approaching / active / undated). |
+| `--graph` | `/cpo --graph` | Decision dependency graph — bottleneck identification, fan-out scoring, transitive chains, orphaned decisions. Cross-references with `--kills` for compounding risk. |
+| `--kills` | `/cpo --kills` | Kill criteria countdown dashboard — ALL active kill criteria with days remaining, grouped by urgency (triggered / approaching / active / undated / external). Cross-references with `--graph`. |
 | `--decide` | `/cpo --decide` | Inbound handoff from another skill. CPO reads the situation, scans your installed toolchain, and routes to the best next action — with install suggestion + fallback if the ideal skill isn't present. |
 | `--export` | `/cpo --export` | Writes output to `~/.cpo/exports/YYYY-MM-DD-[slug].md` — shareable with co-founders, boards, investors. |
 | `--schedule-brief` | `/cpo --schedule-brief` | Sets up a recurring weekly brief that runs automatically. Uses `anthropic-skills:schedule`. *(Claude Code only.)* |
@@ -545,7 +604,7 @@ CPO uses shared local state so it can compound context over time. Everything liv
 |:---|:---|:---|
 | `~/.cpo/context.md` | Company profile — stage, model, constraint, priorities, operating bias | Keeps answers grounded in your actual company. Loads every session. The `operating_bias` field powers `--status` action recommendations. |
 | `~/.cpo/last-status.yaml` | Last `--status` run — red line, action, at-risk decision | Enables delta detection: next `--status` run shows whether the red line changed and why. |
-| `~/.cpo/decisions/` | Decision journal — one YAML per major analysis (schema v1.5: includes Truth fingerprint, status, kill criteria) | Builds a searchable strategic history. Foundation for `--brief`, `--trail`, `--since`, `--drift`, `--invalidate`. |
+| `~/.cpo/decisions/` | Decision journal — one YAML per major analysis (schema v1.5: includes Truth fingerprint, consequences, path chosen, shelf life, status, kill criteria) | Builds a searchable strategic history. Foundation for `--brief`, `--trail`, `--since`, `--drift`, `--graph`, `--kills`, `--patterns`, `--invalidate`. |
 | `~/.cpo/simulations/` | Boardroom and investor roundtable transcripts | Preserves full simulation sessions |
 | `~/.cpo/exports/` | Exported memos and analyses — dated and slugged | Makes outputs portable and shareable |
 | `~/.cpo/integrations.md` | Live data source config — injected into Five Truths | Enriches assessments with real company data |
@@ -711,6 +770,7 @@ CPO is opinionated. It assumes:
 - recommendations should be compared against alternatives
 - kill criteria should exist before commitment
 - decisions should leave a record
+- assumptions should be checked against reality, not forgotten
 
 That is the whole point.
 
@@ -739,10 +799,16 @@ Yes. `/cpo --invalidate [topic]` marks any journal entry as retired — with a r
 **What is logic drift?**
 Logic drift is when a series of individually reasonable decisions quietly moves you away from a prior strategic commitment — without ever explicitly deciding to change course. `/cpo --drift` scans your last 10 decisions for structural contradictions: unacknowledged Truth fingerprint shifts, verdict reversals without explanation, and kill criteria degradation. The passive drift surface also fires automatically whenever you write a new journal entry that shifts Dominant Truth from the last one on the same topic.
 
+**What are consequences and why do they matter?**
+At decision time, CPO auto-generates 2–3 falsifiable predictions about what should happen if the recommended path succeeds. Each prediction has a check date. When that date arrives, `--brief` surfaces it for verification. Over time, this creates a track record of whether your decision framework actually predicts outcomes — a personal prediction market.
+
+**What is decision decay?**
+Every active decision has a mechanical decay score based on age, inferred assumptions, and confidence level. As decisions age and their assumptions go unchecked, the score increases. `--brief` and `--status` surface Stale and Degraded decisions before the founder has to remember to check. Long-horizon decisions (annual strategy, platform bets) can set a `shelf_life` field to prevent false decay alarms.
+
 ---
 
 ## Version · License
 
-Current: **v2.2.0** — [view changelog](CHANGELOG.md)
+Current: **v2.3.0** — [view changelog](CHANGELOG.md)
 
 MIT. Free forever. Go make better product decisions.

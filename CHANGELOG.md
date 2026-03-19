@@ -4,6 +4,79 @@ All notable changes documented here. Follows [Keep a Changelog](https://keepacha
 
 ---
 
+## [2.3.0] — 2026-03-19
+
+**7 structural intelligence features — capabilities structurally impossible in traditional PM workflows.** Panel-reviewed to 10/10 by Gary Tan (YC), Mike Krieger (Anthropic CPO), Boris Cherny (Head of Claude Code). 28 spec fixes across 2 review rounds.
+
+### Added
+
+- **Spec Coherence Validator** — write-time linter checks new journal entries against all active entries for contradictions, scope-aware assumption collisions, and kill criteria overlap. Warnings surface in ALL modes (standard, verbose, deep). Capped at 3 warnings per write.
+- **Decision Dependency Graph (`--graph`)** — directed graph across active decisions with bottleneck scoring (fan-out + staleness penalty + confidence discount), edge confidence (strong `→` [explicit] vs weak `→?` [inferred]), small-graph simplification for ≤5 decisions, schema version gate (v1.5+), cross-reference with `--kills` for compounding risk.
+- **Kill Criterion Countdown (`--kills`)** — cross-cutting dashboard of ALL active kill criteria with days remaining, 5 status classifications (TRIGGERED / APPROACHING / ACTIVE / NO_TIMEFRAME / EXTERNAL), date anchor rules, all-green happy path, cross-reference with `--graph`.
+- **Consequence Tracking** — auto-generated falsifiable predictions at decision time (2-3 per decision), check_date derived from kill criteria timeframes (50-75% of shortest), status lifecycle (pending → confirmed / disconfirmed), integrated into `--brief`, `--status`, and `--outcome`.
+- **Decision Decay Index** — mechanical scoring formula `(days/divisor) × (inferred/5) × confidence_multiplier` with plain-English labels (Fresh / Aging / Stale / Degraded). `shelf_life` field for long-horizon decisions prevents false decay alarms.
+- **Session Replay** — hindsight bias guard in `--outcome` that reconstructs information state at decision time before recording outcomes. Displays Truth fingerprint, open questions, kill criteria, paths considered, and predictions made. Pre-v1.4 graceful fallback.
+- **Founder Pattern Drift** — rolling 10-decision windows comparing recent vs prior behavioral patterns across 5 dimensions. Sort by YAML `date:` field, not filesystem mtime.
+- **`path_chosen` field** — new journal schema field tracking which path letter (A/B/C) the founder selected. Powers `--patterns` path preference analysis and recommended-path adherence rate.
+- **`shelf_life` field** — optional journal field (days) for long-horizon decisions. Used by Decision Decay Index instead of default 30-day divisor.
+- **`consequences` field** — journal schema field with `marker`, `check_date`, and `status` per consequence.
+
+### Changed
+
+- `--brief` bash loader now filters `status: active` (was loading invalidated entries)
+- `--brief` adds Consequence checks due and Decision decay sections
+- `--status` corrected to "8 steps (with sub-steps)" — added Steps 6b (Consequence check) and 6c (Decision decay)
+- `--status` verbose trace template now includes 6b and 6c
+- `--outcome` removes stale "Bold/Balanced/Conservative" reference
+- `--outcome` adds Session Replay, consequence status updates, and learning extraction
+- `--patterns` Path Preference rewritten: letters aren't risk levels, measures recommended-path adherence rate
+- `--patterns` adds Rolling Window Analysis with sort-by-YAML-date rule
+- Journal schema version remains 1.5 with new fields
+- Version bumped to 2.3.0
+- 30 flags (was 28)
+
+---
+
+## [2.2.0] — 2026-03-19
+
+**`--status` 9-point overhaul + operating bias + cross-skill signals contract.**
+
+### Added
+
+- `operating_bias` field in `--save-context` (build-first / research-first / relationship-first)
+- `--status` action recommendations calibrated to operating bias
+- Cross-skill signals contract (`~/.cpo/signals/`) — other skills can write structured YAML that enriches `--status`
+- Git velocity interpretation in `--status` (commits trailing 7d vs prior 7d, merge freshness, stale branches)
+- Ship-to-decision alignment check in `--status`
+- Delta detection across `--status` runs via `~/.cpo/last-status.yaml`
+
+### Changed
+
+- `--status` synthesis expanded from 5 to 8 steps (with sub-steps)
+- `--status` force-rank priority order formalized (7 levels)
+- Version bumped to 2.2.0
+
+---
+
+## [2.1.0] — 2026-03-19
+
+**Architecture split + `--invalidate`, `--invalidate-all`, `--drift` flags.**
+
+### Added
+
+- `--invalidate [topic or #id]` — retire superseded decisions with annotation
+- `--invalidate-all` — bulk invalidation with confirmation gate; `--hard` variant for permanent deletion
+- `--drift` — on-demand logic drift detection across recent decisions
+- `references/flags/invalidate.md`, `references/flags/drift.md`
+- `references/signals-contract.md` — cross-skill signals specification
+
+### Changed
+
+- SKILL.md architecture: mode/flag stubs compressed to routing tables
+- Version bumped to 2.1.0
+
+---
+
 ## [2.0.0] — 2026-03-19
 
 **Major refactor: SKILL.md split from 1,430 → 403 lines.** Panel consensus (Gary Tan, Mike Krieger, Boris Cherny) was that the file was too big for consistent model compliance — attention is finite and rules compete. Behavioral core (templates, ⛔ gates, hard rules) now dominates signal-to-noise. Detailed generation rules moved to reference files loaded on demand.
