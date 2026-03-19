@@ -186,7 +186,7 @@ Flags that accept `#name` for exact lookup (instead of keyword search): `--since
 
 ### Default mode: Four Actions
 
-**All prompts use the four-action flow by default.** Exceptions: `--go` (escape hatch) and utility flags (`--brief`, `--trail`, `--history`, `--outcome`, `--export`, `--stack`, `--roadmap`, `--sell-up`, `--schedule-brief`, `--save-context`, `--setup-integrations`, `--update`, `--import-context`) execute immediately. **Exception: `--scan-strategy` alone executes immediately (Path A); `--scan-strategy [question]` enters the four-action flow with strategy-anchored grounding (Path B).**
+**All prompts use the four-action flow by default.** Exceptions: `--go` (escape hatch) and utility flags (`--brief`, `--trail`, `--history`, `--outcome`, `--export`, `--stack`, `--roadmap`, `--sell-up`, `--schedule-brief`, `--save-context`, `--setup-integrations`, `--update`, `--import-context`, `--decide`) execute immediately. **Exception: `--scan-strategy` alone executes immediately (Path A); `--scan-strategy [question]` enters the four-action flow with strategy-anchored grounding (Path B).**
 
 The four actions run across **three responses**. Response 1 delivers Frame + Assess and ends with a grounding question to confirm the decision angle. Response 2 delivers Paths tailored to the confirmed frame and ends with a path-selection prompt. Response 3 delivers the Verdict + next-steps menu. No exchanges before value — the user sees analysis immediately; grounding and paths both land before any commitment.
 
@@ -834,6 +834,7 @@ In compact mode: identify the **Dominant Truth** and reason from it. In `--deep`
 | `--roadmap [N bets]` | Comparative prioritization across N competing bets. |
 | `--sell-up [audience]` | Reframe a decision as a persuasive internal pitch for a specific audience. |
 | `--stack` | Show the full product workflow with coverage status. |
+| `--decide` | Inbound handoff from another skill. CPO receives structured context, discovers available skills, and recommends the best next action — with install suggestion + fallback if the ideal skill isn't present. |
 
 ### Calibration Protocol
 
@@ -1104,6 +1105,81 @@ Full templates at `~/.claude/skills/cpo/references/modes/[mode].md` — load wit
 
 **Trigger:** `--outcome [topic]` — close the loop on a prior decision, record what happened, detect path patterns.
 **Load:** `cat ~/.claude/skills/cpo/references/flags/outcome.md`
+
+---
+
+## `--decide` Flag
+
+**Trigger:** `/cpo --decide` — inbound handoff from another skill. CPO acts as the decision layer: receives context from the calling skill, discovers what's installed, routes to the best next action.
+
+**Execute immediately** — no four-action flow. This is a routing decision, not a product analysis.
+
+### Skill Handoff Contract
+
+Calling skills emit this block before invoking `/cpo --decide`:
+
+```
+**CPO Handoff Request**
+From: [skill name]
+Context: [what we were doing — 1-3 sentences]
+Decision: [what fork we hit — one sentence]
+Options considered: [optional]
+```
+
+### Discovery (silent, instant)
+
+```bash
+which ship qa review plan-eng-review plan-cpo-review retro 2>/dev/null
+ls ~/.claude/skills/ 2>/dev/null
+ls ~/.claude/plugins/cache/ 2>/dev/null
+```
+
+Map to capability: `ship` → deployment/release · `qa` → quality · `review` → code safety · `plan-eng-review` → architecture · `plan-cpo-review` → strategic · `retro` → post-incident. For `~/.claude/skills/` entries, read SKILL.md description to infer capability.
+
+### Decision Logic
+
+Parse context → run discovery → match need to capability (product judgment, not keyword matching) → pick one → deliver recommendation. Weight: decision stakes (high → deeper analysis), time sensitivity (urgent → fastest path), type (technical → plan-eng; strategic → plan-cpo; quality → qa; release → ship).
+
+### Output
+
+**Ideal skill available:**
+```
+**CPO → [From] decision**
+Given [context in one clause], the right next step is:
+→ **[skill]** — [one-line reason]
+Want me to hand off now?
+```
+
+**Ideal skill NOT installed:**
+```
+**CPO → [From] decision**
+Given [context], the ideal step is [missing skill] — [why].
+[missing skill] isn't installed. → Install via: [source]
+Best available now: **[alternative]** — [why it's the right fallback]
+Want to proceed with [alternative]?
+```
+
+**No suitable skill available:**
+```
+**CPO → [From] decision**
+Given [context], you'd benefit from [category]. None installed.
+Recommended installs: 1. [skill] — [what/where] 2. [skill] — [what/where]
+In the meantime: [specific manual action — never leave stranded]
+```
+
+### Install Source Map
+
+| Skill | Install |
+|-------|---------|
+| gstack (ship, qa, review, etc.) | `github.com/0x2kNJ/gstack` or gstack plugin |
+| anthropic-skills / superpowers | Claude Code plugin registry |
+| Custom skills | Add SKILL.md to `~/.claude/skills/[name]/` |
+
+### Rules
+- Never leave the user stranded — always end with a concrete next action
+- One recommendation only — pick the best, don't list options
+- Context-aware — recommendation must reflect the specific fork, not generic suggestions
+- Respect the calling skill — if `/qa` found a critical bug, don't recommend `/ship`
 
 ---
 

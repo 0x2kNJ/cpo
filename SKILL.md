@@ -174,7 +174,7 @@ Flags that accept `#name` for exact lookup (instead of keyword search): `--since
 
 ### Default mode: Four Actions
 
-**`/cpo` and `/cpo [any prompt]` both use the four-action flow by default.** The only exceptions are `--go` (escape hatch) and utility flags (`--brief`, `--trail`, `--history`, `--outcome`, `--export`, `--stack`, `--roadmap`, `--sell-up`, `--schedule-brief`, `--save-context`, `--setup-integrations`, `--update`, `--import-context`) — those execute immediately. **Exception: `--scan-strategy` alone executes immediately (Path A); `--scan-strategy [question]` enters the four-action flow with strategy-anchored grounding (Path B).**
+**`/cpo` and `/cpo [any prompt]` both use the four-action flow by default.** The only exceptions are `--go` (escape hatch) and utility flags (`--brief`, `--trail`, `--history`, `--outcome`, `--export`, `--stack`, `--roadmap`, `--sell-up`, `--schedule-brief`, `--save-context`, `--setup-integrations`, `--update`, `--import-context`, `--decide`) — those execute immediately. **Exception: `--scan-strategy` alone executes immediately (Path A); `--scan-strategy [question]` enters the four-action flow with strategy-anchored grounding (Path B).**
 
 The four actions run across **three responses**. Response 1 delivers Frame + Assess and ends with a grounding question to confirm the decision angle. Response 2 delivers Paths tailored to the confirmed frame and ends with a path-selection prompt. Response 3 delivers the Verdict + next-steps menu. No exchanges before value — the user sees analysis immediately; grounding and paths both land before any commitment.
 
@@ -847,6 +847,7 @@ Every prompt runs Frame → Assess → Paths → Verdict in that order, across t
 | `--roadmap [N bets]` | Comparative prioritization across N competing bets. Compressed Five Truths per bet, learning-velocity scoring, dependency mapping, capacity check, bias detection from journal. Outputs a ranked stack with ASCII timeline and kill criteria per bet. |
 | `--sell-up [audience]` | Reframe a decision or recent `/cpo` analysis as a persuasive internal pitch for a specific audience (CEO, board, eng-lead, cross-functional). Produces 1-minute and 5-minute versions, objection pre-emption, concession strategy, and an explicit ask. |
 | `--stack` | Show the full product workflow with coverage status. Detects which complementary skills are installed (plan, review, ship, QA, retro) and surfaces gaps. Also shows unknown complementary skills that might be useful. |
+| `--decide` | Inbound handoff from another skill. CPO receives structured context, discovers available skills, and recommends the best next action — with install suggestion + fallback if the ideal skill isn't present. |
 
 ### Calibration Protocol
 
@@ -1105,6 +1106,135 @@ Full templates in `references/modes/[mode].md` — load with Read when needed.
 **M&A framing:** If user is in acquisition talks → flag at start: *"You're in acquisition territory, not a fundraise. Adjusting panel and agenda for a strategic buyer conversation."*
 **Transcript:** After the final round and verdicts, write the full debate transcript to `~/.cpo/simulations/YYYY-MM-DD-investor-roundtable-[ts].md`. Confirm with one line: *"Transcript saved — shareable with your co-founder or advisor."*
 **Load:** `Read references/modes/investor-roundtable.md`
+
+---
+
+## `--decide` Flag
+
+**Trigger:** `/cpo --decide` — inbound handoff from another skill. CPO acts as the decision layer: receives context from the calling skill, discovers what's available on the system, and routes to the best next action.
+
+**Purpose:** Any installed skill can invoke CPO at a decision fork. CPO reads the situation, scans the toolchain, and recommends the right next step — with an install suggestion + best available fallback if the ideal skill isn't present. CPO is never a dead end.
+
+---
+
+### Skill Handoff Contract
+
+To invoke CPO from another skill, emit this block then call `/cpo --decide`:
+
+```
+**CPO Handoff Request**
+From: [skill name — e.g., /ship, /qa, /review]
+Context: [what we were doing — 1-3 sentences]
+Decision: [what fork we hit — one sentence]
+Options considered: [optional — what the calling skill identified as candidates]
+```
+
+**Example (from /qa after finding a critical regression):**
+```
+**CPO Handoff Request**
+From: /qa
+Context: QA pass complete on the pricing-redesign branch. Found a critical regression in the free-tier upgrade flow — 3 of 5 test scenarios fail.
+Decision: Do we block the release, ship with a flag, or escalate for immediate hotfix?
+Options considered: block release / ship behind feature flag / escalate to eng lead
+```
+
+---
+
+### Discovery (silent, runs on trigger)
+
+```bash
+# Tier 1 — gstack skills
+which ship qa review plan-eng-review plan-cpo-review retro 2>/dev/null
+
+# Tier 2 — local custom skills
+ls ~/.claude/skills/ 2>/dev/null
+
+# Tier 3 — plugin cache skills
+ls ~/.claude/plugins/cache/ 2>/dev/null
+```
+
+Map discovered skills to capability:
+
+| Skill | Capability |
+|-------|-----------|
+| `ship` | Deployment, PR creation, release |
+| `qa` | Quality assurance, regression testing |
+| `review` | Code safety, staff engineer review |
+| `plan-eng-review` | Architecture decisions, technical design |
+| `plan-cpo-review` | Strategic/founder-level rethink |
+| `retro` | Post-incident review, team reflection |
+| Any skill in `~/.claude/skills/` | Read SKILL.md description to infer capability |
+
+---
+
+### Decision Logic
+
+1. Parse the handoff context — understand what was happening and what fork was hit
+2. Run discovery (silent)
+3. **Match need to capability** using product judgment (not keyword matching). Weight factors: decision stakes (high stakes = recommend deeper analysis), time sensitivity (urgent = fastest available path), decision type (technical → review/plan-eng; strategic → plan-cpo; quality → qa; release → ship)
+4. Select the best available skill
+5. Deliver recommendation immediately — no four-action flow, no grounding questions
+
+---
+
+### Output Format
+
+**When ideal skill is available:**
+```
+**CPO → [From] decision**
+Given [context in one clause], the right next step is:
+
+→ **[skill]** — [one-line reason why this skill, not another]
+
+Want me to hand off now? (Reply Y or describe what you need instead)
+```
+
+**When ideal skill is NOT installed:**
+```
+**CPO → [From] decision**
+Given [context in one clause], the ideal next step is [missing skill] — [why].
+
+[missing skill] isn't installed. → Install via: [source/command]
+
+Best available now: **[alternative skill]** — [why it's the right fallback given what's installed]
+
+Want to proceed with [alternative]? (Reply Y, or install [missing skill] and re-run)
+```
+
+**When no suitable skill is available:**
+```
+**CPO → [From] decision**
+Given [context], you'd benefit from [category of skill] — none are installed.
+
+Recommended installs:
+1. [skill] — [what it does, where to get it]
+2. [skill] — [what it does, where to get it]
+
+In the meantime: [specific manual action the user can take right now — never leave them stranded]
+```
+
+---
+
+### Install Source Map
+
+When suggesting installs, use these sources:
+
+| Skill | Install |
+|-------|---------|
+| gstack skills (ship, qa, review, etc.) | `github.com/0x2kNJ/gstack` or gstack plugin |
+| anthropic-skills | Claude Code plugin registry |
+| Superpowers skills | Claude Code plugin registry |
+| Custom skills | Add SKILL.md to `~/.claude/skills/[name]/` |
+
+---
+
+### Rules
+
+- **Execute immediately** — no four-action flow. This is a routing decision, not a product analysis.
+- **Never leave the user stranded** — always end with a concrete next action, even if no skill matches.
+- **One recommendation** — don't list options. Pick the best one. If it's unavailable, name the best fallback. Product judgment is the point.
+- **Context-aware routing** — the recommendation must reflect the specific decision context, not generic "try /qa" suggestions.
+- **Respect the calling skill** — don't dismiss what the calling skill surfaced. If `/qa` found a critical bug, don't recommend `/ship`.
 
 ---
 
