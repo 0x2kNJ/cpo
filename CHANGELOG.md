@@ -4,6 +4,24 @@ All notable changes documented here. Follows [Keep a Changelog](https://keepacha
 
 ---
 
+## [1.4.7] — 2026-03-19
+
+Pre-path challenge menu. D/E/H/I challenge options (Pre-mortem, Deep dive, Board simulation, Investor simulation) now surface at the path-selection stage (Response 2), before the user commits to a path — not only after the Verdict. Challenge runs against all three paths, not just the recommended one. Loop has no fixed limit. Suppressed by `--go` and `--quick`.
+
+### Added
+
+- **Pre-path challenge block:** After the path-selection prompt in Response 2, a plain-text challenge block renders: D) Pre-mortem · E) Deep dive · H) Board simulation · I) Investor simulation. The user can challenge any number of times before picking a path.
+- **Pre-path challenge rules spec:** Challenge options run against all three paths; after a challenge completes, path-selection is re-surfaced; journal write still happens after the Verdict in Action 4 (unchanged).
+
+### Changed
+
+- **`_SKILL_VERSION`:** bumped to `"1.4.7"` in both SKILL.md and CURSOR.md (also corrects stale version strings that lagged behind v1.4.5/1.4.6).
+- **Structural rules:** Response 2 rule updated — no longer "ends with `Reply A, B, or C`" but "ends with path-selection prompt + challenge block."
+- **`--go` and `--quick`:** Explicitly suppress the challenge block entirely. Documented in both structural rules and pre-path challenge rules.
+- **`--deep`:** Challenge block still renders after the path-selection AskUserQuestion when `--deep` is active.
+
+---
+
 ## [1.4.6] — 2026-03-18
 
 Bulk journal management. `--invalidate-all` marks all active entries as invalidated in one operation. Optional `#name` filter to scope to a single decision object. Optional `--hard` modifier for permanent file deletion (irreversible).

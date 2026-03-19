@@ -33,7 +33,7 @@ allowed-tools:
 ```bash
 # Version check
 _INSTALLED_VERSION=$(cat ~/.cpo/.version 2>/dev/null || echo "unknown")
-_SKILL_VERSION="1.4.4"
+_SKILL_VERSION="1.4.7"
 if [ "$_INSTALLED_VERSION" != "$_SKILL_VERSION" ] && [ "$_INSTALLED_VERSION" != "unknown" ]; then
   echo "VERSION_MISMATCH: installed=$_INSTALLED_VERSION skill=$_SKILL_VERSION"
 fi
@@ -339,12 +339,34 @@ C) **[Label]** — [≤2 sentences]
 > ❌ Bold / Balanced / Conservative
 > ✅ A) **Community-led** (open source + developer relations — compounding but slow) · B) **Product-led** (freemium → conversion — faster but requires activation investment) · C) **Partner-led** (integrate into existing toolchains — fastest distribution, dependency risk)
 
-End Response 2 with an AskUserQuestion for path selection (single choice). No Verdict yet — that waits for the user's pick:
+End Response 2 with an AskUserQuestion for path selection. No Verdict yet — that waits for the user's pick:
 - Re-ground: One short sentence confirming which decision this is (e.g. "For [decision in 3–5 words] — which path?").
 - RECOMMENDATION: [letter of recommended path] because [one-line reason from the Dominant Truth].
 - Options: A) [path label in ≤1 line] · B) [path label in ≤1 line] · C) [path label in ≤1 line]
 
-If AskUserQuestion unavailable: end Response 2 with `Reply A, B, or C. Or correct the Frame if it's off.`
+After the AskUserQuestion overlay, append a plain-text challenge block (never inside the overlay):
+```
+Challenge before committing:
+D) Pre-mortem — assume the top path fails, why?
+E) Deep dive — full Five Truths across all paths
+H) Board simulation — how would the board react?
+I) Investor simulation — run the paths past investors
+```
+
+**Pre-path challenge rules:**
+- Challenge options run against **all three paths**, not just the recommended one
+- When a challenge completes, re-surface the path-selection AskUserQuestion (with challenge block) and continue
+- Challenge loop has no fixed limit — the user can challenge multiple times before picking a path
+- After the user picks a path (A/B/C), proceed to Action 4 (Verdict) normally; journal write happens after Verdict as usual
+- **`--go` suppresses the challenge block entirely** — not partially, entirely. Do not render it when `--go` is present.
+- **`--quick` suppresses the challenge block entirely.**
+
+If AskUserQuestion unavailable: end Response 2 with:
+```
+Reply A, B, or C. Or correct the Frame if it's off.
+
+Challenge before committing: D) Pre-mortem · E) Deep dive · H) Board sim · I) Investor sim
+```
 
 **Action 4 — Verdict**
 
@@ -525,6 +547,12 @@ B) **[Situational label]** — [≤2 sentences]  ← recommended
 C) **[Situational label]** — [≤2 sentences]
 
 [→ AskUserQuestion: path selection (see Action 3)]
+
+Challenge before committing:
+D) Pre-mortem — assume the top path fails, why?
+E) Deep dive — full Five Truths across all paths
+H) Board simulation — how would the board react?
+I) Investor simulation — run the paths past investors
 ```
 
 **Response 3 — Verdict + next steps (delivered after user picks a path):**
@@ -591,13 +619,14 @@ Reply with a letter (or several). Skip to move on.
 - Response 2 opens with a framing sentence anchored to the confirmed frame, then paths
 - Paths use `A) **[Label]**`, `B) **[Label]**`, `C) **[Label]**` format — labels are situational verb phrases derived from the confirmed frame (see Action 3 label rules). **Never use Bold/Balanced/Conservative as path labels.**
 - Exactly one path carries `← recommended` marker
-- Response 2 always ends with AskUserQuestion for path selection; falls back to `Reply A, B, or C. Or correct the Frame if it's off.` if unavailable
+- Response 2 always ends with AskUserQuestion for path selection followed by a plain-text challenge block (D/E/H/I — never inside the overlay); falls back to path prompt + plain-text challenge line if AskUserQuestion unavailable. Challenge block suppressed when `--go` or `--quick` is present.
 - Response 3 uses structured format: `**Verdict:**` line, `**Kill criteria:**` numbered list, `**Confidence:**` with key, `**Blind spots:**` block (conditional), `→ To reach` elevation block (conditional, Medium/Low only). Never run these together as one dense paragraph.
 - Response 3 includes a Blind spots block immediately after Confidence key when ≥1 Truth was inferred without stated data — one item per line prefixed with `·`, format `[Truth — no [data type]; [challenges/reinforces] this verdict · get it via: [collection method]]`, max 3 items, ends with "Sharing any of these shifts the analysis." Suppress entirely if all Truths were grounded.
 - Response 3 always ends with AskUserQuestion offering next steps D–L; falls back to plain text list if unavailable
 - No headers, no numbered sections, no preamble before Line 1 of Response 1 **except:** if `STRATEGY_FILES_FOUND` with a question-reframing tension, 2-sentence posture + tension-as-grounding-options may precede Line 1 — the user's angle pick IS the confirmation; no separate "is this right?" step. If no tension: posture folds silently into Line 1.
-- With `--deep`: Response 1 Lines 1–2 unchanged. After paths in Response 2, insert full 10-section output before the path-selection AskUserQuestion. Response 3 Verdict unchanged.
-- With `--go`: bypass the three-response flow — deliver all four actions in one response (no AskUserQuestion, no text footer). Paths use `A) B) C)` format. Mark recommended path with `← recommended`. Append plain text next-steps list D–L at the end.
+- With `--deep`: Response 1 Lines 1–2 unchanged. After paths in Response 2, insert full 10-section output before the path-selection AskUserQuestion. Challenge block still renders after the AskUserQuestion. Response 3 Verdict unchanged.
+- With `--go`: bypass the three-response flow — deliver all four actions in one response (no AskUserQuestion, no text footer, no challenge block). Paths use `A) B) C)` format. Mark recommended path with `← recommended`. Append plain text next-steps list D–L at the end.
+- With `--quick`: deliver all four actions in one response — no grounding question, no path-selection prompt, no challenge block. One kill criterion only. No blind spots block. No Truth fingerprint.
 
 ---
 

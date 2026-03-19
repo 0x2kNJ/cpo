@@ -34,7 +34,7 @@ Type `cpo help` or `cpo ?` to see a full overview of what it can do.
 ```bash
 # Version check
 _INSTALLED_VERSION=$(cat ~/.cpo/.version 2>/dev/null || echo "unknown")
-_SKILL_VERSION="1.4.5"
+_SKILL_VERSION="1.4.7"
 if [ "$_INSTALLED_VERSION" != "$_SKILL_VERSION" ] && [ "$_INSTALLED_VERSION" != "unknown" ]; then
   echo "VERSION_MISMATCH: installed=$_INSTALLED_VERSION skill=$_SKILL_VERSION"
 fi
@@ -314,9 +314,25 @@ C) **[Situational label]** — [≤2 sentences]
 
 **Label-to-framing-sentence dependency:** Labels are derived from the framing sentence that opens Response 2. That sentence names the core tradeoff — labels are positions along it. Same decision type → same framing sentence → recognizable label structure. If framing is wrong, labels cascade wrong. Fix the sentence first.
 
-End Response 2 with a path-selection prompt (single choice only). No Verdict yet — that waits for the user's pick:
+End Response 2 with a path-selection prompt. No Verdict yet — that waits for the user's pick:
 
 > Reply A, B, or C. Or correct the Frame if it's off.
+
+After the path-selection line, append a plain-text challenge block:
+```
+Challenge before committing:
+D) Pre-mortem — assume the top path fails, why?
+E) Deep dive — full Five Truths across all paths
+H) Board simulation — how would the board react?
+I) Investor simulation — run the paths past investors
+```
+
+**Pre-path challenge rules:**
+- Challenge options run against **all three paths**, not just the recommended one
+- When a challenge completes, re-surface the path-selection prompt (with challenge block) and continue
+- After the user picks a path (A/B/C), proceed to Action 4 (Verdict); journal write happens after Verdict as usual
+- **`--go` suppresses the challenge block entirely.** Do not render it when `--go` is present.
+- **`--quick` suppresses the challenge block entirely.**
 
 **Action 4 — Verdict**
 
@@ -491,6 +507,12 @@ B) **[Situational label]** — [≤2 sentences]  ← recommended
 C) **[Situational label]** — [≤2 sentences]
 
 Reply A, B, or C. Or correct the Frame if it's off.
+
+Challenge before committing:
+D) Pre-mortem — assume the top path fails, why?
+E) Deep dive — full Five Truths across all paths
+H) Board simulation — how would the board react?
+I) Investor simulation — run the paths past investors
 ```
 
 **Response 3 — Verdict + next steps (delivered after user picks a path):**
@@ -548,15 +570,15 @@ Reply with a letter (or several). Skip to move on.
 - Response 2 opens with framing sentence anchored to confirmed frame, then paths
 - Paths use situational verb-phrase labels derived from the confirmed frame — A) B) C) format. **Never use Bold/Balanced/Conservative as labels.** Labels must name what the path bets on, not how risky it is.
 - Exactly one path carries `← recommended` marker
-- Response 2 always ends with `Reply A, B, or C. Or correct the Frame if it's off.`
+- Response 2 always ends with path-selection prompt followed by plain-text challenge block (D/E/H/I). Challenge block suppressed when `--go` or `--quick` is present.
 - Response 3 uses structured format: `**Verdict:**` line, `**Kill criteria:**` numbered list, `**Confidence:**` with key, `**Blind spots:**` block (conditional), `→ To reach` elevation block (conditional, Medium/Low only). Never run these together as one dense paragraph.
 - Response 3 includes a Blind spots block immediately after Confidence key when ≥1 Truth was inferred without stated data — one item per line prefixed with `·`, format `[Truth — no [data type]; [challenges/reinforces] this verdict · get it via: [collection method]]`, max 3 items, ends with "Sharing any of these shifts the analysis." Suppress entirely if all Truths were grounded.
 - Response 3 always includes the next-steps menu D–L
 - **Progressive disclosure:** On the user's first decision (preamble returned `NO_DECISIONS`), show only D–G in the initial menu with a "More →" option: `D) Pre-mortem E) Deep dive F) Roadmap G) Sell-up → More: H) Board sim · I) Investor sim · J) Hand off · K) Something else [L) New evidence]`. Returning users (any prior journal entries) see the full D–L menu.
 - No headers, no numbered sections, no preamble before Line 1 of Response 1 **except:** if `STRATEGY_FILES_FOUND` with a question-reframing tension, 2-sentence posture + tension-as-grounding-options precede Line 1 — the user's angle pick IS the confirmation; no separate "is this right?" gate. If no tension found: posture folds silently into Line 1.
-- With `--deep`: Response 1 Lines 1–2 unchanged. After paths in Response 2, insert full 10-section output before the path-selection prompt. Response 3 Verdict unchanged.
-- With `--go`: bypass the three-response flow — deliver all four actions in one response (no grounding question, no text footer). Paths use `A) B) C)` format. Mark recommended path with `← recommended`. Append plain text next-steps list D–L at the end.
-- With `--quick`: deliver all four actions in one response — no grounding question, no path-selection prompt. No blind spots block. One kill criterion only. No Truth fingerprint. If confidence is Low, append: *"Low confidence — consider running without `--quick` for full analysis."*
+- With `--deep`: Response 1 Lines 1–2 unchanged. After paths in Response 2, insert full 10-section output before the path-selection prompt. Challenge block still renders after the path-selection prompt. Response 3 Verdict unchanged.
+- With `--go`: bypass the three-response flow — deliver all four actions in one response (no grounding question, no text footer, no challenge block). Paths use `A) B) C)` format. Mark recommended path with `← recommended`. Append plain text next-steps list D–L at the end.
+- With `--quick`: deliver all four actions in one response — no grounding question, no path-selection prompt, no challenge block. No blind spots block. One kill criterion only. No Truth fingerprint. If confidence is Low, append: *"Low confidence — consider running without `--quick` for full analysis."*
 
 **Blind spots rules:**
 - Render only when ≥1 Truth was primarily inferred during Assess (tracked silently via blind spots tracking)
