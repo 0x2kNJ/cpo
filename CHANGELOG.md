@@ -4,6 +4,18 @@ All notable changes documented here. Follows [Keep a Changelog](https://keepacha
 
 ---
 
+## [1.8.2] — 2026-03-19
+
+Patch: Cursor agentic loop runs through without stopping + progressive disclosure rendering bug.
+
+### Fixed
+
+- **⛔ STOP gates added (CURSOR.md) — critical:** Cursor's agentic mode auto-continues through response boundaries. Added explicit GATE markers at both user-input boundaries: Gate 1 after Response 1 (grounding question), Gate 2 after Response 2 (path selection). Soft language like "generate paths only after the user confirms" was not enforced — replaced with hard stop markers that explicitly prohibit auto-selection and auto-continuation.
+- **THREE HARD STOPS rule added to Critical Output Rules (CURSOR.md):** Read-first section now opens with the three gates enumerated explicitly — grounding gate, path gate, D–M pick gate — with named prohibition ("Do not auto-select"). Models reading the preamble see this before any response.
+- **Progressive disclosure code block fix (CURSOR.md):** The first-time user menu rule was a single compressed inline string. Models were misreading it and rendering K) Eng brief as a standalone top-level bullet alongside D–G (H, I, J, L dropped entirely). Expanded into a proper fenced code block with exact output format and explicit rule: the `→ More:` line is a single collapsed summary — do not render H, I, J, K, L as separate items.
+
+---
+
 ## [1.8.1] — 2026-03-19
 
 Patch: six panel-identified bugs and recommendations fixed before prod.
