@@ -4,6 +4,34 @@ All notable changes documented here. Follows [Keep a Changelog](https://keepacha
 
 ---
 
+## [1.9.0] — 2026-03-19
+
+**Architecture rewrite: instructions-first CURSOR.md.** Complete restructure of CURSOR.md to solve the fundamental compliance failure: models were ignoring all gate enforcement, format rules, and structural constraints because behavioral rules were buried 145 lines deep behind preamble and context-loading code.
+
+### Changed — Architecture
+
+- **Instructions-first structure:** CURSOR.md now opens with 7 mandatory behavioral rules at the very top — before the preamble, before context loading, before anything. The first thing a model reads is "THREE SEPARATE RESPONSES" with exact templates and ⛔ STOP markers.
+- **Document reduced from 648 to ~300 lines (~55% cut).** Signal-to-noise ratio dramatically improved. Detailed reference content (elevation loops, challenge rules, D-M pick behaviors) now lives in SKILL.md only. CURSOR.md is the behavioral enforcement layer.
+- **Tone shifted from documentation to instruction.** Previous: *"Response 2 always ends with..."* (describes what happens). New: *"⛔ RESPONSE 2 ENDS HERE. Do not write a verdict."* (commands what to do).
+- **Exact output templates in the first 80 lines.** Even if the model reads nothing else, it knows: what Response 1 looks like, what Response 2 looks like, what Response 3 looks like, and when to stop.
+
+### Fixed — Root Causes
+
+- **Critical Output Rules were at line 146** — after 145 lines of preamble/context loading. By the time the model reached format constraints, it had already formed an intent to "give product advice." Rules now start at line 1.
+- **Five Truth names were being substituted** — models used generic names (Desirability, Viability, etc.) instead of spec names (User Truth, Strategic Truth, etc.). Rule 3 now lists exact names with an explicit prohibition on substitution.
+- **Invented sections (Weekend Plan, Technical Notes, etc.)** — models added helpful sections not in the spec. Rule 4 now explicitly prohibits common invented sections by name.
+- **No gate enforcement in Cursor** — there is no AskUserQuestion mechanical pause. The document now uses ⛔ STOP markers, self-check questions, and explicit deletion instructions ("If you find yourself writing paths before the user replied — STOP. Delete what you wrote.").
+
+### Removed (from CURSOR.md — still in SKILL.md)
+
+- Detailed elevation loop mechanics
+- Full D-M pick behavior descriptions (H/I/L/M handling)
+- Smoke test (now unnecessary if rules are followed — reintroduce if needed)
+- Feature register (SKILL.md concern, not Cursor enforcement)
+- Detailed structural rules section (replaced by Rule 1-7)
+
+---
+
 ## [1.8.12] — 2026-03-19
 
 Patch: Six UX/flow bugs fixed — grounding correction first-class, D-M/1-2-3 boundary enforced, challenge loop cap removed, F surfaced post-path-commit, structural rules corrected. Root cause of screenshot bug (D/E/H/I in structural rule) eliminated.
