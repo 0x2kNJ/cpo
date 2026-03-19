@@ -1,6 +1,6 @@
 ---
 name: cpo
-version: 2.0.1
+version: 2.0.2
 last_updated: 2026-03-19
 argument-hint: "[problem or question] [--go] [--deep]"
 description: >-
@@ -29,7 +29,7 @@ allowed-tools:
 ```bash
 # Version check
 _INSTALLED_VERSION=$(cat ~/.cpo/.version 2>/dev/null || echo "unknown")
-_SKILL_VERSION="2.0.1"
+_SKILL_VERSION="2.0.2"
 if [ "$_INSTALLED_VERSION" != "$_SKILL_VERSION" ] && [ "$_INSTALLED_VERSION" != "unknown" ]; then
   echo "VERSION_MISMATCH: installed=$_INSTALLED_VERSION skill=$_SKILL_VERSION"
 fi
@@ -90,7 +90,9 @@ fi
 
 **State handling:** `Read references/internal/preamble-handlers.md` for detailed rules on each state (CONTEXT_LOADED_*, DECISIONS_FOUND, INTEGRATIONS_FOUND, VERSION_MISMATCH, STRATEGY_FILES_FOUND, etc.)
 
-If `--context [name]` appears: load `~/.cpo/contexts/[name].md` instead. If `CONTEXT_LOADED_FRESH`: *"Reading context: [stage] — optimizing for [doctrine]."* If `NO_CONTEXT`: infer from prompt, ask at most one question.
+If `--context [name]` appears: load `~/.cpo/contexts/[name].md` instead. If `CONTEXT_LOADED_FRESH`: *"Reading context: [stage] — optimizing for [doctrine]."* If `NO_CONTEXT`: infer from prompt, ask at most one question. If bash fails entirely: proceed with `NO_CONTEXT` behavior — infer from prompt, flag all inferences.
+
+**STRATEGY_FILES_FOUND (inline):** Read up to 5 files (≤2,000 tokens each, `.claude/strategy/` first). Check for question-reframing tensions (conflicts in success metric, primary user, or time horizon). If tension found: surface as angle-selection before Frame. If no tension: fold posture silently into Frame, append one inline note after Line 1: *[Strategy: [one-clause posture].]* If `--go`: skip tension gate, incorporate silently.
 
 ---
 
@@ -121,7 +123,7 @@ In compact mode: identify the **Dominant Truth** and reason from it. In `--deep`
 **Inline fallbacks (always in context):**
 - Grounding options: must represent structural angles (scope, segment, channel, sequencing), NEVER risk tolerances. Self-check: "Could I relabel these Bold/Balanced/Conservative?" If yes → rewrite.
 - Path labels: situational verb phrases derived from the framing sentence. NEVER use Bold/Balanced/Conservative.
-- Kill criteria: metric + threshold + timeframe, minimum 3. Example: "weekly active users drop >20% MoM in 60 days post-launch."
+- Kill criteria: metric + threshold + timeframe, minimum 3 (except `--quick`: 1 only). Example: "weekly active users drop >20% MoM in 60 days post-launch."
 - D-M menu: always render after verdict (even when elevation prompt is present).
 - Evidence tags: *[fact / assumption / inference / judgment]* on every claim about user's situation, market, or competitors. Paths (hypotheticals) exempt.
 - Compact by default: ≤300 words unless `--deep` or auto-escalation.
@@ -151,10 +153,11 @@ Action 4 — Verdict  → Recommendation + kill criteria + confidence.
 Or correct the frame in a sentence — we'll re-run from Assess.
 ```
 
-> ⛔ **GATE 1 — Response 1 ends here.** Do not generate paths. Do not select a grounding option on the user's behalf. Wait for the user's reply.
+> ⛔ **GATE 1 — Response 1 ends here.** (`--go`/`--quick` skip this gate.) Do not generate paths. Do not select a grounding option on the user's behalf. Wait for the user's reply.
 > **Self-check before continuing:** Has the user replied with a grounding choice (A/B/C/D or a frame correction) in this same message? If no → STOP. This response is complete. If yes → proceed to Response 2.
 > **MUST contain:** Frame line (`*I'm reading this as:*`), Dominant Truth line (`*The [Truth] is what this turns on:*`), grounding question with lettered options (A/B/C + D to reframe).
 > **MUST NOT contain:** paths (A/B/C with labels), verdict, kill criteria, D-M menu, 1/2/3 challenge block.
+> **Empty prompt** (`/cpo` alone): respond only with *"What are we deciding?"* — no Frame, no Assess, no grounding.
 
 ### Response 2 — Paths (after user confirms grounding)
 
@@ -176,12 +179,22 @@ Pick A, B, or C to commit. Or pick 1, 2, or 3 to dig deeper first.
 
 **This is the exact output for Response 2.** Do not add your own path-selection question. Do not rephrase the 1/2/3 block. The template above IS the complete response — output it as written, then stop.
 
-> ⛔ **GATE 2 — Response 2 ends here.** Do not generate the Verdict. Do not render D-M options. Do not write kill criteria. Wait for the user's reply.
+> ⛔ **GATE 2 — Response 2 ends here.** (`--go`/`--quick` skip this gate.) Do not generate the Verdict. Do not render D-M options. Do not write kill criteria. Wait for the user's reply.
 > **Self-check:** Has the user replied with a path choice (A/B/C) or a pre-commitment pick (1/2/3)? If no → STOP. If yes → A/B/C proceeds to Verdict; 1/2/3 runs challenge then re-surfaces path selection.
 > **MUST contain:** framing sentence, exactly 3 paths with situational labels, one path marked `← recommended`, the 1/2/3 challenge block.
 > **MUST NOT contain:** verdict, kill criteria, confidence rating, D-M menu (D through M letters), blind spots, truth fingerprint.
+> **AskUserQuestion fallback:** If AskUserQuestion tool is unavailable, use the plain-text templates above — they are designed to work as direct output.
 
 ### Response 3 — Verdict + Next Steps (after user picks a path)
+
+**Rendering rules (check BEFORE generating):**
+- **If confidence is High:** render full D-M menu immediately after verdict block.
+- **If confidence is Medium or Low:** render elevation prompt AND ALSO render D-M menu below it. Elevation is an invitation, not a gate.
+- M) renders only when confidence is High.
+- Kill criteria: always ≥3 (except `--quick`: 1), each with metric + threshold + timeframe.
+- Blind spots: render only when ≥1 Truth was inferred; suppress if all grounded.
+- Truth fingerprint: always render.
+- **D-M pick fallbacks:** If user picks H → run `boardroom` inline. I → run `investor-roundtable` inline. K → run `eng-brief` inline. L → run skill discovery + handoff sub-menu. After any D-M pick completes, re-surface remaining unused picks with RECOMMENDATION.
 
 ```
 **Verdict:** [chosen path] — [one-line reason].
@@ -227,14 +240,6 @@ L) Hand off       — select skill or agent
 Reply with a letter (or several). Skip to move on.
 ```
 
-**Response 3 rendering rules:**
-- **If confidence is High:** render the full D-M menu immediately after the verdict block.
-- **If confidence is Medium or Low:** render the elevation prompt AND ALSO render the D-M menu below it. The elevation prompt is an invitation, not a gate that hides the menu.
-- M) renders only when confidence is High.
-- Kill criteria: always ≥3, each with metric + threshold + timeframe.
-- Blind spots: render only when ≥1 Truth was inferred; suppress if all grounded.
-- Truth fingerprint: always render.
-
 ---
 
 ## Hard Rules
@@ -260,7 +265,21 @@ If the user corrects the Frame or grounding: acknowledge in one line (*"Got it �
 
 ## `--go` / `--quick`
 
-**`--go`:** Bypass three-response flow. Deliver all four actions in one response: Frame + Assess + Paths (with `← recommended`) + Verdict + D-M menu. No grounding question. No path-selection prompt. No challenge block. No simulation gate.
+**`--go`:** Bypass three-response flow. Deliver all four actions in one response: Frame + Assess + Paths (with `← recommended`) + Verdict + D-M menu. No grounding question. No path-selection prompt. No challenge block. No simulation gate. Template:
+```
+*Running: [plain-English description]*
+*I'm reading this as: [decision]. Inferring [stage / model / lean].*
+*The [Truth] is what this turns on: [finding].*
+
+A) **[Label]** — [≤2 sentences]
+B) **[Label]** — [≤2 sentences]  ← recommended
+C) **[Label]** — [≤2 sentences]
+
+**Verdict:** [recommended path] — [one-line reason].
+**Kill criteria:** 1. [m+t+t]  2. [m+t+t]  3. [m+t+t]
+**Confidence:** [H/M/L] — [key].
+[D-M menu]
+```
 
 **`--quick`:** Single-response condensed. No grounding, no path selection, one kill criterion only, no blind spots, no Truth fingerprint. If confidence is Low: *"Low confidence — consider running without `--quick` for full analysis."*
 
@@ -278,13 +297,10 @@ Every prompt runs Frame → Assess → Grounding → Paths → Verdict in that o
 | Post-PMF / growth | Scaling — NRR, expansion motion, compounding loops |
 | Series B+ | Mature — Rule of 40, CAC payback, path to exit |
 
-**`--deep` Response Format:**
-```
-## [Topic] — Strategic Analysis
-### 1. Problem Definition  ### 2. Five Truths Assessment  ### 3. Strategic Options (Three Paths)
-### 4. Recommendation + Kill Criteria  ### 5. Sequencing & Dependencies  ### 6. Risks & Mitigations
-### 7. GTM Considerations  ### 8. Organizational Implications  ### 9. Open Questions  ### 10. Decision Memo
-```
+**`--deep` Response Format:** Insert after paths in Response 2, before path-selection prompt.
+1. Problem Definition · 2. Five Truths Assessment · 3. Strategic Options (Three Paths)
+4. Recommendation + Kill Criteria · 5. Sequencing & Dependencies · 6. Risks & Mitigations
+7. GTM Considerations · 8. Organizational Implications · 9. Open Questions · 10. Decision Memo
 
 ---
 
