@@ -34,7 +34,7 @@ Type `cpo help` or `cpo ?` to see a full overview of what it can do.
 ```bash
 # Version check
 _INSTALLED_VERSION=$(cat ~/.cpo/.version 2>/dev/null || echo "unknown")
-_SKILL_VERSION="1.4.7"
+_SKILL_VERSION="1.4.8"
 if [ "$_INSTALLED_VERSION" != "$_SKILL_VERSION" ] && [ "$_INSTALLED_VERSION" != "unknown" ]; then
   echo "VERSION_MISMATCH: installed=$_INSTALLED_VERSION skill=$_SKILL_VERSION"
 fi
@@ -323,6 +323,7 @@ After the path-selection line, append a plain-text challenge block:
 Challenge before committing:
 D) Pre-mortem — assume the top path fails, why?
 E) Deep dive — full Five Truths across all paths
+G) Leadership reaction — how does each path land with your CEO/board?
 H) Board simulation — how would the board react?
 I) Investor simulation — run the paths past investors
 ```
@@ -511,6 +512,7 @@ Reply A, B, or C. Or correct the Frame if it's off.
 Challenge before committing:
 D) Pre-mortem — assume the top path fails, why?
 E) Deep dive — full Five Truths across all paths
+G) Leadership reaction — how does each path land with your CEO/board?
 H) Board simulation — how would the board react?
 I) Investor simulation — run the paths past investors
 ```

@@ -33,7 +33,7 @@ allowed-tools:
 ```bash
 # Version check
 _INSTALLED_VERSION=$(cat ~/.cpo/.version 2>/dev/null || echo "unknown")
-_SKILL_VERSION="1.4.7"
+_SKILL_VERSION="1.4.8"
 if [ "$_INSTALLED_VERSION" != "$_SKILL_VERSION" ] && [ "$_INSTALLED_VERSION" != "unknown" ]; then
   echo "VERSION_MISMATCH: installed=$_INSTALLED_VERSION skill=$_SKILL_VERSION"
 fi
@@ -349,9 +349,12 @@ After the AskUserQuestion overlay, append a plain-text challenge block (never in
 Challenge before committing:
 D) Pre-mortem — assume the top path fails, why?
 E) Deep dive — full Five Truths across all paths
+G) Leadership reaction — how does each path land with your CEO/board?
 H) Board simulation — how would the board react?
 I) Investor simulation — run the paths past investors
 ```
+
+**Pre-path G) framing note:** Sell-up at the path stage asks *"how does each path land with leadership?"* — not "how do I pitch the verdict." It frames all three paths for the target audience, not just the recommended one. This differs from the post-verdict G) which packages a committed decision.
 
 **Pre-path challenge rules:**
 - Challenge options run against **all three paths**, not just the recommended one
@@ -365,7 +368,7 @@ If AskUserQuestion unavailable: end Response 2 with:
 ```
 Reply A, B, or C. Or correct the Frame if it's off.
 
-Challenge before committing: D) Pre-mortem · E) Deep dive · H) Board sim · I) Investor sim
+Challenge before committing: D) Pre-mortem · E) Deep dive · G) Leadership reaction · H) Board sim · I) Investor sim
 ```
 
 **Action 4 — Verdict**
@@ -551,6 +554,7 @@ C) **[Situational label]** — [≤2 sentences]
 Challenge before committing:
 D) Pre-mortem — assume the top path fails, why?
 E) Deep dive — full Five Truths across all paths
+G) Leadership reaction — how does each path land with your CEO/board?
 H) Board simulation — how would the board react?
 I) Investor simulation — run the paths past investors
 ```

@@ -4,6 +4,20 @@ All notable changes documented here. Follows [Keep a Changelog](https://keepacha
 
 ---
 
+## [1.4.8] — 2026-03-19
+
+G) Leadership reaction added to the pre-path challenge block. Asks "how does each path land with your CEO/board?" before committing — frames all three paths for the target audience, not just the recommended one. Distinct from the post-verdict G) sell-up, which packages a committed decision.
+
+### Added
+
+- **G) Leadership reaction in pre-path challenge block:** Surfaces in Response 2 alongside D/E/H/I. Frames all three paths for the specified audience (CEO, board, eng-lead). Pre-path framing: "which path lands with leadership?" Post-verdict G) framing: "how do I pitch this committed decision?" — different questions, same letter.
+
+### Changed
+
+- **`_SKILL_VERSION`:** 1.4.7 → 1.4.8 in both SKILL.md and CURSOR.md.
+
+---
+
 ## [1.4.7] — 2026-03-19
 
 Pre-path challenge menu. D/E/H/I challenge options (Pre-mortem, Deep dive, Board simulation, Investor simulation) now surface at the path-selection stage (Response 2), before the user commits to a path — not only after the Verdict. Challenge runs against all three paths, not just the recommended one. Loop has no fixed limit. Suppressed by `--go` and `--quick`.
