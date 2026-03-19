@@ -4,6 +4,27 @@ All notable changes documented here. Follows [Keep a Changelog](https://keepacha
 
 ---
 
+## [1.4.5] — 2026-03-18
+
+Journal override and logic drift detection. Three additions: `--invalidate` to retire superseded decisions, passive drift surface on journal writes, and `--drift` for on-demand structural contradiction detection.
+
+### Added
+
+- **`--invalidate [topic or #id]`:** Mark a past decision as intentionally retired. Annotates the YAML entry with `status: invalidated`, `invalidated_date`, and `invalidated_reason`. Future context loads (`DECISIONS_FOUND`) skip invalidated entries silently; `--history` always shows them with `[invalidated]` marker for audit. Never automatic — always user-initiated with a reason.
+- **Passive drift surface:** When writing any journal entry, CPO now also checks whether the incoming entry's Dominant Truth fingerprint differs from the most recent non-invalidated entry on the same topic. If it does, one non-blocking note is appended: *"Note: Dominant Truth shifted from [prior] → [current] — intentional? Run `--drift` or `--invalidate [topic]`."* Does not interrupt the flow.
+- **`--drift` flag:** On-demand logic drift detection. Scans last 10 non-invalidated journal entries, surfaces only structural contradictions: Truth fingerprint shifts across ≥3 consecutive entries without `delta_from_prior`, verdict reversals without acknowledgment, or kill criteria degradation. Keyword similarity alone does not trigger drift — fingerprint-based only.
+- **`references/flags/invalidate.md`:** Full `--invalidate` spec with step-by-step execution, rules, and per-flag behavior table.
+- **`references/flags/drift.md`:** Full `--drift` spec with structural drift definition, what does/doesn't count, bash execution block, and output format.
+
+### Changed
+
+- **Journal schema bumped to `"1.5"`:** Three new fields added to every journal entry: `status: active`, `invalidated_date: ""`, `invalidated_reason: ""`.
+- **`DECISIONS_FOUND` context load:** Silently skips entries with `status: invalidated`. Full history (including invalidated) always available via `--history`.
+- **Progressive disclosure nit (from panel review):** Clarified that the first-time user condition is "no prior journal entries *ever*" — not "no entries in current session." Prevents experienced founders starting a fresh session from seeing the compressed menu.
+- **`--patterns` minimum threshold note:** Added inline note that 3 entries is the technical gate; meaningful patterns emerge at 8–10 entries.
+
+---
+
 ## [1.4.4] — 2026-03-18
 
 8 improvements: Truth Fingerprint tracking, `--decide` version guard, `--stack` CPO-aware detection, kill criterion in `--decide` outputs, `--patterns` flag (Decision DNA), `--quick` mode, `references/handoff-contract.md`, progressive D–L menu disclosure for first-time users.

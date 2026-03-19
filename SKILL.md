@@ -104,7 +104,7 @@ If `--context [name]` appears in the user's prompt: disregard the bash output. L
 
 **Staleness check:** Trigger on `CONTEXT_LOADED_STALE` OR if any context state includes explicit pivot/thesis language ("rethink," "pivot," "starting over," "not sure about our thesis," "what went wrong"). Fire at most once. If `--silent`: skip entirely.
 
-**DECISIONS_FOUND:** Load the printed entries as recent decision history. Use them silently to: (1) inform `--since` diffs, (2) power `--brief` and `--trail` outputs, (3) detect pattern consistency ("Last month you committed to the Balanced path on enterprise — this week you're asking about doubling down. What changed?"). Do not read these aloud unless the user asks for history or `--brief` / `--trail` is passed.
+**DECISIONS_FOUND:** Load the printed entries as recent decision history. Use them silently to: (1) inform `--since` diffs, (2) power `--brief` and `--trail` outputs, (3) detect pattern consistency ("Last month you committed to the Balanced path on enterprise — this week you're asking about doubling down. What changed?"). Do not read these aloud unless the user asks for history or `--brief` / `--trail` is passed. Entries with `status: invalidated` are silently skipped during context load — they remain accessible via `--history` for audit.
 
 **NO_DECISIONS:** No prior decision journal entries. Proceed normally. If the user asks about history, note there are no logged decisions yet.
 
@@ -174,7 +174,7 @@ Flags that accept `#name` for exact lookup (instead of keyword search): `--since
 
 ### Default mode: Four Actions
 
-**`/cpo` and `/cpo [any prompt]` both use the four-action flow by default.** The only exceptions are `--go` (full bypass), `--quick` (single-response condensed), and utility flags (`--brief`, `--trail`, `--history`, `--outcome`, `--export`, `--stack`, `--roadmap`, `--sell-up`, `--schedule-brief`, `--save-context`, `--setup-integrations`, `--update`, `--import-context`, `--decide`, `--patterns`) — those execute immediately. **Exception: `--scan-strategy` alone executes immediately (Path A); `--scan-strategy [question]` enters the four-action flow with strategy-anchored grounding (Path B).**
+**`/cpo` and `/cpo [any prompt]` both use the four-action flow by default.** The only exceptions are `--go` (full bypass), `--quick` (single-response condensed), and utility flags (`--brief`, `--trail`, `--history`, `--outcome`, `--export`, `--stack`, `--roadmap`, `--sell-up`, `--schedule-brief`, `--save-context`, `--setup-integrations`, `--update`, `--import-context`, `--decide`, `--patterns`, `--invalidate`, `--drift`) — those execute immediately. **Exception: `--scan-strategy` alone executes immediately (Path A); `--scan-strategy [question]` enters the four-action flow with strategy-anchored grounding (Path B).**
 
 The four actions run across **three responses**. Response 1 delivers Frame + Assess and ends with a grounding question to confirm the decision angle. Response 2 delivers Paths tailored to the confirmed frame and ends with a path-selection prompt. Response 3 delivers the Verdict + next-steps menu. No exchanges before value — the user sees analysis immediately; grounding and paths both land before any commitment.
 
@@ -393,7 +393,7 @@ Immediately follow with an AskUserQuestion offering next steps.
 - No RECOMMENDATION on initial menu (see AskUserQuestion Format exception above).
 - Options: D) Pre-mortem — stress-test this · E) Deep dive — full Five Truths · F) Roadmap — stack vs other bets · G) Sell-up — reframe for leadership · H) Board simulation — pressure-test in the boardroom · I) Investor simulation — run the pitch · J) Hand off — pass to next tool · K) Something else — one sentence · [L) New evidence — share what you found, I'll show what shifts] (L) renders only when confidence is High; suppress when elevation `→` block fires)
 
-**Progressive disclosure:** On the user's first decision (no prior journal entries detected), show only D–G in the initial menu with a "More →" option:
+**Progressive disclosure:** On the user's first decision (no prior journal entries ever (preamble returned `NO_DECISIONS`)), show only D–G in the initial menu with a "More →" option:
 ```
 Next steps (pick any):
 D) Pre-mortem — stress-test before committing
@@ -695,7 +695,7 @@ If role is influencer AND prompt contains a decision question — state in Actio
 >
 > ---
 >
-> **Flags:** `--go` · `--deep` · `--quick` · `--memo` · `--silent` · `--roadmap` · `--sell-up [audience]` · `--brief` · `--trail` · `--history` · `--since` · `--outcome` · `--export` · `--stack` · `--save-context` · `--setup-integrations` · `--schedule-brief` · `--import-context [path]` · `--scan-strategy` · `--update`
+> **Flags:** `--go` · `--deep` · `--quick` · `--memo` · `--silent` · `--roadmap` · `--sell-up [audience]` · `--brief` · `--trail` · `--history` · `--since` · `--outcome` · `--export` · `--stack` · `--save-context` · `--setup-integrations` · `--schedule-brief` · `--import-context [path]` · `--scan-strategy` · `--update` · `--invalidate [topic or #id]` · `--drift`
 >
 > **20 modes:** `blue-ocean` · `ceo` · `sequence` · `gtm` · `discovery` · `narrative` · `launch-os` · `investor-story` · `red-team` · `premortem` · `postmortem` · `org-design` · `board-memo` · `board-story` · `eng-brief` · `eng-translate` · `advisory-roundtable` · `boardroom` · `investor-roundtable` · `upward-pitch`
 >
@@ -878,6 +878,8 @@ Every prompt runs Frame → Assess → Paths → Verdict in that order, across t
 | `--history` | Load and display full decision journal (all entries, not just last 5). Use with a prompt to search: `/cpo --history enterprise` shows all decisions related to enterprise. |
 | `--outcome [topic]` | Close the loop on a prior decision. Find the most recent journal entry on the topic, surface the original verdict and kill criteria, record what actually happened, detect patterns across path outcomes over time. |
 | `--patterns` | Analyze the decision journal for personal decision-making tendencies: Truth weighting biases, path preferences, kill criteria hit rate, decision reversal frequency. Surfaces your decision DNA. |
+| `--invalidate [topic or #id]` | Mark a past decision as invalidated. Annotates with date + reason. Future context loads skip invalidated entries; `--history` always shows them. |
+| `--drift` | On-demand logic drift detection. Cross-references Truth fingerprints + verdict directions across recent decisions. Surfaces only structural contradictions — not semantic similarity. |
 | `--schedule-brief` | Set up a recurring weekly strategic brief using `anthropic-skills:schedule`. Runs `/cpo --brief` automatically — kill criteria alerts, unresolved decisions, pattern warnings — without the founder having to remember to ask. |
 | `--setup-integrations` | Detect available MCP data sources and configure live data enrichment for Five Truths assessments. Falls back to manual entry if no MCP tools found. Saves config to `~/.cpo/integrations.md`. |
 | `--import-context [path]` | Copy an external file into `.claude/strategy/` so CPO can reference it as strategic context. Path extracted from prompt in prose; bash block runs with literal substitution. |
@@ -951,7 +953,7 @@ _DATE=$(date +%Y-%m-%d)
 _TS=$(date +%s | tail -c 5)
 _MODE="${_CURRENT_MODE:-unknown}"
 cat > ~/.cpo/decisions/${_DATE}-${_MODE}-${_TS}.yaml << EOF
-schema_version: "1.4"
+schema_version: "1.5"
 date: $_DATE
 mode: $_MODE
 decision_id: ${_DECISION_ID:-}
@@ -974,6 +976,9 @@ open_questions:
 outcome: pending
 outcome_date: ""
 outcome_notes: ""
+status: active
+invalidated_date: ""
+invalidated_reason: ""
 EOF
 ```
 
@@ -986,6 +991,8 @@ Replace every `REPLACE_WITH_*` value with the actual content from the output jus
 **`delta_from_prior` field:** For returning decisions, write a one-line summary of what changed from the prior entry (e.g., "pilot data shifted Economic Truth from unknown to favorable"). For new decisions, write `na`.
 
 **Consistency check:** If a new journal entry contradicts a recent one (same `decision_id` or same topic, opposite verdict), flag it inline: *"Note: last time we looked at [topic] ([date]), verdict was X. Today's context shifts that to Y because Z."* Do not suppress the contradiction — surface it.
+
+**Passive drift surface:** When writing a new journal entry, also check whether the incoming entry's Dominant Truth (from the truth_fingerprint) differs from the most recent non-invalidated entry on the same `decision_id` or topic. If it does, append one non-blocking line after the journal write: *"Note: Dominant Truth shifted from [prior] → [current] vs. your last entry on [topic]. Intentional? Run `/cpo --drift` for a full drift check, or `--invalidate [topic]` to retire the prior entry."* This line is informational only — it does not interrupt the flow.
 
 **Decision object queries:** When `--since #name`, `--outcome #name`, or `--history #name` is passed, filter journal entries by `decision_id` instead of keyword search. This is exact — no fuzzy matching needed.
 
@@ -1283,6 +1290,20 @@ When suggesting installs, use these sources:
 
 ---
 
+## `--invalidate` Flag Behavior
+
+**Trigger:** `/cpo --invalidate [topic or #id]` — mark a past decision as intentionally retired.
+**Load:** `Read references/flags/invalidate.md` — follow all instructions there.
+
+---
+
+## `--drift` Flag Behavior
+
+**Trigger:** `/cpo --drift` — on-demand logic drift detection across recent decisions.
+**Load:** `Read references/flags/drift.md` — follow all instructions there.
+
+---
+
 ## `--patterns` Flag
 
 **Trigger:** `/cpo --patterns` — read the full decision journal and surface the user's decision-making DNA.
@@ -1327,6 +1348,8 @@ Calibration: High confidence verdicts held in 4/5 cases. Medium confidence: 3/6 
 **Load:** `Read references/flags/patterns.md` — follow all instructions there.
 
 **Minimum entries:** If fewer than 3 journal entries exist, output: *"Not enough decisions to detect patterns yet. Make 3+ decisions to unlock pattern analysis."*
+
+*Note: 3 entries is the technical gate; meaningful patterns emerge at 8–10 entries.*
 
 ---
 
