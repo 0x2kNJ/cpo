@@ -52,7 +52,9 @@ If fewer than 3 decisions have verified outcomes: *"Not enough verified decision
 
 ## Step 4 — Write score profile
 
-After computing scores with ≥3 verified decisions, write a compact profile to `~/.cpo/score-profile.md`. This profile loads at session start and informs Assess, Blind spots, and Confidence for every future decision.
+**Gate:** Only write the profile when `--since` is NOT present in the invocation. If `--since [date]` was passed, the analysis is scoped to a period — writing it as a permanent profile would corrupt the full-history baseline. If `--since` is present, skip Step 4 entirely and note: *"Score profile not updated — `--since` produces a partial-period view. Run `/cpo --score` (no date filter) to update your profile."*
+
+After computing scores with ≥3 verified decisions (no `--since`), write a compact profile to `~/.cpo/score-profile.md`. This profile loads at session start and informs Assess, Blind spots, and Confidence for every future decision.
 
 ```bash
 mkdir -p ~/.cpo

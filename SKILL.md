@@ -1,7 +1,7 @@
 ---
 name: cpo
-version: 2.3.0
-last_updated: 2026-03-19
+version: 2.5.0
+last_updated: 2026-03-20
 argument-hint: "[problem or question] [--go] [--deep]"
 description: >-
   The operating system for product decisions — what to build, whether to build it, how to communicate it, and when to kill it — before your team commits time, headcount, or capital.
@@ -97,7 +97,14 @@ fi
 # Score profile
 _SP=~/.cpo/score-profile.md
 if [ -f "$_SP" ] && [ -s "$_SP" ]; then
-  echo "SCORE_PROFILE_FOUND:"
+  _SP_DATE=$(grep "^Generated:" "$_SP" 2>/dev/null | sed 's/Generated: //' | tr -d ' ')
+  _SP_THEN=$(date -j -f "%Y-%m-%d" "$_SP_DATE" +%s 2>/dev/null || date -d "$_SP_DATE" +%s 2>/dev/null || echo "0")
+  _SP_AGE=$(( (_NOW - _SP_THEN) / 86400 ))
+  if [ "$_SP_AGE" -gt 90 ]; then
+    echo "SCORE_PROFILE_STALE: $_SP_DATE"
+  else
+    echo "SCORE_PROFILE_FOUND:"
+  fi
   cat "$_SP"
 else
   echo "NO_SCORE_PROFILE"
@@ -106,7 +113,7 @@ fi
 
 **HARD_STOP rule:** If bash output contains `HARD_STOP:`, output the error verbatim, then stop. Surface: *"[error]. Run `--save-context` to rebuild, or delete `~/.cpo/context.md` and start fresh."*
 
-**State handling:** `Read references/internal/preamble-handlers.md` for detailed rules on each state (CONTEXT_LOADED_*, DECISIONS_FOUND, INTEGRATIONS_FOUND, VERSION_MISMATCH, STRATEGY_FILES_FOUND, etc.)
+**State handling:** `Read references/internal/preamble-handlers.md` for detailed rules on each state (CONTEXT_LOADED_*, DECISIONS_FOUND, INTEGRATIONS_FOUND, VERSION_MISMATCH, STRATEGY_FILES_FOUND, SCORE_PROFILE_FOUND, SCORE_PROFILE_STALE, etc.)
 
 If `--context [name]` appears: load `~/.cpo/contexts/[name].md` instead. If `CONTEXT_LOADED_FRESH`: *"Reading context: [stage] — optimizing for [doctrine]."* If `NO_CONTEXT`: infer from prompt, ask at most one question. If bash fails entirely: proceed with `NO_CONTEXT` behavior — infer from prompt, flag all inferences.
 

@@ -4,6 +4,26 @@ All notable changes documented here. Follows [Keep a Changelog](https://keepacha
 
 ---
 
+## [2.5.1] — 2026-03-20
+
+**Panel review pass — 5 spec bugs fixed.** Test + review by Gary Tan (YC), Mike Krieger (Anthropic CPO), Boris Cherny (Head of Claude Code). All critical behavioral bugs corrected; no new features.
+
+### Fixed
+
+- **[Boris] Frontmatter version mismatch** — `SKILL.md` front matter said `version: 2.3.0`; bash block said `2.5.0`. Skill registries read frontmatter. Corrected to `2.5.0`.
+- **[Boris/Gary] `--score --since` profile corruption** — Running `/cpo --score --since [date]` wrote a partial-period analysis as the permanent score profile, overwriting full history. Now gated: Step 4 only writes the profile when `--since` is absent. When `--since` is present, user is notified that the profile was not updated.
+- **[Mike] Transparency inconsistency in confidence adjustments** — Hot calibration silently downgraded High → Medium while Dominant Truth cap showed a visible note. Both adjustments now show a note. Consistent policy: all confidence modifications are transparent.
+- **[Boris/Mike] Double-trigger overlap unspecified** — When both hot calibration AND Dominant Truth = Weak Truth fired simultaneously, the spec had no tie-breaker. Added: Dominant Truth note takes priority; hot calibration note is suppressed when the cap already fires (one note, one adjustment).
+- **[Gary] No score profile staleness detection** — A profile written months ago could drive wrong behavior indefinitely. Added `SCORE_PROFILE_STALE` state: preamble bash checks profile `Generated:` date; if >90 days, emits `SCORE_PROFILE_STALE: [date]`. Handler surfaces one-time notice to refresh. Profile is still used — not discarded.
+
+### Changed
+
+- `SKILL.md` — Score profile bash block: added `_SP_DATE` / `_SP_AGE` check; emits `SCORE_PROFILE_STALE` when >90 days old. Frontmatter version corrected to `2.5.0`. State handling hint updated to include `SCORE_PROFILE_STALE`.
+- `references/flags/score.md` — Step 4 gated behind `--since` absence check; added user-facing note when gate fires.
+- `references/internal/preamble-handlers.md` — Hot calibration modifier now explicit with a note (not silent). Double-trigger rule added. `SCORE_PROFILE_STALE` handler section added.
+
+---
+
 ## [2.5.0] — 2026-03-19
 
 **The true closed loop — CPO adjusts its behavior based on your decision history.** After running `--score`, CPO writes a compact score profile to `~/.cpo/score-profile.md`. Every future session loads this profile silently at startup and uses it to surface your weakest Truth more aggressively, prioritize it first in Blind spots (even when grounded), and cap Confidence from High to Medium when your track record on that Truth is low. CPO now knows your judgment better over time.

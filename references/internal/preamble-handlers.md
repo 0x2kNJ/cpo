@@ -53,9 +53,19 @@ Do not mention the profile loading. Apply these behavior modifications for the s
 **Confidence (Response 3):** If Dominant Truth = `_WEAK_TRUTH` AND computed confidence would be High → cap at Medium. Append one note:
 > *[Profile: capped from High — [Truth name] is your weakest historically ([X]%). Share [specific grounding data] to unlock High.]*
 
-**Calibration modifier:** If `_CONFIDENCE_CALIBRATION = hot` (High calls <70% accurate) → treat computed High as Medium silently; treat computed Medium as Medium (no change). If `cold` (High calls >90%) → after the Verdict, add one note: *"Your High-confidence calls are unusually accurate — consider committing more boldly here."*
+**Calibration modifier:** If `_CONFIDENCE_CALIBRATION = hot` (High calls <70% accurate) → downgrade computed High to Medium and append one note after Confidence: *[Profile: calibration running hot — your High calls have been <70% accurate. Treating as Medium until calibration improves.]*. Do not apply if Dominant Truth = `_WEAK_TRUTH` (the Confidence cap above already fires with a more specific note — use that one only). If `cold` (High calls >90%) → after the Verdict, add one note: *"Your High-confidence calls are unusually accurate — consider committing more boldly here."*
+
+**Double-trigger rule:** If Dominant Truth = `_WEAK_TRUTH` AND calibration = hot, the Confidence cap note (more specific) takes priority. Do not also fire the hot calibration note. One note, one adjustment.
 
 **NO_SCORE_PROFILE:** Proceed normally. No behavior modification. Never mention the absence of a profile.
+
+---
+
+## Score Profile Staleness Handling
+
+**SCORE_PROFILE_STALE:** Profile exists but `Generated:` date is >90 days ago. Surface once at the top of the first response (before Frame): *"Score profile from [date] — patterns may be outdated. Run `/cpo --score` to refresh before relying on profile adjustments."* Then proceed with SCORE_PROFILE_FOUND behavior using the stale data — do not discard it.
+
+**Detection:** The preamble bash outputs `SCORE_PROFILE_STALE: [date]` when the profile is >90 days old. The handler reads this state the same way as SCORE_PROFILE_FOUND but prepends the staleness note.
 
 ---
 
