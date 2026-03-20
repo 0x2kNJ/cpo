@@ -4,6 +4,31 @@ All notable changes documented here. Follows [Keep a Changelog](https://keepacha
 
 ---
 
+## [2.5.0] — 2026-03-19
+
+**The true closed loop — CPO adjusts its behavior based on your decision history.** After running `--score`, CPO writes a compact score profile to `~/.cpo/score-profile.md`. Every future session loads this profile silently at startup and uses it to surface your weakest Truth more aggressively, prioritize it first in Blind spots (even when grounded), and cap Confidence from High to Medium when your track record on that Truth is low. CPO now knows your judgment better over time.
+
+### Added
+
+- **Score profile write (Step 4 of `--score`)** — After computing scores with ≥3 verified decisions, writes `~/.cpo/score-profile.md` with: weakest/strongest Truth, per-Truth accuracy, and calibration classification (hot / calibrated / cold). Profile persists across sessions.
+- **Score profile preamble load** — Preamble bash block now checks for `~/.cpo/score-profile.md` at session start. Outputs `SCORE_PROFILE_FOUND` (with profile content) or `NO_SCORE_PROFILE`.
+- **Profile-aware Assess** — When the Dominant Truth matches your weakest historical Truth, appends one bracketed note: *[Profile: [Truth name] is your weakest historically at [X]% — treating as inference-heavy regardless of available data.]*
+- **Profile-aware Blind spots** — Weak Truth always appears first in blind spots list, even if it was grounded in this analysis. Labeled with historical accuracy.
+- **Profile-aware Confidence** — When Dominant Truth = Weak Truth and computed confidence would be High, caps at Medium. Notes what specific data would unlock High.
+- **Calibration modifier** — `hot` calibration (High calls <70% accurate): silently downgrades High → Medium. `cold` calibration (High calls >90% accurate): adds one post-Verdict note suggesting bolder commitment.
+
+### Changed
+
+- `references/flags/score.md` — Added Step 4 (score profile write with exact bash block). Never writes placeholder values to disk.
+- `references/internal/preamble-handlers.md` — Added SCORE_PROFILE_FOUND / NO_SCORE_PROFILE handler section with full behavior specification.
+- `SKILL.md` — Added 8-line score profile load to preamble bash block; bumped version to 2.5.0.
+
+### Size
+
+Net additions: +45 lines across 3 files. All behavior in reference files; SKILL.md core grew 8 lines. Total skill size unchanged from lazy-load architecture.
+
+---
+
 ## [2.4.0] — 2026-03-19
 
 **Decision Intelligence Loop — CPO now gets smarter about you the more you use it.** 5 new capabilities that close the feedback cycle: consequence verification, decision quality score, assumption tracker, counterfactual replay, and automatic decision similarity matching. Panel-reviewed to 9.5/10 by Gary Tan (YC), Mike Krieger (Anthropic CPO), Boris Cherny (Head of Claude Code). 10 spec fixes across 2 review rounds.

@@ -50,6 +50,29 @@ Your weakest Truth: [Truth name] — [X]% accuracy when Dominant
 
 If fewer than 3 decisions have verified outcomes: *"Not enough verified decisions yet ([N]/3 minimum). Run `/cpo --verify` to close the loop on past predictions, then re-run `--score`."*
 
+## Step 4 — Write score profile
+
+After computing scores with ≥3 verified decisions, write a compact profile to `~/.cpo/score-profile.md`. This profile loads at session start and informs Assess, Blind spots, and Confidence for every future decision.
+
+```bash
+mkdir -p ~/.cpo
+cat > ~/.cpo/score-profile.md << 'EOF'
+# CPO Score Profile
+Generated: REPLACE_DATE
+Decisions analyzed: REPLACE_N
+Verified outcomes: REPLACE_M
+
+Weakest Truth: REPLACE_WEAK_TRUTH — REPLACE_WEAK_ACCURACY% accuracy when Dominant
+Strongest Truth: REPLACE_STRONG_TRUTH — REPLACE_STRONG_ACCURACY% accuracy when Dominant
+Confidence calibration: REPLACE_CALIBRATION
+  (hot = High confidence decisions <70% accurate · calibrated = 70-90% · cold = >90%)
+EOF
+```
+
+Replace all `REPLACE_*` values with the actual computed values. Never write placeholders to disk.
+
+After writing: *"Score profile saved to `~/.cpo/score-profile.md` — CPO will use this to surface your [Weak Truth] blind spots more aggressively in future sessions."*
+
 ## Integration
 
-`--score` is read-only — never writes to the journal. Only reads existing entries and computes.
+`--score` reads existing entries and computes. It does not write to the decision journal — only to `score-profile.md`.

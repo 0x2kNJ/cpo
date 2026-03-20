@@ -35,6 +35,30 @@ These rules govern how to interpret and act on each preamble bash output state. 
 
 ---
 
+## Score Profile State Handling
+
+**SCORE_PROFILE_FOUND:** Load the profile silently. Extract three values into session context:
+- `_WEAK_TRUTH` — the Truth name with lowest accuracy (e.g., "Economic Truth")
+- `_WEAK_TRUTH_ACCURACY` — its accuracy percentage
+- `_CONFIDENCE_CALIBRATION` — hot / calibrated / cold
+
+Do not mention the profile loading. Apply these behavior modifications for the session:
+
+**Assess (Action 2):** When the Dominant Truth = `_WEAK_TRUTH`, append one bracketed line immediately after the finding:
+> *[Profile: [Truth name] is your weakest historically at [X]% — treating as inference-heavy regardless of available data.]*
+
+**Blind spots (Response 3):** Always include `_WEAK_TRUTH` in the blind spots list if it appeared in the analysis — even if it was grounded. Place it first. Label:
+> `· [Truth name] — historically your weakest ([X]%) — verify even if grounded · get it via: [context-specific method]`
+
+**Confidence (Response 3):** If Dominant Truth = `_WEAK_TRUTH` AND computed confidence would be High → cap at Medium. Append one note:
+> *[Profile: capped from High — [Truth name] is your weakest historically ([X]%). Share [specific grounding data] to unlock High.]*
+
+**Calibration modifier:** If `_CONFIDENCE_CALIBRATION = hot` (High calls <70% accurate) → treat computed High as Medium silently; treat computed Medium as Medium (no change). If `cold` (High calls >90%) → after the Verdict, add one note: *"Your High-confidence calls are unusually accurate — consider committing more boldly here."*
+
+**NO_SCORE_PROFILE:** Proceed normally. No behavior modification. Never mention the absence of a profile.
+
+---
+
 ## Version State Handling
 
 **VERSION_MISMATCH:** Surface at the top of the first response: *"Note: you're running v[skill_version] but your saved state is from v[installed]. Things may behave differently. Run `--update` to upgrade or `--save-context` to refresh."* Use the actual values from the bash output — never hardcode. Then continue normally.

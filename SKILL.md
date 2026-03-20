@@ -38,7 +38,7 @@ This is not optional. Without it, all choice popups silently fail in Cursor and 
 ```bash
 # Version check
 _INSTALLED_VERSION=$(cat ~/.cpo/.version 2>/dev/null || echo "unknown")
-_SKILL_VERSION="2.4.0"
+_SKILL_VERSION="2.5.0"
 if [ "$_INSTALLED_VERSION" != "$_SKILL_VERSION" ] && [ "$_INSTALLED_VERSION" != "unknown" ]; then
   echo "VERSION_MISMATCH: installed=$_INSTALLED_VERSION skill=$_SKILL_VERSION"
 fi
@@ -92,6 +92,15 @@ if [ -n "$_STRAT_FILES" ] || [ -n "$_STRAT_SAVED" ]; then
   [ -n "$_STRAT_SAVED" ] && echo "STRATEGY_SAVED:" && echo "$_STRAT_SAVED"
 else
   echo "NO_STRATEGY_FILES"
+fi
+
+# Score profile
+_SP=~/.cpo/score-profile.md
+if [ -f "$_SP" ] && [ -s "$_SP" ]; then
+  echo "SCORE_PROFILE_FOUND:"
+  cat "$_SP"
+else
+  echo "NO_SCORE_PROFILE"
 fi
 ```
 
