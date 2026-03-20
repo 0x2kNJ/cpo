@@ -1,6 +1,6 @@
 # `--save-context` Flag / Company Context Bootstrap
 
-**Trigger:** `/cpo --save-context` explicitly passed, OR when enough answers have emerged to fill all 5 fields after the first analysis.
+**Trigger:** `/cpo --save-context` explicitly passed, OR when enough answers have emerged to fill all 6 fields after the first analysis.
 
 **When this runs:** Only on explicit `--save-context`, or after first analysis reveals all 5 fields. Never interrupt the first interaction. Never run if any `CONTEXT_LOADED_*`. Never run if context was established earlier in this session.
 

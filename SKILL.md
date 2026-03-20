@@ -1,6 +1,6 @@
 ---
 name: cpo
-version: 2.5.0
+version: 2.5.4
 last_updated: 2026-03-20
 argument-hint: "[problem or question] [--go] [--deep]"
 description: >-
@@ -39,7 +39,7 @@ This is not optional. Without it, all choice popups silently fail in Cursor and 
 ```bash
 # Version check
 _INSTALLED_VERSION=$(cat ~/.cpo/.version 2>/dev/null || echo "unknown")
-_SKILL_VERSION="2.5.0"
+_SKILL_VERSION="2.5.4"
 if [ "$_INSTALLED_VERSION" != "$_SKILL_VERSION" ] && [ "$_INSTALLED_VERSION" != "unknown" ]; then
   echo "VERSION_MISMATCH: installed=$_INSTALLED_VERSION skill=$_SKILL_VERSION"
 fi
@@ -68,11 +68,11 @@ else
   echo "NO_CONTEXT"
 fi
 
-# Decision journal — load 5 most recent entries
+# Decision journal — load 5 most recent active entries
 _DJ=~/.cpo/decisions
 if [ -d "$_DJ" ] && ls "$_DJ"/*.yaml 2>/dev/null | head -1 | grep -q .; then
   echo "DECISIONS_FOUND:"
-  ls -t "$_DJ"/*.yaml 2>/dev/null | head -5 | while read -r _f; do echo "---"; cat "$_f"; done
+  grep -l "status: active" "$_DJ"/*.yaml 2>/dev/null | xargs ls -t 2>/dev/null | head -5 | while read -r _f; do echo "---"; cat "$_f"; done
 else
   echo "NO_DECISIONS"
 fi

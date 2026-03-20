@@ -19,7 +19,7 @@ Then output:
 >
 > | Date | Topic | Mode | Verdict | Path chosen |
 > |------|-------|------|---------|-------------|
-> | [date] | [prompt] | [mode] | [verdict] | [balanced/bold/conservative] |
+> | [date] | [prompt] | [mode] | [verdict] | [A/B/C — situational label] |
 > | ... | ... | ... | ... | ... |
 >
 > [N] decisions logged. [X] Go · [Y] No-Go · [Z] Conditional.

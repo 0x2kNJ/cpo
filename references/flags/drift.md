@@ -30,14 +30,17 @@ Detect ONLY these patterns — not semantic similarity in topic keywords:
 ## Execution
 
 ```bash
-# Load last 10 non-invalidated entries
-ls -t ~/.cpo/decisions/*.yaml 2>/dev/null | head -20 | while read _f; do
+# Load last 10 non-invalidated, non-superseded entries
+_COUNT=0
+for _f in $(ls -t ~/.cpo/decisions/*.yaml 2>/dev/null); do
   _STATUS=$(grep "^status:" "$_f" 2>/dev/null | awk '{print $2}')
-  if [ "$_STATUS" != "invalidated" ]; then
+  if [ "$_STATUS" != "invalidated" ] && [ "$_STATUS" != "superseded" ]; then
     echo "---"
     cat "$_f"
+    _COUNT=$((_COUNT + 1))
+    [ "$_COUNT" -ge 10 ] && break
   fi
-done | head -200
+done
 ```
 
 Parse the output. Group entries by `decision_id` (exact) and by topic keyword (fuzzy — use `prompt` field). For each group with ≥3 entries, run the three structural checks above.

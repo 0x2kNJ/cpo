@@ -70,13 +70,7 @@ echo "Outcome recorded: $_OUTCOME_FILE"
 ```
 
 **Consequence status update:**
-After recording the outcome, check if the matched entry has `consequences:` with `status: pending`. For each pending consequence, ask the user: *"You predicted: '[marker]' — did this happen? (confirmed / disconfirmed / still pending)"*. Then update the consequence status in the YAML file:
-
-```bash
-# Update consequence status — run for each consequence that needs updating
-# CONSEQUENCE_INDEX is 0-based, STATUS is confirmed|disconfirmed
-sed -i.bak "/marker: MATCHED_MARKER/{n;n;s/status: pending/status: CONFIRMED_OR_DISCONFIRMED/;}" "$_OUTCOME_FILE" && rm -f "${_OUTCOME_FILE}.bak"
-```
+After recording the outcome, check if the matched entry has `consequences:` with `status: pending`. For each pending consequence, ask the user: *"You predicted: '[marker]' — did this happen? (confirmed / disconfirmed / still pending)"*. Then use the Edit tool to surgically update each consequence's `status:` field in the YAML file. Read the file first, then Edit — target the exact consequence by matching the `marker:` text, then update only that consequence's `status:` field. Never update the top-level `status:` or `outcome:` fields via Edit.
 
 If the user says "still pending" or skips, leave the status unchanged. If the entry has no `consequences:` field or `consequences: []`, skip this step silently.
 

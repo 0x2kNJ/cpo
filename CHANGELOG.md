@@ -4,6 +4,32 @@ All notable changes documented here. Follows [Keep a Changelog](https://keepacha
 
 ---
 
+## [2.5.4] — 2026-03-20
+
+**Full codebase audit — 75 files read, 7 bugs fixed across 8 files.** Comprehensive cross-reference audit of every file in the skill: all 19 modes, 30+ flags, 5 domains, 6 internal files, and all misc references. Panel-reviewed on Opus by Gary Tan (YC), Mike Krieger (Anthropic CPO), Boris Cherny (Head of Claude Code).
+
+### Fixed
+
+- **[Boris] Preamble loads superseded entries** — Decision journal preamble loaded 5 most recent by mtime, ignoring status. After v2.5.3 supersession `sed` updates mtime, superseded entries would sort to top and crowd out active decisions. Now filters for `status: active` before loading.
+- **[Boris] `--outcome` fragile sed for consequence updates** — Used `sed {n;n;s/...}` to update consequence status, which breaks if schema changes or marker text contains special chars. Now uses Edit tool (available since v2.5.3).
+- **[Mike] `--trail` references Bold/Balanced/Conservative** — Table example showed `[balanced/bold/conservative]` for path chosen, directly contradicting SKILL.md's prohibition on risk-posture labels. Now shows `[A/B/C — situational label]`.
+- **[Boris] `--save-context` says "5 fields" but has 6** — Operating bias (added in v2.x) wasn't counted. Fixed to "6 fields".
+- **[Gary] `help` missing 9 flags** — `--patterns`, `--status`, `--graph`, `--kills`, `--decide`, `--compare`, `--context`, `--no-context`, `--focus` were all missing from the help output. Added all. Also added `score-profile.md` and `signals/` to persistent layers list.
+- **[Mike] personas.md "Nick Krieger"** — First name was wrong. Fixed to "Mike Krieger" (Anthropic CPO, Instagram co-founder).
+- **[Boris] `--drift` bash `head -200` truncation** — Piped output through `head -200` which could truncate entries. Replaced with a counted loop that loads exactly 10 non-invalidated/non-superseded entries.
+
+### Changed
+
+- `SKILL.md` — Preamble decision load now uses `grep -l "status: active"` filter; version bumped to 2.5.4.
+- `references/flags/trail.md` — Path chosen column example corrected.
+- `references/flags/outcome.md` — Consequence updates use Edit tool instead of sed.
+- `references/flags/save-context.md` — Field count corrected to 6.
+- `references/flags/help.md` — All 35 flags listed; persistent layers updated.
+- `references/flags/drift.md` — Bash rewritten as counted loop without line truncation.
+- `references/personas.md` — Name corrected.
+
+---
+
 ## [2.5.3] — 2026-03-20
 
 **Structural integrity fix — revision supersession + Edit tool.** Deep panel review (Opus pass). 3 bugs, 1 root cause: the journal never superseded prior revisions, corrupting every scanner in the Intelligence Loop.

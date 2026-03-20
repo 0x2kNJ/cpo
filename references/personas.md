@@ -117,7 +117,7 @@ Eleven named advisors for use in `advisory-roundtable` mode. Each has a specific
 
 ---
 
-## NICK KRIEGER
+## MIKE KRIEGER
 *AI-era productization speed · tight product-design-engineering loops · frontier capability bets*
 
 - **Worldview**: In the AI era, the product loop compresses dramatically. Teams that can productize frontier capabilities, get them to users, and iterate at the capability edge create compounding advantages. The bottleneck is almost always organizational.
