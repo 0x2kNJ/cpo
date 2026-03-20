@@ -8,6 +8,7 @@ description: >-
 allowed-tools:
   - Bash
   - Read
+  - Edit
   - AskUserQuestion
   - ToolSearch
 ---

@@ -63,6 +63,18 @@ Replace every `REPLACE_WITH_*` value with the actual content from the output jus
 
 **`revision`:** For new decisions (or untagged decisions), write `1`. For returning decisions (`DECISION_OBJECT_LOADED`), count the existing entries for this `decision_id` and write `N+1`.
 
+**Revision supersession:** When writing revision N+1 for a `decision_id`, mark ALL prior revisions of that `decision_id` as `status: superseded`. Do this immediately after the new entry is written:
+
+```bash
+# Supersede prior revisions (run after writing the new entry)
+_PRIOR_FILES=$(grep -rl "decision_id: ${_DECISION_ID}" ~/.cpo/decisions/*.yaml 2>/dev/null | grep -v "${_DATE}-${_MODE}-${_TS}.yaml")
+for _pf in $_PRIOR_FILES; do
+  [ -n "$_pf" ] && sed -i '' 's/^status: active$/status: superseded/' "$_pf" 2>/dev/null
+done
+```
+
+Superseded entries are excluded from `--verify`, `--assumptions`, `--brief`, `--score`, and coherence checks (all of which grep for `status: active`). They remain accessible via `--history` and `--replay` for full audit trail. The `sed` is safe here because it only targets the exact top-level `status: active` line — consequence `status:` fields are indented and won't match `^status:`.
+
 **`path_chosen`:** The letter of the path the user selected (A, B, or C). This is the raw letter, not the situational label. Used by `--patterns` for path preference analysis. If the user didn't explicitly select a path (e.g., `--go` auto-selects the recommended path), write the recommended path letter.
 
 **`delta_from_prior`:** For returning decisions, write a one-line summary of what changed. For new decisions, write `na`.

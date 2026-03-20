@@ -43,9 +43,9 @@ Options:
 
 **Step 3 — Update journal entries:**
 
-For each verified consequence, update the specific consequence block in the YAML. Target the exact consequence by matching the `marker:` text, then update only that consequence's `status:` field. Never update the top-level `status:` or `outcome:` fields.
+For each verified consequence, use the Edit tool to surgically update the specific consequence block in the YAML. Read the file first, then Edit — target the exact consequence by matching the `marker:` text, then update only that consequence's `status:` field. Never update the top-level `status:` or `outcome:` fields.
 
-For Confirmed: set consequence `status: confirmed`. For Disconfirmed: set consequence `status: disconfirmed`. For Inconclusive: advance `check_date` by 30 days, keep `status: pending`.
+For Confirmed: Edit `status: pending` → `status: confirmed` in the matching consequence block. For Disconfirmed: Edit `status: pending` → `status: disconfirmed`. For Inconclusive: Edit `check_date:` to +30 days, keep `status: pending`.
 
 **Step 4 — Summary:**
 
@@ -54,6 +54,7 @@ Verification complete:
 · [N] confirmed · [N] disconfirmed · [N] pushed
 · Prediction accuracy: [confirmed / (confirmed + disconfirmed)]%
 
+[If confirmed + disconfirmed = 0 (all pushed)]: "All consequences pushed — no predictions resolved this session. Accuracy unchanged."
 [If accuracy < 50%]: Your predictions are running below 50% — consider whether your framework over-indexes on [most common Dominant Truth in disconfirmed decisions].
 [If accuracy > 75%]: Strong calibration. Your [most common Dominant Truth] calls are particularly reliable.
 ```

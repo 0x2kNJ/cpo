@@ -4,6 +4,24 @@ All notable changes documented here. Follows [Keep a Changelog](https://keepacha
 
 ---
 
+## [2.5.3] — 2026-03-20
+
+**Structural integrity fix — revision supersession + Edit tool.** Deep panel review (Opus pass). 3 bugs, 1 root cause: the journal never superseded prior revisions, corrupting every scanner in the Intelligence Loop.
+
+### Fixed
+
+- **[Boris/Gary] Revision supersession** — When a `decision_id` gets revision N+1, prior revisions now marked `status: superseded` via targeted `sed` on the top-level status line. All scanners (`--verify`, `--assumptions`, `--brief`, `--score`, coherence validator) grep for `status: active` — superseded revisions are now automatically excluded. Audit trail preserved via `--history` and `--replay`.
+- **[Boris] Edit tool added to `allowed-tools`** — Consequence updates in `--verify` now use surgical Edit instead of fragile Bash file rewrites. Prevents YAML corruption from LLM reconstruction errors.
+- **[Mike] `--verify` division by zero** — If all consequences are pushed as Inconclusive (0 confirmed, 0 disconfirmed), accuracy calculation now shows "no predictions resolved" instead of dividing by zero.
+
+### Changed
+
+- `references/internal/journal-schema.md` — Added revision supersession step to the write flow with bash block. `sed` targets `^status: active$` only — consequence-level status fields (indented) are unaffected.
+- `references/flags/verify.md` — Step 3 now specifies Edit tool for consequence updates. Step 4 handles zero-denominator case.
+- `SKILL.md` — Added `Edit` to `allowed-tools` frontmatter.
+
+---
+
 ## [2.5.1] — 2026-03-20
 
 **Panel review pass — 5 spec bugs fixed.** Test + review by Gary Tan (YC), Mike Krieger (Anthropic CPO), Boris Cherny (Head of Claude Code). All critical behavioral bugs corrected; no new features.
