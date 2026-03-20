@@ -43,12 +43,14 @@ if [ "$_INSTALLED_VERSION" != "$_SKILL_VERSION" ] && [ "$_INSTALLED_VERSION" != 
   echo "VERSION_MISMATCH: installed=$_INSTALLED_VERSION skill=$_SKILL_VERSION"
 fi
 
+# Timestamp — set once, used by context staleness and score profile staleness checks
+_NOW=$(date +%s)
+
 # Context state
 _CTX=~/.cpo/context.md
 if [ -f "$_CTX" ] && [ -s "$_CTX" ]; then
   _LAST_UPDATED=$(grep "^Last updated:" "$_CTX" 2>/dev/null | sed 's/Last updated: //' | tr -d ' ')
   _FIELDS_FILLED=$(grep -cE "^(Stage|Business model|Core constraint|Top priorities|Open question): .+" "$_CTX" 2>/dev/null || echo 0)
-  _NOW=$(date +%s)
   _THEN=$(date -j -f "%Y-%m-%d" "$_LAST_UPDATED" +%s 2>/dev/null || date -d "$_LAST_UPDATED" +%s 2>/dev/null || echo "$_NOW")
   _DAYS_OLD=$(( (_NOW - _THEN) / 86400 ))
   if [ "$_FIELDS_FILLED" -lt 3 ]; then

@@ -10,19 +10,21 @@
 
 **Step 1 — Load the original decision:**
 
+Substitute the actual decision ID (from `_DECISION_ID` in prose context) into the bash before running:
+
 ```bash
-# Find all entries for this decision_id, load the most recent
+# Replace DECISION_ID_VALUE with the actual ID extracted from the user's prompt
 _DJ=~/.cpo/decisions
-_ENTRIES=$(grep -rl "decision_id: ${_DECISION_ID}" "$_DJ"/*.yaml 2>/dev/null | xargs ls -t 2>/dev/null)
+_ENTRIES=$(grep -rl "decision_id: DECISION_ID_VALUE" "$_DJ"/*.yaml 2>/dev/null | xargs ls -t 2>/dev/null)
 _LATEST=$(echo "$_ENTRIES" | head -1)
 if [ -n "$_LATEST" ]; then
   echo "REPLAY_LOADED:"
   cat "$_LATEST"
   # Also load Five Truths snapshot if it exists
-  _TRUTHS=~/.cpo/.scratch/${_DECISION_ID}-truths.md
+  _TRUTHS=~/.cpo/.scratch/DECISION_ID_VALUE-truths.md
   [ -f "$_TRUTHS" ] && echo "TRUTHS_LOADED:" && cat "$_TRUTHS"
 else
-  echo "REPLAY_NOT_FOUND: no entries for decision_id ${_DECISION_ID}"
+  echo "REPLAY_NOT_FOUND: no entries for decision_id DECISION_ID_VALUE"
 fi
 ```
 
