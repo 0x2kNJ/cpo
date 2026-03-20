@@ -38,7 +38,7 @@ This is not optional. Without it, all choice popups silently fail in Cursor and 
 ```bash
 # Version check
 _INSTALLED_VERSION=$(cat ~/.cpo/.version 2>/dev/null || echo "unknown")
-_SKILL_VERSION="2.3.0"
+_SKILL_VERSION="2.4.0"
 if [ "$_INSTALLED_VERSION" != "$_SKILL_VERSION" ] && [ "$_INSTALLED_VERSION" != "unknown" ]; then
   echo "VERSION_MISMATCH: installed=$_INSTALLED_VERSION skill=$_SKILL_VERSION"
 fi
@@ -408,6 +408,10 @@ Full templates in `references/modes/[mode].md` — load with Read when needed. *
 | `--kills` | Kill criteria countdown dashboard | `references/flags/kills.md` |
 | `--stack` | Product workflow coverage | `references/flags/stack.md` |
 | `--decide` | Inbound handoff from other skill | `references/flags/decide.md` |
+| `--verify` | Consequence verification loop | `references/flags/verify.md` |
+| `--score` | Decision quality score / batting average | `references/flags/score.md` |
+| `--assumptions` | Ungrounded assumption tracker by age | `references/flags/assumptions.md` |
+| `--replay #name` | Counterfactual replay with new data | `references/flags/replay.md` |
 | `--update` | `cd ~/.claude/skills/cpo && git pull` | (inline) |
 | `help` / `?` | Show help | `references/flags/help.md` |
 | `--compare` | Two approaches side-by-side | (inline) |

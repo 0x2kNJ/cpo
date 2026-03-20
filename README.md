@@ -47,6 +47,16 @@ These capabilities require persistent memory, cross-decision computation, and au
 ### How your decision-making style is evolving — and whether you've noticed
 **Founder Pattern Drift.** With 10+ logged decisions, CPO computes rolling-window behavioral analysis across 5 dimensions: Truth weighting bias, path preference, confidence calibration, reversal rate, and kill criteria usage. It tells you whether shifts in your decision patterns are intentional growth or unconscious drift.
 
+### CPO gets smarter about you the more you use it
+**Decision Intelligence Loop.** Four new capabilities that close the feedback cycle — turning the journal from a log into a learning system that compounds:
+
+- **Consequence Verification (`--verify`).** Close the loop on past predictions. Every consequence CPO generated at decision time surfaces for a 3-second verify: confirmed / disconfirmed / push 30 days. Your prediction market, closing in real time.
+- **Decision Quality Score (`--score`).** Your batting average across all verified decisions — prediction accuracy, confidence calibration (does "High" mean >80%?), blind spot rate, and per-Truth accuracy. The only PM tool that tells you *which* of the Five Truths you read well vs. poorly.
+- **Assumption Tracker (`--assumptions`).** Every ungrounded inference across active decisions, aged by how long it's been unvalidated (Fresh / Aging / Stale / Critical). Specific validation method for each — not "check analytics" but "run a pricing survey with 20 existing users."
+- **Counterfactual Replay (`--replay #name`).** Re-run a past decision with information you didn't have at the time. See which Truths shift, whether the verdict would have changed, and — most importantly — what you would have learned earlier if you'd grounded a specific assumption. One-line Lesson at the end.
+
+Pattern matching is automatic: when you log a new decision structurally similar to a past one with verified outcomes, CPO surfaces it — "that one succeeded because X."
+
 ---
 
 ## Start here
@@ -74,6 +84,18 @@ These capabilities require persistent memory, cross-decision computation, and au
 
 **See your decision-making DNA.** Truth bias, path preference, confidence calibration.
 → `/cpo --patterns`
+
+**Close the loop on past predictions.** Verify in 3 seconds per prediction.
+→ `/cpo --verify`
+
+**See your decision batting average.** Prediction accuracy, confidence calibration, per-Truth accuracy.
+→ `/cpo --score`
+
+**Find your oldest unvalidated assumptions.** Aged and actionable.
+→ `/cpo --assumptions`
+
+**Re-run a past decision with new data.** See what would have changed.
+→ `/cpo --replay #[decision-name]`
 
 **All active kill criteria with countdown timers.** Grouped by urgency.
 → `/cpo --kills`

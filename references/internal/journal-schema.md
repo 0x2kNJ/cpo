@@ -92,6 +92,9 @@ Parse the `truth_fingerprint:` of the new entry. For each Grounded Truth, check 
 **Check 3 — Kill criteria overlap:**
 If the new entry's kill criteria reference the same metric as an active entry's kill criteria but with a different threshold or timeframe, flag the discrepancy.
 
+**Check 4 — Decision similarity:**
+Scan active entries for structural similarity to the new entry — overlapping keywords in `prompt:` or `recommendation:`, same Dominant Truth, or same mode. If a similar past decision exists with at least one verified consequence (`confirmed` or `disconfirmed`), surface it. Cap at 1 match per write. Skip if the matched decision is the same `decision_id` (that's a revision, not a similarity). Output: *"Pattern match: this resembles #[decision-id or slug] ([date]) — that one [succeeded/failed] because [one-clause reason]. Run `/cpo --replay #[id]` to compare."*
+
 **Output behavior:**
 - If any check fires: append one non-blocking line after the Verdict, visible in ALL modes (standard, verbose, deep): *"⚠ Coherence: this [contradicts/tensions with] your active decision on [topic or decision_id] ([date]) — [one-sentence description]. Run `/cpo --drift` to investigate."*
 - If `--verbose` or `--deep`: surface the full coherence findings inline after the Verdict.

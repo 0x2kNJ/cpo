@@ -33,9 +33,20 @@ Then output:
 > If none of the three checks fire: omit **Pattern alerts** section entirely — do not write "No patterns."
 >
 > **Consequence checks due:**
-> [Scan all loaded journal entries for `consequences:` where `check_date` is today or in the past AND `status: pending`. For each: "[decision_id/date] predicted: '[marker]' — check was due [check_date]. Was this prediction correct? Run `/cpo --outcome [topic]` to record."]
+> [Scan all loaded journal entries for `consequences:` where `check_date` is today or in the past AND `status: pending`.]
 >
-> If no consequence checks are due: omit this section entirely.
+> If 1–3 due: present each as an inline AskUserQuestion (A) Confirmed / B) Disconfirmed / C) Inconclusive — push +30 days). Update the specific consequence's `status:` field in the YAML immediately after each answer. Never update top-level `status:` or `outcome:` fields.
+>
+> If 4+: list them briefly, then: *"[N] consequence predictions due — run `/cpo --verify` to batch-verify."*
+>
+> If none due: omit this section entirely.
+>
+> **Aging assumptions:**
+> [Scan all loaded journal entries for inferred Truths (from `truth_fingerprint:` fields) where the decision date is >60 days ago AND `status: active`. These are STALE or CRITICAL assumptions.]
+>
+> If any exist: *"[N] assumptions unvalidated for >60 days — run `/cpo --assumptions` to review."*
+>
+> If none: omit this section entirely.
 >
 > **Decision decay:**
 > [For each active decision, compute a decay score: `(days_since_decision / divisor) × (number_of_inferred_truths / 5) × confidence_multiplier` where divisor is the decision's `shelf_life` field if present, otherwise 30. Confidence_multiplier is 1.5 for Low, 1.0 for Medium, 0.5 for High. Classify: **Fresh** (<1.0) · **Aging** (1.0–2.0) · **Stale** (2.0–4.0) · **Degraded** (>4.0). Only surface Stale and Degraded decisions.]

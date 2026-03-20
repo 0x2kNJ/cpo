@@ -4,6 +4,35 @@ All notable changes documented here. Follows [Keep a Changelog](https://keepacha
 
 ---
 
+## [2.4.0] — 2026-03-19
+
+**Decision Intelligence Loop — CPO now gets smarter about you the more you use it.** 5 new capabilities that close the feedback cycle: consequence verification, decision quality score, assumption tracker, counterfactual replay, and automatic decision similarity matching. Panel-reviewed to 9.5/10 by Gary Tan (YC), Mike Krieger (Anthropic CPO), Boris Cherny (Head of Claude Code). 10 spec fixes across 2 review rounds.
+
+### Added
+
+- **`--verify`** — Consequence verification loop. Surfaces predictions past their check date for 3-second verify (confirmed / disconfirmed / push +30 days). 1-3 consequences verify inline during `--brief`; 4+ batch via `--verify`. Updates specific consequence `status:` field in YAML — never corrupts top-level fields.
+- **`--score`** — Decision quality score. Computes prediction accuracy, confidence calibration (does "High" actually mean >80%?), blind spot rate, and per-Truth accuracy. Minimum 3 verified decisions. Read-only.
+- **`--assumptions`** — Assumption tracker. Ages every ungrounded inference across active decisions: Fresh (<30d) / Aging (30-60d) / Stale (60-90d) / Critical (>90d). Validation method is decision-context-specific — not generic placeholders.
+- **`--replay #name`** — Counterfactual replay. Re-runs a past decision with new information: shows which Truths shift, updated paths, whether the verdict would have changed, and a one-line Lesson — the meta-learning for next time. Read-only, no journal write.
+- **Decision similarity (Check 4 in coherence pipeline)** — Automatic. At journal write time, scans for structurally similar past decisions with verified outcomes. Surfaces: "Pattern match: this resembles #[id] ([date]) — that one [succeeded/failed] because [reason]. Run `--replay` to compare." Requires at least one verified consequence before firing.
+- **`--brief` consequence verification inline** — 1-3 due consequences now verify inside `--brief` instead of redirecting to `--verify`. Make it effortless.
+- **`--brief` aging assumptions alert** — When STALE or CRITICAL assumptions exist (>60d unvalidated), brief adds one line: "[N] assumptions aging past 60 days — run `--assumptions` to review."
+
+### Changed
+
+- `brief.md` — Consequence checks due section updated to inline-verify 1-3, redirect 4+ to `--verify`
+- `brief.md` — Added Aging assumptions section
+- `journal-schema.md` — Added Check 4 (decision similarity) to Spec Coherence Validator pipeline
+- `help.md` — Added `--verify`, `--score`, `--assumptions`, `--replay #name` to flag list; added `briefs/` to persistent layers
+- `SKILL.md` — Added 4 new flag routing entries
+
+### Fixed
+
+- `--score` kill discipline metric removed (no data source in schema) — replaced with Truth accuracy per Dominant Truth
+- `--score` minimum data threshold lowered from 5 to 3 decisions
+
+---
+
 ## [2.3.0] — 2026-03-19
 
 **7 structural intelligence features — capabilities structurally impossible in traditional PM workflows.** Panel-reviewed to 10/10 by Gary Tan (YC), Mike Krieger (Anthropic CPO), Boris Cherny (Head of Claude Code). 28 spec fixes across 2 review rounds.
