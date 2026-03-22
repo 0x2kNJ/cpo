@@ -1,6 +1,6 @@
 # CPO — Strategic Product Advisor
 
-**v3.4.0** · The operating system for product decisions.
+**v4.0.0** · The operating system for product decisions.
 
 `/cpo` helps founders, PMs, and execs decide **what to build, whether to build it, how to communicate it, and when to kill it** — before the team commits time, headcount, or capital.
 
@@ -36,6 +36,14 @@ Available skill: /cpo
 ```
 
 No build step. No dependencies. Invoke with `/cpo` in any Claude Code session.
+
+### Upgrade
+
+```bash
+cd ~/.claude/skills/cpo && git pull
+```
+
+CPO detects version mismatches automatically on every invocation. If the installed version (`~/.cpo/.version`) differs from the skill version, CPO updates it silently and tells you what changed. No auto-upgrade daemon — you pull when you want to update.
 
 ### Save your context (one-time)
 
@@ -160,11 +168,13 @@ Every session starts with a scan of recent decisions. If keywords match a prior 
 
 Tag any decision with `#name` (e.g., `/cpo #pricing should we add a free tier?`) to create an addressable record. When returning to a named decision, CPO opens with a **delta frame** — what's changed since the last call — instead of starting from scratch.
 
-### Signals integration
+### Signals integration (bidirectional)
 
-CPO reads red-flag signals from other skills (`~/.cpo/signals/*-latest.yaml`). If any signal shows `severity: red`, it surfaces in the Frame:
+**Inbound:** CPO reads red-flag signals from other skills (`~/.cpo/signals/*-latest.yaml`). If any signal shows `severity: red`, it surfaces in the Frame:
 
 > *"Note: [skill] flagged [summary] ([N] days ago). This may affect your decision."*
+
+**Outbound:** After every verdict (or `[GO]` response), CPO writes `~/.cpo/signals/cpo-latest.yaml` with decision summary, door type, confidence, and kill criteria count. Other skills (`/build`, `/review`, `/retro`) can read this to check if a decision exists before implementation.
 
 ---
 
@@ -214,6 +224,23 @@ Surfaces all active decisions and asks for current data against each kill criter
 ```
 /cpo --review
 ```
+
+### `--outcome`
+
+Close the loop on a past decision. Reconstructs the information state at decision time, walks through each kill criterion asking for current data, and writes an outcome block to the journal entry.
+
+```
+/cpo --outcome #pricing
+```
+
+Three close modes:
+- **Walk through** — evaluate each kill criterion one at a time (recommended for one-way doors)
+- **Quick close** — one-line summary of what happened
+- **Decision was wrong** — decision replay to understand why
+
+After closing, CPO surfaces patterns across all closed decisions: *"This is your 8th closed decision. 5 succeeded, 2 pivoted, 1 failed. Most common failure mode: underestimating execution time."*
+
+The preamble also nudges stale decisions — any active decision older than 30 days gets surfaced: *"You have 2 decisions older than 30 days that haven't been closed. Run `/cpo --outcome #[id]` to close the loop."*
 
 ### `--save-context`
 

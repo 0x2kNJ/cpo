@@ -1,8 +1,8 @@
 ---
 name: cpo
-version: 3.5.0
+version: 4.0.0
 last_updated: 2026-03-22
-argument-hint: "[problem or question] [--go] [--quick] [--deep] [--journal] [--review] [--save-context] [--decide]"
+argument-hint: "[problem or question] [--go] [--quick] [--deep] [--journal] [--review] [--outcome] [--save-context] [--decide]"
 description: >-
   The operating system for product decisions — what to build, whether to build it, how to communicate it, and when to kill it — before your team commits time, headcount, or capital.
 allowed-tools:
@@ -21,6 +21,13 @@ allowed-tools:
 **STEP 0 — before anything else:** Call ToolSearch `select:AskUserQuestion` (max_results: 1). Without this, choice popups fail silently in Cursor/IDEs.
 
 ```bash
+# Version check + upgrade detection
+_CPO_SKILL_VER="4.0.0"
+_CPO_INSTALLED=$(cat ~/.cpo/.version 2>/dev/null || echo "unknown")
+echo "CPO_SKILL=$_CPO_SKILL_VER INSTALLED=$_CPO_INSTALLED"
+if [ "$_CPO_INSTALLED" != "$_CPO_SKILL_VER" ] && [ "$_CPO_INSTALLED" != "unknown" ]; then
+  echo "VERSION_MISMATCH: installed=$_CPO_INSTALLED skill=$_CPO_SKILL_VER"
+fi
 # Context + signals + gotchas
 cat ~/.cpo/context.md 2>/dev/null || echo "NO_CONTEXT"
 tail -n 60 ~/.claude/skills/cpo/GOTCHAS.md 2>/dev/null
@@ -28,7 +35,21 @@ tail -n 60 ~/.claude/skills/cpo/GOTCHAS.md 2>/dev/null
 grep -A2 "severity: red" ~/.cpo/signals/*-latest.yaml 2>/dev/null || true
 # Prior decisions (scan for related entries)
 ls -t ~/.cpo/decisions/*.yaml 2>/dev/null | head -5 | while read -r f; do cat "$f" 2>/dev/null; echo "---"; done
+# Decisions needing outcome closure (active + older than 30 days)
+find ~/.cpo/decisions -name "*.yaml" -mtime +30 2>/dev/null | while read -r f; do
+  grep -l "status: active" "$f" 2>/dev/null
+done | head -3
 ```
+
+**Version mismatch handling:** If `VERSION_MISMATCH` is printed, the installed CPO version differs from SKILL.md. Run:
+```bash
+echo "$_CPO_SKILL_VER" > ~/.cpo/.version
+```
+Then tell the user: *"CPO updated to v$_CPO_SKILL_VER (was v$_CPO_INSTALLED)."*
+
+**Upgrade mechanism:** CPO uses git for upgrades. Users run `cd ~/.claude/skills/cpo && git pull` to get the latest version. The version check above detects stale installations automatically. No auto-upgrade — CPO is a third-party skill, not a managed service.
+
+**Stale decision nudge:** If the preamble finds active decisions older than 30 days, append to the first response: *"You have [N] decision(s) older than 30 days that haven't been closed. Run `/cpo --outcome #[id]` to close the loop."*
 
 **Red signal rule:** If any skill signal shows `severity: red`, surface it in the Frame: *"Note: [skill] flagged [summary] ([N] days ago). This may affect your decision."*
 
@@ -182,6 +203,24 @@ K) Eng brief    — translate for engineering, save artifact
 L) Hand off     — route to another skill
 ```
 
+**After emitting [VERDICT] (or [GO]), write the decision signal for other skills:**
+
+```bash
+mkdir -p ~/.cpo/signals
+cat > ~/.cpo/signals/cpo-latest.yaml << EOF
+skill: cpo
+severity: info
+summary: "[one-line verdict]"
+decision_id: "[id or slug]"
+door_type: "[one-way / two-way]"
+kill_criteria_count: [n]
+confidence: "[H/M/L]"
+timestamp: "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+EOF
+```
+
+This makes CPO decisions visible to other skills. `/build`, `/review`, and `/retro` can read `~/.cpo/signals/cpo-latest.yaml` to check if a decision exists before implementation.
+
 **After any D/E/F/K/L pick completes:** re-offer remaining unused picks.
 
 **K) Eng brief handoff:** Write a structured brief to `~/.cpo/briefs/YYYY-MM-DD-[slug].md`:
@@ -318,6 +357,67 @@ Action: [keep active / close / update]
 ```
 
 The model does NOT evaluate kill criteria independently — it surfaces them and asks the user for current data.
+
+---
+
+## `--outcome` Mode
+
+Close the loop on a past decision. Usage: `/cpo --outcome #decision-name` or `/cpo --outcome [topic]`.
+
+```bash
+# Load the decision
+grep -rl "decision_id: DECISION_ID" ~/.cpo/decisions/*.yaml 2>/dev/null | while read -r f; do cat "$f"; echo "---"; done
+```
+
+If the decision is found, present:
+
+```
+**Closing the loop on #[decision_id]** — [decision summary] ([date])
+
+**What was decided:** [verdict — one sentence]
+**Door type:** [one-way / two-way]
+**Kill criteria at decision time:**
+1. [criterion 1] — **Status?**
+2. [criterion 2] — **Status?**
+3. [criterion 3] — **Status?**
+
+**Assumptions that were flagged:**
+· [each assumption from the original decision] — **Still true?**
+```
+
+Then AskUserQuestion:
+- A) Walk through each kill criterion (recommended for one-way doors)
+- B) Quick close — one-line summary of what happened
+- C) Decision was wrong — I want to understand why
+
+**If A:** For each kill criterion, ask for current data via AskUserQuestion (one at a time). After all criteria evaluated, write an outcome block:
+
+```yaml
+# Appended to the original decision YAML
+outcome:
+  date: YYYY-MM-DD
+  result: [succeeded / failed / pivoted / abandoned]
+  kill_criteria_results:
+    - criterion: [metric]
+      threshold: [original threshold]
+      actual: [what happened]
+      triggered: [true/false]
+  lesson: [one sentence — what would you do differently?]
+  assumptions_validated: [which assumptions were confirmed or disproven]
+```
+
+Update `status: active` → `status: closed` in the decision file.
+
+**If B:** Ask one AskUserQuestion: "What happened in one sentence?" Write a minimal outcome block with `result` and `lesson` only.
+
+**If C:** Present a **decision replay** — reconstruct the information state at decision time:
+- What Truths were dominant, grounded, inferred?
+- What was flagged as assumption vs fact?
+- What blind spots were identified?
+
+Then ask: "Knowing what you know now, what would you change about the frame?" This is not self-scoring — it's helping the founder learn from their own decision-making. Write outcome with `result: failed` and the lesson.
+
+After any close, surface the learning: *"This is your Nth closed decision. Pattern so far: [X succeeded, Y failed, Z pivoted]. Most common failure mode: [if ≥3 closed decisions, identify pattern]."*
 
 ---
 
