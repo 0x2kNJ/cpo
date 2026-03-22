@@ -47,8 +47,9 @@ fi
 # Gotchas — load known failure patterns so they're visible before analysis
 _GOTCHAS=~/.claude/skills/cpo/GOTCHAS.md
 if [ -f "$_GOTCHAS" ]; then
-  echo "GOTCHAS_LOADED: $(grep -c '^###' "$_GOTCHAS") known failure patterns on record"
-  cat "$_GOTCHAS"
+  _GOTCHA_COUNT=$(grep -c '^###' "$_GOTCHAS")
+  echo "GOTCHAS_LOADED: $_GOTCHA_COUNT known failure patterns (showing last 20)"
+  tail -n 120 "$_GOTCHAS"
 fi
 
 # Timestamp — set once, used by context staleness and score profile staleness checks
