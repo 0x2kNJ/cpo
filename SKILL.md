@@ -1,6 +1,6 @@
 ---
 name: cpo
-version: 2.5.4
+version: 2.7.1
 last_updated: 2026-03-20
 argument-hint: "[problem or question] [--go] [--deep]"
 description: >-
@@ -39,9 +39,16 @@ This is not optional. Without it, all choice popups silently fail in Cursor and 
 ```bash
 # Version check
 _INSTALLED_VERSION=$(cat ~/.cpo/.version 2>/dev/null || echo "unknown")
-_SKILL_VERSION="2.5.4"
+_SKILL_VERSION="2.7.1"
 if [ "$_INSTALLED_VERSION" != "$_SKILL_VERSION" ] && [ "$_INSTALLED_VERSION" != "unknown" ]; then
   echo "VERSION_MISMATCH: installed=$_INSTALLED_VERSION skill=$_SKILL_VERSION"
+fi
+
+# Gotchas — load known failure patterns so they're visible before analysis
+_GOTCHAS=~/.claude/skills/cpo/GOTCHAS.md
+if [ -f "$_GOTCHAS" ]; then
+  echo "GOTCHAS_LOADED: $(grep -c '^###' "$_GOTCHAS") known failure patterns on record"
+  cat "$_GOTCHAS"
 fi
 
 # Timestamp — set once, used by context staleness and score profile staleness checks
@@ -175,6 +182,7 @@ In compact mode: identify the **Dominant Truth** and reason from it. In `--deep`
 - **Reality check — two contexts:** Pre-path (1/2/3 block, labeled "3"): reacts to ALL THREE paths. Post-verdict (D-M menu, labeled "F"): reacts to the CHOSEN PATH and verdict only — this is a commitment validator, not a comparison.
 - **Progressive disclosure:** First decision ever (NO_DECISIONS): show D-G + "More →" in the D-M menu. Subsequent decisions: show full D-M.
 - **M) New evidence:** Single data point → run elevation mini-flow. Comprehensive new context → re-run Assess as delta, deliver updated Verdict with journal revision N+1.
+- **Freeform input at any gate:** If the user's reply isn't a recognized option (A/B/C, 1/2/3, D-M, correction keyword), treat it as conversational — a question, idea, or pushback. Respond in 2-4 sentences, integrate implications into paths if relevant (update `**We recommend [letter]:**` block and `← recommended` marker if the recommendation shifts), then re-surface the same decision point. Never ask "did you mean to pick an option?" — just engage and re-present choices. The flow stays intact.
 
 ```
 Action 1 — Frame    → State the decision. Inferences visible inline.
@@ -206,10 +214,11 @@ Or correct the frame in a sentence — we'll re-run from Assess.
 ```
 *[Given [confirmed frame], the question is [core tradeoff in one clause].]*
 
+**We recommend [letter]:** [one-sentence rationale from the Dominant Truth]
+
 Pick a path:
 A) **[Situational label]** — [≤2 sentences]
 B) **[Situational label]** — [≤2 sentences]  ← recommended
-   *Why: [one-line reason from the Dominant Truth]*
 C) **[Situational label]** — [≤2 sentences]
 
 Before committing to a path, consider to stress test, analyze, or reality check them:
@@ -296,6 +305,41 @@ Reply with a letter (or several). Skip to move on.
 
 ---
 
+## Execution Pipeline (Flag Precedence Order)
+
+When multiple flags and modes are active simultaneously, they execute in this fixed order. Never reorder.
+
+```
+1. Preamble          — context load, decision journal, score profile, strategy files
+                       If --dry-run detected: _DRY_START_DATE=$(date +%Y-%m-%d)
+2. Enrichment        — in order: --scan-strategy → --since → --roadmap
+                       Each may fire a reframe check; at most 1 fires total (first eligible wins)
+                       All enrichment outputs (cross-references) run regardless of reframe
+3. Reframe check     — fires once after all enrichment, before Frame
+                       Suppressed entirely if --go present
+4. Primary mode/flag — Frame → Assess → Paths → Verdict (standard 3-response or --go/--quick bypass)
+                       --deep: truth subagents run during Assess (Section 2), synthesis closes Section 2
+                       Kill criteria gate: ≥3 measurable criteria required before D-M menu renders
+                       Elevation loop: fires after kill criteria pass, if confidence Medium/Low
+5. Post-output       — verification subagent (--deep/--go only): 8 checks, inline fixes before user sees output
+                       Contributor mode: silent score, field report if <10
+6. Journal write     — skipped if --dry-run; skipped for simulations and execution artifacts
+                       Coherence validator runs before persisting (4 checks against active entries)
+                       Revision supersession for returning decisions
+7. Trace write       — skipped if --dry-run; fires after journal write
+```
+
+**Example — `--dry-run --deep --since [date] #decision-id [question]`:**
+1. Preamble: load context, load prior `#decision-id` entries (DECISION_OBJECT_LOADED). Set `_DRY_START_DATE`.
+2. Enrichment: `--since` fires, loads temporal delta — outputs cross-reference inline
+3. Reframe check: fires if `--since` found question-reframing conflict (standard flow gates handle via AskUserQuestion)
+4. Primary: `--deep` runs full 10-section; truth subagents assess each Truth independently during Assess, synthesis and conflict detection close Section 2; Paths built from conflict-aware context
+5. Post-output: verification subagent fires (8 checks, inline fixes); contributor mode scores
+6. Journal write: SKIPPED (`--dry-run`)
+7. Trace write: SKIPPED (`--dry-run`)
+
+---
+
 ## Hard Rules
 
 1. **Never fabricate data.** Say what data would answer the question.
@@ -324,6 +368,8 @@ If the user corrects the Frame or grounding: acknowledge in one line (*"Got it �
 *Running: [plain-English description]*
 *I'm reading this as: [decision]. Inferring [stage / model / lean].*
 *The [Truth] is what this turns on: [finding].*
+
+**We recommend [letter]:** [one-sentence rationale from the Dominant Truth]
 
 A) **[Label]** — [≤2 sentences]
 B) **[Label]** — [≤2 sentences]  ← recommended
@@ -355,6 +401,8 @@ Every prompt runs Frame → Assess → Grounding → Paths → Verdict in that o
 1. Problem Definition · 2. Five Truths Assessment · 3. Strategic Options (Three Paths)
 4. Recommendation + Kill Criteria · 5. Sequencing & Dependencies · 6. Risks & Mitigations
 7. GTM Considerations · 8. Organizational Implications · 9. Open Questions · 10. Decision Memo
+
+**`--deep` Truth subagents:** For Section 2, assess each Truth independently — complete one Truth fully before starting the next, without referencing prior Truth findings. Synthesize cross-Truth interactions only after all five are assessed. `Read references/internal/truth-subagents.md` for the full independent assessment protocol and conflict detection rules.
 
 ---
 
@@ -433,6 +481,7 @@ Full templates in `references/modes/[mode].md` — load with Read when needed. *
 | `--replay #name` | Counterfactual replay with new data | `references/flags/replay.md` |
 | `--update` | `cd ~/.claude/skills/cpo && git pull` | (inline) |
 | `help` / `?` | Show help | `references/flags/help.md` |
+| `--dry-run` | Full flow, no journal write | `references/flags/dry-run.md` |
 | `--compare` | Two approaches side-by-side | (inline) |
 | `--context [name]` | Load named context | (preamble) |
 | `--no-context` | Ignore saved context | (inline) |
@@ -464,6 +513,8 @@ Enforce at each step before proceeding. Each check is self-contained — no exte
 - **User selected the path:** Did the user explicitly pick A/B/C before you wrote the Verdict? If no → STOP (exception: `--go`/`--quick` auto-select the recommended path).
 - **≥3 measurable kill criteria:** Does each criterion have a named metric + specific threshold + timeframe? If not → rewrite before rendering D-M menu.
 - **Path labels are not risk labels:** Do your labels describe what the path *bets on*, or just how risky it is? If risk only → rewrite.
+
+**Verification subagent (`--deep` and `--go` only):** After generating the final output, run a mechanical verification pass against all assertions above plus evidence tags, D-M menu, truth fingerprint, and confidence rating. Fix violations inline before the user sees the output. `Read references/internal/verification-subagent.md` for the full 8-check spec and trace integration.
 
 ---
 
