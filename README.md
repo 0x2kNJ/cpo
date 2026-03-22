@@ -95,7 +95,7 @@ Every `[FRAME]` includes:
 Every decision is classified on entry:
 
 - **Two-way door** — reversible. Low-magnitude two-way doors auto-suggest `--quick`.
-- **One-way door** — not reversible. One-way doors auto-suggest `--deep`.
+- **One-way door** — not reversible. One-way doors auto-suggest `--deep` and trigger a **market reality check** (two quick web searches for competitors and market trends, surfaced as a one-line finding in the Frame).
 
 This is the Bezos framework applied mechanically — not as decoration.
 
@@ -282,13 +282,15 @@ CPO is the decision layer for the gstack skill stack. Two directions:
 
 **CPO → gstack (outbound via `[VERDICT]` options):**
 - **K) Eng brief** — saves a structured brief to `~/.cpo/briefs/` and suggests `/plan-eng-review`
-- **L) Hand off** — routes to the best next skill: `/plan-eng-review` for architecture, `/plan-ceo-review` for scope expansion, `/office-hours` for new idea pressure-testing, `/build` for implementation, `/retro` for historical pattern checks
+- **L) Hand off** — routes to the best next skill: `/plan-eng-review` for architecture, `/plan-ceo-review` for scope expansion, `/office-hours` for new idea pressure-testing, `/build` for implementation, `/ship` or `/land-and-deploy` for shipping, `/canary` for post-deploy monitoring, `/retro` for historical pattern checks
 
 **gstack → CPO (inbound via `--decide`):**
-- `/office-hours`, `/plan-ceo-review`, and the master gstack skill all surface CPO as a suggestion when the conversation hits a genuine product decision fork
 - Any gstack skill can route to CPO via the `CPO Handoff Request` block (see `references/handoff-contract.md`)
+- To enable CPO discovery in gstack skills, add CPO trigger descriptions to gstack's master SKILL.md and relevant skill files (see **Known limitation** below)
 
 CPO works standalone without gstack. If a suggested skill isn't installed: *"I'd suggest [skill] for this — install gstack to get it."*
+
+**Known limitation:** CPO discovery triggers in gstack skill files (e.g., suggesting `/cpo` from `/office-hours` or `/plan-ceo-review`) are local modifications that get overwritten by `gstack-upgrade` (which runs `git reset --hard`). After upgrading gstack, re-apply the triggers by adding CPO to gstack's suggestion list. Long-term fix: contribute CPO discovery upstream to gstack, or wait for a third-party skill hook system.
 
 ---
 

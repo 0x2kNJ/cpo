@@ -1,6 +1,6 @@
 ---
 name: cpo
-version: 3.4.0
+version: 3.5.0
 last_updated: 2026-03-22
 argument-hint: "[problem or question] [--go] [--quick] [--deep] [--journal] [--review] [--save-context] [--decide]"
 description: >-
@@ -11,6 +11,7 @@ allowed-tools:
   - Edit
   - AskUserQuestion
   - ToolSearch
+  - WebSearch
 ---
 
 # CPO — Strategic Product Advisor
@@ -92,6 +93,16 @@ State the decision. Classify the door type. Surface the dominant Truth. Present 
 Push until the answer is specific. If the founder can't answer → flag as a blind spot in the Truth fingerprint.
 
 **Delay test rule:** If cost of delay is genuinely low, say so: *"Low urgency — you could defer 90 days without material cost. Proceeding anyway since you asked, but consider parking this."* Then continue.
+
+**Market reality check (one-way doors only):**
+When the door type is one-way, run a quick WebSearch before presenting the Frame. Two searches max:
+1. `[problem domain] + competitors OR alternatives OR "already solved"` — who else is doing this?
+2. `[problem domain] + market size OR trend OR growth` — is this space growing or contracting?
+
+Surface findings in the Frame as a one-line addition after the dominant Truth:
+*Market scan: [one sentence — e.g., "3 funded competitors in this space; Acme raised $12M for the same thesis in Q4." or "No direct competitors found — greenfield or dead market."]* [fact/inference]
+
+Skip the market scan for two-way doors (low stakes, not worth the latency) and for `--go`/`--quick`/`--decide` modes (speed modes skip enrichment).
 
 **Auto-calibrate depth from door type:**
 - Two-way door + low magnitude → auto-suggest `--quick` unless user overrides
@@ -204,6 +215,8 @@ Confirm: *"Brief saved to `~/.cpo/briefs/[filename]`. Run `/plan-eng-review` to 
 - Scope expansion → *"Run `/plan-ceo-review` to rethink the ambition."*
 - New idea exploration → *"Run `/office-hours` to pressure-test the premise."*
 - Ready to build → *"Run `/build` to start implementation."*
+- Ready to ship (PR exists) → *"Run `/ship` to push a PR, or `/land-and-deploy` to merge, deploy, and verify production."*
+- Post-launch monitoring → *"Run `/canary [url]` to watch for regressions after deploy."*
 - Process/team patterns → *"Run `/retro` to check if this pattern has historical precedent."*
 
 If a suggested skill is not installed: *"I'd suggest [skill] for this — install gstack to get it."*
