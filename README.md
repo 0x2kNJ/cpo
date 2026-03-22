@@ -1,4 +1,4 @@
-# CPO — Strategic Product Advisor
+# CPO — the product decision layer
 
 **v4.0.0** · The operating system for product decisions.
 
@@ -25,7 +25,7 @@ Today, every AI tool in the product ecosystem accelerates execution. CPO is the 
 ### Install
 
 ```bash
-git clone https://github.com/0x2kNJ/CPO.git ~/.claude/skills/cpo
+git clone https://github.com/0x2kNJ/cpo.git ~/.claude/skills/cpo
 ```
 
 Then add to your `CLAUDE.md`:
@@ -305,19 +305,150 @@ CPO auto-detects stage from context. Without context, it infers from the prompt 
 
 ## gstack integration
 
-CPO is the decision layer for the gstack skill stack. Two directions:
+CPO is the decision layer for the [gstack](https://github.com/garrynsk/gstack) skill stack — the missing node between "we have an idea" and "engineering is building it."
 
-**CPO → gstack (outbound via `[VERDICT]` options):**
-- **K) Eng brief** — saves a structured brief to `~/.cpo/briefs/` and suggests `/plan-eng-review`
-- **L) Hand off** — routes to the best next skill: `/plan-eng-review` for architecture, `/plan-ceo-review` for scope expansion, `/office-hours` for new idea pressure-testing, `/build` for implementation, `/ship` or `/land-and-deploy` for shipping, `/canary` for post-deploy monitoring, `/retro` for historical pattern checks
+### Where CPO fits in the ecosystem
 
-**gstack → CPO (inbound via `--decide`):**
-- Any gstack skill can route to CPO via the `CPO Handoff Request` block (see `references/handoff-contract.md`)
-- To enable CPO discovery in gstack skills, add CPO trigger descriptions to gstack's master SKILL.md and relevant skill files (see **Known limitation** below)
+```
+THINKING              DECIDING              EXECUTING             FEEDBACK
+─────────             ─────────             ─────────             ─────────
+/office-hours    ──►  /cpo             ──►  /plan-eng-review  ──►  /retro
+/plan-ceo-review ──►  (product          ──►  /plan-design-review──►  /review
+/retro           ──►   decision layer)  ──►  /build            ──►  /qa
+                                        ──►  /ship             ──►  /canary
+                                        ──►  /land-and-deploy  ──►  /benchmark
+```
 
-CPO works standalone without gstack. If a suggested skill isn't installed: *"I'd suggest [skill] for this — install gstack to get it."*
+CPO is the only skill in the stack that can say "don't build this." Every skill before it generates options. Every skill after it commits resources.
 
-**Known limitation:** CPO discovery triggers in gstack skill files (e.g., suggesting `/cpo` from `/office-hours` or `/plan-ceo-review`) are local modifications that get overwritten by `gstack-upgrade` (which runs `git reset --hard`). After upgrading gstack, re-apply the triggers by adding CPO to gstack's suggestion list. Long-term fix: contribute CPO discovery upstream to gstack, or wait for a third-party skill hook system.
+---
+
+### Full gstack skill reference
+
+#### THINKING — feeds into CPO
+
+| Skill | Role relative to CPO |
+|:---|:---|
+| `/office-hours` | YC-style forcing questions that expose demand reality before a decision is framed. When a strategic fork emerges, `/office-hours` can hand off to CPO via `--decide`. |
+| `/plan-ceo-review` | CEO/founder-mode plan review: challenges premises, expands scope, finds the 10-star product. Routes scope-level decisions to CPO when product prioritization is needed. |
+| `/retro` | Weekly engineering retrospective. Surfaces recurring patterns and team signals — including historical CPO decisions — that inform the current bet. Writes `~/.cpo/signals/retro-latest.yaml` for CPO to read at session start. |
+
+#### DECIDING — CPO's layer
+
+| Skill | Role |
+|:---|:---|
+| `/cpo` | The product decision layer. Frames decisions, explores three paths, defines kill criteria, and logs outcomes. Reads signals from QA, retro, and review. Writes `~/.cpo/signals/cpo-latest.yaml` for downstream skills. |
+
+#### PLANNING — after a decision is made
+
+| Skill | Role relative to CPO |
+|:---|:---|
+| `/plan-eng-review` | Eng manager-mode plan review: architecture, data flow, edge cases, test coverage. CPO's K) Eng brief handoff saves a structured brief and routes here to lock in the implementation plan. |
+| `/plan-design-review` | Designer's eye plan review: rates each design dimension, fixes issues iteratively. CPO routes here when the decision involves a significant UI/UX bet. |
+| `/design-consultation` | Full design system proposal: aesthetic, typography, color, layout, spacing, motion. Use when the decision opens a new product surface that needs a design language from scratch. |
+
+#### EXECUTING — commits resources, CPO decision already made
+
+| Skill | Role relative to CPO |
+|:---|:---|
+| `/build` | Parallel implementation orchestrator. Decomposes plans into tasks, dispatches agents with worktrees. Reads `~/.cpo/signals/cpo-latest.yaml` to check a decision exists before starting. CPO's L) Hand off routes here when ready to build. |
+| `/ship` | Release engineer mode: sync main, run tests, bump version, push branch, open PR. CPO routes here when a PR needs to be created. |
+| `/land-and-deploy` | Merges the PR, waits for CI, verifies production health via canary. CPO routes here when the decision is to ship to production (vs. just create a PR). |
+| `/setup-deploy` | Configures deployment settings for `/land-and-deploy`. Detects platform (Fly.io, Render, Vercel, Netlify, Heroku, GitHub Actions). Run once before the first `/land-and-deploy`. |
+
+#### FEEDBACK — closes the loop, writes signals CPO reads
+
+| Skill | Role relative to CPO |
+|:---|:---|
+| `/canary` | Post-deploy canary monitoring: watches the live app for console errors, performance regressions, and page failures. Writes `~/.cpo/signals/canary-latest.yaml`. CPO surfaces red canary signals in `[FRAME]`. |
+| `/qa` | Systematic QA testing — runs tests, fixes bugs, commits atomically. Writes `~/.cpo/signals/qa-latest.yaml`. CPO surfaces red QA signals in `[FRAME]`. |
+| `/qa-only` | Report-only QA: produces a health score and repro steps without touching code. Use when you want signal without automated fixes. |
+| `/review` | Pre-landing PR review: SQL safety, LLM trust boundary violations, structural issues. Reads `~/.cpo/signals/cpo-latest.yaml` to check if a decision backs the implementation before approving. |
+| `/benchmark` | Performance regression detection: baselines page load times and Core Web Vitals. Use after deploy to verify the build didn't regress. |
+| `/retro` | Also closes the feedback loop: surfaces what went wrong, what recurred, what the team learned. CPO's `--outcome` mode cross-references retro findings with original kill criteria. |
+
+#### QUALITY & SAFETY — available at any phase
+
+| Skill | When to use |
+|:---|:---|
+| `/design-review` | Designer's eye QA: finds visual inconsistency, spacing issues, AI slop patterns. Use after build, before ship. |
+| `/investigate` | Systematic debugging: four phases (investigate, analyze, hypothesize, implement). Iron Law: no fixes without root cause. |
+| `/document-release` | Post-ship documentation update: reads all docs, cross-references the diff, updates README/ARCHITECTURE/CONTRIBUTING. Run after `/land-and-deploy`. |
+| `/codex` | OpenAI Codex CLI wrapper: independent code review, adversarial mode, or test generation. Use for a second opinion on the implementation. |
+| `/review` | (see Feedback above) |
+| `/careful` | Warns before destructive commands (rm -rf, DROP TABLE, force-push). Lightweight safety layer. |
+| `/guard` | Full safety mode: combines `/careful` with directory-scoped edits. Use during high-risk operations. |
+| `/freeze` / `/unfreeze` | Restrict edits to a specific directory. Use when debugging to prevent scope creep. |
+
+#### BROWSER & VISUAL — verification and QA support
+
+| Skill | When to use |
+|:---|:---|
+| `/browse` | Fast headless browser for QA testing and dogfooding. Navigate, interact, diff before/after actions, take annotated screenshots. |
+| `/setup-browser-cookies` | Import cookies from your real browser into the headless browse session for authenticated testing. |
+
+---
+
+### Signal flow
+
+CPO participates in a bidirectional signal bus with other gstack skills:
+
+**Inbound signals CPO reads** (`~/.cpo/signals/`):
+
+| Signal file | Written by | CPO action |
+|:---|:---|:---|
+| `qa-latest.yaml` | `/qa`, `/qa-only` | If `severity: red`, surfaces in `[FRAME]` before the decision |
+| `review-latest.yaml` | `/review` | If `severity: red`, surfaces in `[FRAME]` |
+| `retro-latest.yaml` | `/retro` | If `severity: red`, surfaces in `[FRAME]` |
+| `canary-latest.yaml` | `/canary` | If `severity: red`, surfaces in `[FRAME]` |
+
+**Outbound signal CPO writes** (`~/.cpo/signals/cpo-latest.yaml`):
+
+Written after every `[VERDICT]` or `[GO]`. Contains: decision summary, door type, confidence, kill criteria count, timestamp. Read by `/build`, `/review`, and `/retro` to verify a decision backs the implementation.
+
+---
+
+### Routing: CPO → gstack
+
+After `[VERDICT]`, option **L) Hand off** routes to the best next skill:
+
+| Situation | Routed to |
+|:---|:---|
+| Architecture/implementation needed | `/plan-eng-review` |
+| Scope expansion warranted | `/plan-ceo-review` |
+| New idea needs premise pressure-test | `/office-hours` |
+| Design direction needed | `/plan-design-review` or `/design-consultation` |
+| Ready to build | `/build` |
+| Ready to ship (PR needed) | `/ship` |
+| Ready to merge + deploy | `/land-and-deploy` |
+| Post-launch monitoring | `/canary [url]` |
+| Historical pattern check | `/retro` |
+
+Option **K) Eng brief** saves a structured brief to `~/.cpo/briefs/YYYY-MM-DD-[slug].md` and suggests `/plan-eng-review`.
+
+---
+
+### Routing: gstack → CPO
+
+Any gstack skill can route decision forks to CPO via the `--decide` flag and a `CPO Handoff Request` block:
+
+```
+**CPO Handoff Request**
+From: [skill name]
+Context: [1-3 sentences]
+Decision: [the fork — one sentence]
+Options considered: [optional]
+```
+
+CPO skips redundant premise checks (the calling skill validated urgency), keeps "Who benefits?", and runs the standard flow. After verdict, it suggests returning to the calling skill. See `references/handoff-contract.md` for the full contract.
+
+---
+
+### Works standalone
+
+CPO does not require gstack. If a suggested skill isn't installed: *"I'd suggest [skill] for this — install gstack to get it."*
+
+**Known limitation:** CPO discovery triggers in gstack skill files (e.g., suggesting `/cpo` from `/office-hours` or `/plan-ceo-review`) are local modifications that get overwritten by `gstack-upgrade` (which runs `git reset --hard`). After upgrading gstack, re-apply the triggers manually. Long-term fix: contribute CPO discovery upstream to gstack.
 
 ---
 
