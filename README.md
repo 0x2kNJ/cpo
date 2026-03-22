@@ -37,7 +37,51 @@ Premise checks:
   a month of compounding CAC disadvantage.
 ```
 
-*Then it gates. You correct the frame or confirm it. Then paths. Then verdict with kill criteria. All logged automatically.*
+*Gate 1 — CPO stops here and asks: confirm this frame, correct it, or reframe entirely.*
+
+```
+[PATHS]
+
+Given the one-way door and competitive timing, the question is how to structure
+free so it pulls toward paid rather than replacing it.
+
+We recommend B: hard-limit free tier with team-invite expansion loop.
+
+A) Viral free tier (no limits) — maximises top-of-funnel, minimises conversion
+   pressure. Risks anchoring users to $0 permanently.
+B) Hard-limit free tier + team-invite loop — seats cap at 3, upgrade triggered
+   by collaboration. Freemium as a sales motion, not a product line. ← recommended
+C) Extended free trial (30 days, full access) — preserves pricing integrity,
+   reduces support load, but doesn't compound virally.
+
+Before committing: stress test all three, or pick a path.
+```
+
+*Gate 2 — you pick a path, or pressure-test first. CPO holds until you reply.*
+
+```
+[VERDICT]
+
+Verdict: Hard-limit free tier with team-invite expansion loop (Path B).
+
+Confidence: Medium
+The conversion rate data is estimated, not measured. Validate before scaling
+paid acquisition against this model.
+
+Stop if:
+1. Free-to-paid conversion stays below 8% at 30 days
+2. Paid ARR growth stays below 15% QoQ after 2 quarters
+3. Support ticket volume increases more than 40% within 90 days
+
+Truth fingerprint: Dominant — Economic · Grounded — User, Strategic
+                  Inferred — Execution [validate eng cost of seat enforcement]
+
+What next?
+D) Stress test  E) Deep dive  F) Reality check  K) Eng brief  L) Hand off
+```
+
+*Logged automatically to `~/.cpo/decisions/free-tier-add.yaml`. Kill criteria tracked.*
+*Next time you open a pricing question, CPO opens with what changed since this call.*
 
 ---
 
