@@ -37,7 +37,7 @@ Premise checks:
   a month of compounding CAC disadvantage.
 ```
 
-*Gate 1 — CPO stops here and asks: confirm this frame, correct it, or reframe entirely.*
+*↳ Gate 1 — CPO stops. You confirm the frame, correct it, or reframe entirely.*
 
 ```
 [PATHS]
@@ -57,7 +57,7 @@ C) Extended free trial (30 days, full access) — preserves pricing integrity,
 Before committing: stress test all three, or pick a path.
 ```
 
-*Gate 2 — you pick a path, or pressure-test first. CPO holds until you reply.*
+*↳ Gate 2 — you pick a path, or pressure-test first. CPO holds until you reply.*
 
 ```
 [VERDICT]
@@ -80,8 +80,8 @@ What next?
 D) Stress test  E) Deep dive  F) Reality check  K) Eng brief  L) Hand off
 ```
 
-*Logged automatically to `~/.cpo/decisions/free-tier-add.yaml`. Kill criteria tracked.*
-*Next time you open a pricing question, CPO opens with what changed since this call.*
+*↳ Logged to `~/.cpo/decisions/free-tier-add.yaml`. Kill criteria tracked. Next time*
+*you open a pricing question, CPO opens with what's changed since this call.*
 
 ---
 
@@ -102,8 +102,6 @@ whether to build it, when to kill it, or how to sequence competing priorities.
 
 No build step. No dependencies. Works immediately.
 
-### First run
-
 ```bash
 /cpo --save-context   # one-time: saves your stage, model, constraints
 /cpo should we launch a collaboration feature this quarter?
@@ -111,13 +109,9 @@ No build step. No dependencies. Works immediately.
 /cpo --quick should we use Postgres or Mongo?  # ≤300 words, one criterion
 ```
 
-### Upgrade
-
 ```bash
-cd ~/.claude/skills/cpo && git pull
+cd ~/.claude/skills/cpo && git pull   # upgrade
 ```
-
-CPO detects version mismatches on every invocation. No daemon, no auto-upgrade — you pull when you want to update.
 
 ---
 
@@ -125,29 +119,19 @@ CPO detects version mismatches on every invocation. No daemon, no auto-upgrade �
 
 Claude gives you an answer. CPO makes you face the real question.
 
-The difference: Claude will tell you whether a free tier is a good idea. CPO will ask you what your current conversion rate is, classify this as a one-way door, run a market scan, define three structurally distinct paths, and refuse to give a verdict without three kill criteria attached to it. Then it logs everything, so next time you revisit pricing, you open with what changed — not from scratch.
+Claude will tell you whether a free tier is a good idea. CPO will ask what your current conversion rate is, classify this as a one-way door, run a market scan, surface four premise checks, present three structurally distinct paths, and refuse to give a verdict without three kill criteria with specific thresholds and timeframes. Then it logs everything — so the next time you revisit pricing, you open with what changed, not from scratch.
 
-The value isn't the answer. It's the structure that forces better questions, and the journal that makes decisions compounding assets instead of forgotten conversations.
+The value isn't the answer. It's the structure that forces better questions, and the journal that turns decisions into compounding assets instead of forgotten conversations.
 
 ---
 
-## How it works
+## The system
 
-### Three-phase flow
-
-Every decision moves through three marked, gated phases:
-
-**`[FRAME]`** — Classify the decision. Is it reversible? What Truth does it turn on? Four premise checks: right problem, who benefits, stage-specific forcing question, cost of delay. Ends with a structural grounding AskUserQuestion — the gate cannot be skipped.
-
-**`[PATHS]`** — Three situationally-labeled paths (never Bold/Balanced/Conservative). Recommendation appears first. Pressure-test options before committing. Ends with another gate: commit to a path or pressure-test first.
-
-**`[VERDICT]`** — Chosen path, confidence, three kill criteria (metric + threshold + timeframe), Truth fingerprint. Routes to K) Eng brief or L) Hand off to the next skill.
-
-The gates are mechanical, not suggestive. `[FRAME]` and `[PATHS]` cannot proceed until you reply.
+The example above shows the output. Here's what's running underneath it.
 
 ### Five Truths
 
-Every decision is assessed across five independent dimensions:
+Every decision is assessed across five independent dimensions. CPO identifies the **dominant Truth** — what this decision actually turns on — before exploring paths. No decision is just a product question or just an economics question.
 
 | Truth | What it asks |
 |:---|:---|
@@ -157,29 +141,38 @@ Every decision is assessed across five independent dimensions:
 | **Macro-Political** | What regulatory, geopolitical, or ecosystem forces could override good execution? |
 | **Execution** | Can we actually build this with our current team, runway, and tech stack? |
 
-CPO identifies the **dominant Truth** — what this decision actually turns on — then tags every claim: `[fact / assumption / inference / judgment]`.
+Every claim is tagged: `[fact / assumption / inference / judgment]`. You always know what's known vs. inferred.
 
 ### One-way vs two-way doors
 
-Every decision is classified on entry.
+Every decision is classified on entry — before a single path is explored.
 
 - **Two-way door** — reversible. Low-magnitude two-way doors auto-suggest `--quick`.
-- **One-way door** — not reversible. Triggers `--deep` suggestion and a **market reality check**: two web searches for competitors and market trends, surfaced as a one-line finding in the Frame.
+- **One-way door** — not reversible. Auto-suggests `--deep` and triggers a live **market reality check**: two web searches for competitors and market trends, surfaced as a one-line finding in the Frame.
 
 Bezos framework, applied mechanically — not as decoration.
 
-### Kill criteria
+### Kill criteria — a hard rule
 
-No recommendation without kill criteria. Every verdict includes three, each with:
-- a named metric
-- a specific threshold
-- a timeframe
+No recommendation without kill criteria. Every verdict includes three, each with a named metric, a specific threshold, and a timeframe.
 
-*"Stop if: free-to-paid conversion stays below 8% at 30 days."*
+This is non-negotiable by design. A recommendation without kill criteria isn't a recommendation — it's a preference.
 
-### Decision journal
+### Prior art scan
 
-Every verdict is automatically logged to `~/.cpo/decisions/`:
+Every session starts with a scan of recent decisions. If keywords match a prior call:
+
+> *"Related prior decision: #free-tier — Gated expansion path (2026-01-15). Revisiting or new question?"*
+
+Tag any decision with `#name` to make it addressable. When you return to a named decision, CPO skips the fresh frame entirely and opens with a **delta frame**: what's changed since the last call, and whether the kill criteria have been triggered.
+
+---
+
+## The journal
+
+The journal is the thing that makes CPO a system instead of a tool. Every other AI advice interaction is stateless. This one isn't.
+
+Every verdict is automatically written to `~/.cpo/decisions/`:
 
 ```yaml
 decision_id: free-tier-add
@@ -194,53 +187,47 @@ kill_criteria:
 status: active
 ```
 
-The journal compounds. CPO scans the last 5 decisions at session start and surfaces any related prior decisions before framing. Every session starts smarter than the last.
+CPO scans the last 5 decisions at session start. Every session starts smarter than the last.
+
+### Closing the loop — `--outcome`
+
+The most important feature nobody talks about: closing the loop on a decision after the fact.
+
+```
+/cpo --outcome #free-tier
+```
+
+CPO reconstructs the information state at decision time — what Truths were dominant, what was flagged as assumption vs. fact, what blind spots were identified. Then it walks through each kill criterion and asks for current data.
+
+Three close modes:
+- **Walk through** — criterion by criterion, recommended for one-way doors
+- **Quick close** — one-line summary of what happened
+- **Decision was wrong** — full decision replay to understand why
+
+After closing, CPO surfaces the pattern across everything you've logged:
+
+> *"This is your 8th closed decision. 5 succeeded, 2 pivoted, 1 failed. Most common failure mode: underestimating execution time."*
+
+That's not a feature. That's institutional memory. No team has this without CPO.
+
+Active decisions older than 30 days are surfaced automatically at session start: *"You have 2 decisions that haven't been closed — run `/cpo --outcome #[id]`."*
 
 ---
 
 ## Flags
 
-### `--go`
-All three phases in one response. No gates, no premise checks. Use when you've already thought through the frame.
-
-```
-/cpo --go should we build mobile before web is profitable?
-```
-
-### `--quick`
-Single response, ≤300 words, one kill criterion. Use for low-stakes decisions.
-
-### `--deep`
-Full 10-section expansion after paths: Problem Definition → Five Truths → Strategic Options → Recommendation → Sequencing → Risks → GTM → Org implications → Open Questions → Decision Memo. Auto-triggered for one-way doors.
-
-### `--journal`
-Shows the 10 most recent decisions. Read-only — does not trigger a new flow.
-
-### `--review`
-Surfaces all active decisions and asks for current data against each kill criterion. Use weekly or before major check-ins. CPO surfaces, doesn't evaluate — it asks you for the data.
-
-### `--outcome #name`
-Close the loop on a past decision. Reconstructs the information state at decision time, walks through kill criteria, writes an outcome block. Three close modes:
-- **Walk through** — criterion by criterion (recommended for one-way doors)
-- **Quick close** — one-line summary of what happened
-- **Decision was wrong** — decision replay to understand why
-
-After closing: *"This is your 8th closed decision. 5 succeeded, 2 pivoted, 1 failed. Most common failure mode: underestimating execution time."*
-
-Active decisions older than 30 days are surfaced automatically: *"You have 2 decisions that haven't been closed — run `/cpo --outcome #[id]`."*
-
-### `--save-context`
-Bootstrap `~/.cpo/context.md` with 5 questions — stage, business model, core constraint, top priorities, biggest open question. Every future session loads this automatically.
-
-### `--decide`
-Inbound handoff from other tools. Any skill can route a decision fork to CPO via a structured handoff block. CPO skips redundant premise checks and routes back after verdict. See `references/handoff-contract.md`.
-
-### `#name`
-Tag any decision for addressability:
-```
-/cpo #pricing should we add a free tier?
-```
-When you return to a named decision, CPO opens with a **delta frame** — what's changed since the last call — instead of starting from scratch.
+| Flag | What it does |
+|:---|:---|
+| *(no flag)* | Standard flow: `[FRAME]` → `[PATHS]` → `[VERDICT]` with gates |
+| `--go` | All three phases in one response. No gates, no premise checks. Use when you've already thought through the frame. |
+| `--quick` | ≤300 words, one kill criterion. For low-stakes decisions. |
+| `--deep` | Full 10-section expansion: Problem → Five Truths → Options → Recommendation → Sequencing → Risks → GTM → Org → Open Questions → Decision Memo. Auto-triggered for one-way doors. |
+| `--journal` | Shows the 10 most recent decisions. Read-only. |
+| `--review` | Surfaces all active decisions and asks for current data against each kill criterion. Use weekly or before major check-ins. |
+| `--outcome #name` | Close the loop on a past decision. See [The journal](#the-journal). |
+| `--save-context` | Bootstrap `~/.cpo/context.md` — stage, model, constraint, priorities, open question. Loads automatically every session. |
+| `--decide` | Inbound handoff from other tools. Routes a decision fork to CPO mid-workflow. See `references/handoff-contract.md`. |
+| `#name` | Tag any decision for addressability. Returns a delta frame on revisit. |
 
 ---
 
@@ -328,17 +315,17 @@ CPO reads red-flag signals from other skills at session start. If `severity: red
 | `retro-latest.yaml` | `/retro` | Recurring team failure pattern |
 | `canary-latest.yaml` | `/canary` | Production regressions detected |
 
-After every verdict, CPO writes `~/.cpo/signals/cpo-latest.yaml` — decision summary, door type, confidence, kill criteria count. Downstream skills (`/build`, `/review`, `/retro`) read this to verify a decision exists before committing work.
+After every verdict, CPO writes `~/.cpo/signals/cpo-latest.yaml` — decision summary, door type, confidence, kill criteria count. Downstream skills read this to verify a decision exists before committing work.
 
-> **Note:** Signal integration requires skills to write to `~/.cpo/signals/`. Native gstack signals require local configuration — see `references/handoff-contract.md`. CPO degrades gracefully when no signals are present.
+> **Note:** Signal integration requires skills to write to `~/.cpo/signals/`. CPO degrades gracefully when no signals are present.
 
 ### Known limitation
 
-CPO discovery triggers in gstack skill files — e.g., suggesting `/cpo` from `/office-hours` — are local modifications that `gstack-upgrade` overwrites. After upgrading gstack, re-apply triggers manually or contribute CPO discovery upstream.
+CPO discovery triggers in gstack skill files are local modifications that `gstack-upgrade` overwrites. After upgrading gstack, re-apply triggers manually or contribute CPO discovery upstream.
 
 ### Full skill reference
 
-Complete documentation of all 25+ gstack skills and their relationship to CPO: [`docs/gstack-skills.md`](docs/gstack-skills.md)
+[`docs/gstack-skills.md`](docs/gstack-skills.md) — all 25+ gstack skills and their relationship to CPO.
 
 ---
 
@@ -352,8 +339,6 @@ Complete documentation of all 25+ gstack skills and their relationship to CPO: [
 | `~/.cpo/signals/*-latest.yaml` | Signals from other skills |
 
 ## Reference files
-
-Loaded on demand — not pre-loaded:
 
 | File | Contents |
 |:---|:---|
