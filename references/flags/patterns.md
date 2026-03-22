@@ -66,6 +66,7 @@ Watch for: [one specific behavioral pattern to watch for in the next 3 decisions
 - If a dimension has insufficient data (<3 data points), skip it and note: *"[dimension]: insufficient data"*
 - Do not make normative judgments — describe patterns, not character
 - If `truth_fingerprint:` is missing from older journal entries (pre-v1.4), skip Truth bias dimension and note: *"Truth bias: requires journal entries from v1.4+ — run more decisions to populate"*
+- If `verified:` field is missing from older journal entries (pre-v1.6), treat those entries as full-weight (1.0) — do not penalize legacy entries. When weighting entries for Confidence Calibration, use: `verified: yes` = 1.0 weight, `verified: no` = 0.75 weight, missing field (pre-v1.6) = 1.0 weight
 - Pattern summary is always plain language, no jargon
 - "Watch for" is always one concrete, observable behavior — not a meta-instruction
 

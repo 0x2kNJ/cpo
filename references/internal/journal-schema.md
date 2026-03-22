@@ -8,6 +8,8 @@ After every output from: `ceo`, `blue-ocean`, `red-team`, `premortem`, `sequence
 
 Do NOT write for: `advisory-roundtable`, `boardroom`, `investor-roundtable` (simulations write transcripts instead). Do NOT write for `eng-translate` or `eng-brief` (execution artifacts, not strategic decisions).
 
+**`--dry-run` gate:** If `--dry-run` is present, skip the entire journal write (YAML creation, coherence validator, revision supersession, and execution trace). The analysis runs identically — only persistence is suppressed. Exception: if `--deep` or `--go` is also active, the verification subagent still runs its inline output checks (it validates quality, not persistence), but its trace checkpoint is also suppressed. See `references/flags/dry-run.md`.
+
 **Write the entry silently. Do not interrupt the conversation.** Do not announce the write unless the user has `--export` set or asks.
 
 ## YAML Schema
@@ -19,10 +21,13 @@ mkdir -p ~/.cpo/decisions
 _DATE=$(date +%Y-%m-%d)
 _TS=$(date +%s | tail -c 5)
 _MODE="${_CURRENT_MODE:-unknown}"
+# For dry-run commits, _DRY_START is set at invocation time — use it as date if present
+_ENTRY_DATE="${_DRY_START_DATE:-$_DATE}"
 cat > ~/.cpo/decisions/${_DATE}-${_MODE}-${_TS}.yaml << EOF
-schema_version: "1.5"
-date: $_DATE
+schema_version: "1.6"
+date: $_ENTRY_DATE
 mode: $_MODE
+entry_type: ${_ENTRY_TYPE:-decision}
 decision_id: ${_DECISION_ID:-}
 prompt: REPLACE_WITH_PROMPT_SUMMARY
 revision: REPLACE_WITH_REVISION_NUMBER
@@ -46,6 +51,7 @@ consequences:
   - marker: REPLACE_WITH_CONSEQUENCE_DESCRIPTION
     check_date: REPLACE_WITH_DATE_TO_CHECK
     status: pending
+verified: REPLACE_WITH_yes_or_no
 outcome: pending
 outcome_date: ""
 outcome_notes: ""
@@ -58,6 +64,8 @@ EOF
 Replace every `REPLACE_WITH_*` value with the actual content from the output just produced. **Never write a `REPLACE_WITH_*` value to disk literally.** If a field cannot be determined, write `unknown`.
 
 ## Field Rules
+
+**`entry_type`:** Classifies the journal entry. Values: `decision` (default — standard analysis output), `ship_event` (logged when a decision results in a shipped artifact — version release, PR merge, launch). `--brief` scans for `entry_type: ship_event` to render the "Recent ships" section. If the mode output is a standard analysis, write `decision`. If the output records a ship/launch event (e.g., from L) Hand off → /ship), write `ship_event`. If omitted, scanners treat the entry as `decision`.
 
 **`decision_id`:** If the user tagged the prompt with `#name`, write that name (without the `#`). If no tag, leave empty.
 
@@ -80,6 +88,8 @@ Superseded entries are excluded from `--verify`, `--assumptions`, `--brief`, `--
 **`delta_from_prior`:** For returning decisions, write a one-line summary of what changed. For new decisions, write `na`.
 
 **`consequences`:** Auto-generated at decision time. Derive 2-3 consequences from the Verdict and kill criteria — each is a testable prediction about what should change if the recommended path succeeds. Each consequence must be falsifiable within the stated timeframe — if you can't tell whether it happened or not, it's not a valid consequence. Prefer measurable consequences over qualitative ones. `marker` is a one-sentence prediction (e.g., "If we ship the paywall, free-tier signups should drop 20-40%"). `check_date` is when to look for this effect. Derive from context: if the decision has kill criteria with explicit timeframes, align the consequence check_date to 50-75% of the shortest kill criterion timeframe (check before the kill deadline, not after). If no kill criteria timeframe exists, default to 60 days from the decision date. Format: YYYY-MM-DD. `status` is `pending`, `confirmed`, or `disconfirmed`. If no meaningful consequence can be inferred from the decision, write `consequences: []` — never write placeholder text. `--status` and `--brief` scan for consequences past their `check_date` that are still `pending` — surfacing them as "consequence check due."
+
+**`verified`:** Whether the output passed the verification subagent's 8-check compliance pass. Write `yes` for outputs from `--deep` or `--go` (verification subagent fires). Write `no` for `--quick`, standard three-response flow, simulations, or entries committed via `N) Commit` from a `--dry-run` (dry-run commits never ran the interactive gate sequence). Scanners (`--score`, `--patterns`) can weight entries by this field: `verified: no` entries carry lower signal for calibration purposes. The field documents *how* the decision was produced, not whether it was good.
 
 **`shelf_life`:** Optional. Number of days this decision is expected to remain valid (e.g., `180` for a 6-month strategic bet, `365` for an annual plan). If present, the Decision Decay Index uses this value instead of the default 30-day divisor: `(days_since_decision / shelf_life) × ...`. If absent or empty, the default 30-day divisor applies. Set this for long-horizon decisions (market positioning, annual strategy, platform bets) to prevent false decay alarms. Short-horizon decisions (sprint-level, launch timing) should omit this field. In the bash block, set `_SHELF_LIFE` to the number of days before running the write, or leave it unset to produce an empty value.
 
@@ -106,6 +116,8 @@ If the new entry's kill criteria reference the same metric as an active entry's 
 
 **Check 4 — Decision similarity:**
 Scan active entries for structural similarity to the new entry — overlapping keywords in `prompt:` or `recommendation:`, same Dominant Truth, or same mode. If a similar past decision exists with at least one verified consequence (`confirmed` or `disconfirmed`), surface it. Cap at 1 match per write. Skip if the matched decision is the same `decision_id` (that's a revision, not a similarity). Output: *"Pattern match: this resembles #[decision-id or slug] ([date]) — that one [succeeded/failed] because [one-clause reason]. Run `/cpo --replay #[id]` to compare."*
+
+**Truth-subagent conflict integration:** When `--deep` mode runs and truth-subagents surface a cross-Truth conflict (e.g., Economic Truth says "unit economics don't work" while Strategic Truth says "must enter now"), check whether the same conflict already appears as an active coherence contradiction from a prior decision (Check 1 or Check 2 of the coherence validator). If so, surface a single merged note instead of two separate warnings: *"⚠ Coherence + internal conflict: [topic] — [prior decision date] showed the same tension between [Truth A] and [Truth B]. This pattern is recurring — run `/cpo --drift` or `--replay #[id]` to investigate."* Do not emit both a coherence warning and a truth-subagent conflict for the same underlying tension.
 
 **Output behavior:**
 - If any check fires: append one non-blocking line after the Verdict, visible in ALL modes (standard, verbose, deep): *"⚠ Coherence: this [contradicts/tensions with] your active decision on [topic or decision_id] ([date]) — [one-sentence description]. Run `/cpo --drift` to investigate."*

@@ -322,11 +322,13 @@ Or correct the frame in a sentence — we'll re-run from Assess.
 
 **Action 3 — Paths**
 
-Delivered in Response 2, after the user confirms the grounding. Three Paths tailored to the confirmed frame. ≤2 sentences each. Mark the recommended path with `← recommended` — exactly one path gets this marker.
+Delivered in Response 2, after the user confirms the grounding. Three Paths tailored to the confirmed frame. ≤2 sentences each. Lead with a `**We recommend [letter]:**` block before the path list — the primary scannability signal. The corresponding path also carries `← recommended` inline for machine parsing. Both must stay letter-consistent.
 
 Open Response 2 with one framing sentence naming the tradeoff the three paths represent, anchored to the confirmed frame:
 
 > *[Given [confirmed frame], the question is [core tradeoff in one clause].]*
+
+**We recommend [letter]:** [one-sentence rationale from the Dominant Truth]
 
 Pick a path:
 A) **[Situational label]** — [≤2 sentences]
@@ -542,6 +544,8 @@ Or correct the frame in a sentence — we'll re-run from Assess.
 ```
 *[Given [confirmed frame], the question is [core tradeoff in one clause].]*
 
+**We recommend [letter]:** [one-sentence rationale from the Dominant Truth]
+
 Pick a path:
 A) **[Situational label]** — [≤2 sentences]
 B) **[Situational label]** — [≤2 sentences]  ← recommended
@@ -675,7 +679,7 @@ If the user corrects at the grounding stage (*"actually we're only targeting ent
 
 ### `--go` escape hatch
 
-Bypasses the three-response interactive flow. Delivers all four actions in one response: Frame + Assess + Paths (with `← recommended` marker) + Verdict + next-steps menu. No grounding question. No path-selection prompt. Also skips simulation gate.
+Bypasses the three-response interactive flow. Delivers all four actions in one response: Frame + Assess + `**We recommend [letter]:**` block + Paths (with `← recommended`) + Verdict + next-steps menu. No grounding question. No path-selection prompt. Also skips simulation gate.
 
 > *Running: [plain-English description]*
 
@@ -685,7 +689,7 @@ Bypasses the three-response interactive flow. Delivers all four actions in one r
 
 **With `--quick`:** Deliver all four actions in one response — no grounding question, no path-selection prompt. Format:
 *Reading this as: [decision]. [Truth name] is what this turns on.*
-Paths:
+**We recommend [letter]:** [one-sentence rationale]
 A) [label] — [one sentence]
 B) [label] ← recommended
 C) [label] — [one sentence]

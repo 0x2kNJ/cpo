@@ -90,6 +90,18 @@ Path A is a standalone maintenance utility — it outputs a posture refresh and 
 
 ---
 
+## `--dry-run` Combinations
+
+`--dry-run` stacks with any decision-producing flag (`--go`, `--deep`, `--quick`, `--memo`, `--silent`, `--compare`, `--scan-strategy`, `--sell-up`, `--export`). The analysis runs identically — only the journal write is suppressed.
+
+**`--dry-run --since [date] [question]`:** Valid. `--since` enriches the analysis with a temporal delta from the journal, then hands off to the full four-action flow. No journal write from the resulting decision. See dry-run.md for full combination spec.
+
+**`--dry-run --since` (alone, no question):** Invalid — `--since` without a question just reads the journal with no decision to analyze. Drop `--dry-run`, run `--since` normally.
+
+**Invalid with journal-reading flags:** `--dry-run` + `--brief` / `--trail` / `--history` / `--outcome` / `--patterns` / `--score` / `--verify` / `--assumptions` / `--replay` / `--kills` / `--drift` / `--graph` / `--status`. These flags read the journal, not write to it — `--dry-run` has nothing to suppress. Drop `--dry-run`, run the flag normally, note: *"--dry-run doesn't apply to [flag] (journal read, not write). Running [flag] normally."*
+
+---
+
 ## Invalid Combinations
 
 These combinations are not supported — proceed with the primary flag only, note the incompatibility inline.

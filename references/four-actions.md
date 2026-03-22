@@ -150,7 +150,19 @@ Or correct the frame in a sentence — we'll re-run from Assess.
 
 ## Action 3 — Paths (Detailed Rules)
 
-Delivered in Response 2, after the user confirms the grounding. Three Paths tailored to the confirmed frame. <=2 sentences each. Mark the recommended path with `<- recommended` — exactly one path gets this marker. Immediately below the recommended path, add a one-line rationale in italics: `*Why: [one-line reason from the Dominant Truth]*`. This line makes the recommendation legible without requiring the user to recall the Assess finding.
+Delivered in Response 2, after the user confirms the grounding. Three Paths tailored to the confirmed frame. <=2 sentences each.
+
+**Recommendation block (always first, before paths):** Lead with a bold recommendation line above the path list: `**We recommend [letter]:** [one-sentence rationale from the Dominant Truth]`. This is the primary signal — position-consistent regardless of which letter is recommended. The corresponding path also carries `← recommended` inline for machine parsing and verification. Format:
+
+```
+**We recommend B:** [one-sentence rationale]
+
+A) **[Label]** — [description]
+B) **[Label]** — [description]  ← recommended
+C) **[Label]** — [description]
+```
+
+Exactly one path carries `← recommended`. The letter in `We recommend [letter]:` must match the path carrying `← recommended`.
 
 Open Response 2 with one framing sentence naming the tradeoff the three paths represent, anchored to the confirmed frame:
 
@@ -208,6 +220,15 @@ or A, B, or C to commit to a path
 - **`--go` and `--quick` suppress the challenge block entirely.**
 - **D-M options are post-verdict only** — never render in the pre-path challenge block.
 
+**Freeform input at gates:** If the user's reply at any gate is not a recognized option (A/B/C, 1/2/3, D-M, or a correction keyword), interpret it as conversational input — a question, idea, pushback, or observation about the paths or analysis. Handle it without exiting the flow:
+
+1. Address the input directly in 2-4 sentences. Answer the question, engage with the idea, or respond to the pushback.
+2. If the input has implications for the paths (new constraint, alternative angle, factual correction), integrate those implications into the path descriptions and update the `**We recommend [letter]:**` block and `← recommended` marker if the recommendation shifts (both must stay consistent).
+3. Re-surface the same decision point: updated paths → AskUserQuestion overlay → challenge block (or D-M menu if post-verdict). The flow continues from where it was.
+4. Do not ask "did you mean to pick an option?" — just engage with what they said and re-present the choices.
+
+This keeps the structured flow intact while allowing natural conversation at every gate. The user should feel like they're talking to an advisor who happens to use a structured framework, not navigating a menu system.
+
 **3) Reality check — inference rule (pre-commitment):** Infer the intended audience from the product context. If unambiguous, name them and run the check. If ambiguous, ask one clarifying question. Output: 2-3 plain-language reactions per path from that audience's perspective.
 
 ---
@@ -253,7 +274,7 @@ Each kill criterion must satisfy all three requirements:
 
 **Kill criteria gate:** The D-M next-steps menu MUST NOT render until the Verdict contains at least three kill criteria — each specific, measurable, and time-bound. If a Verdict cannot produce three, state why and ask: *"What would tell you this bet is failing? Give me one measurable signal and I'll use it."*
 
-**Elevation gate:** If confidence is Medium or Low, the elevation block fires first — render the elevation prompt AND ALSO render the D-M menu below it. The elevation prompt is an invitation to improve confidence, not a gate that hides options.
+**Gate sequencing:** Kill criteria gate fires FIRST. Only after ≥3 measurable kill criteria are present does the elevation check run. Order: (1) kill criteria gate → (2) elevation prompt (if Medium/Low) → (3) D-M menu. The elevation prompt renders WITH the D-M menu below it — elevation is an invitation to improve confidence, not a gate that hides options.
 
 ### D-M Next-Steps Menu
 

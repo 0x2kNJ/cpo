@@ -4,6 +4,143 @@ All notable changes documented here. Follows [Keep a Changelog](https://keepacha
 
 ---
 
+## [2.7.1] — 2026-03-20
+
+**Recommendation block above paths.** The answer is now always first.
+
+### Changed
+
+- **Recommendation position moved above path list** — Instead of the recommendation being inline with one of the path letters (buried mid-list), it now leads as a dedicated block: `**We recommend [letter]:** [one-sentence rationale]`. This appears before the path list in Response 2, `--go`, and after every path rewrite in the challenge loop. The recommendation is always at the same visual position regardless of which letter is recommended.
+- **`← recommended` marker retained** inline on the corresponding path for machine parsing and verification subagent Check 4. The letter in the block must match.
+- **Dropped `**Recommended** ·` prefix** (added in 2.7.0) — superseded by the cleaner block-above pattern.
+- `SKILL.md` — Updated Response 2 template, `--go` template, freeform input handler inline rule.
+- `references/four-actions.md` — Updated Action 3 path format spec with example block.
+- `references/internal/verification-subagent.md` — Check 4 updated to verify block-above presence + letter consistency.
+
+---
+
+## [2.7.0] — 2026-03-20
+
+**Two UX features: conversational flow + recommended path visibility.** CPO now feels like talking to an advisor who uses a framework, not navigating a menu system.
+
+### Added
+
+- **Freeform input at every gate** — When the user types something that isn't a recognized option (A/B/C, 1/2/3, D-M) at any decision point, CPO engages conversationally: answers the question or responds to the idea in 2-4 sentences, integrates implications into the paths if relevant, and re-surfaces the same decision point. No new flag, no new menu option — just natural conversation without breaking the structured flow.
+- **Recommended path visual treatment** — The recommended path now leads with bold `**Recommended**` prefix before the label for instant scannability: `B) **Recommended** · **[Label]** — [description] ← recommended`. The `← recommended` end marker is preserved for machine parsing and verification subagent Check 4. `*Why:*` replaced with `**Rationale:** *[explanation]*` for clearer visual hierarchy.
+
+### Changed
+
+- `SKILL.md` — Version bumped to 2.7.0. Updated Response 2 and `--go` templates with new recommended path format. Added freeform input handler to inline loop behaviors.
+- `references/four-actions.md` — Updated Action 3 path format spec. Added freeform input handler section under pre-path challenge rules.
+- `references/internal/verification-subagent.md` — Check 4 updated to validate both `**Recommended**` prefix and `← recommended` end marker, plus `**Rationale:**` line.
+
+---
+
+## [2.6.3] — 2026-03-20
+
+**Comprehensive audit — 22 issues identified, 10 fixed.** Full cross-file consistency pass across the entire CPO codebase. Focused on spec coherence between reference files, pipeline ordering, schema completeness, and gate sequencing.
+
+### Added
+
+- **`entry_type` field in journal schema** — New field classifying entries as `decision` (default) or `ship_event` (shipped artifact). `--brief` scans for `ship_event` to render "Recent ships" section. Previously referenced in brief.md but missing from schema.
+- **`verified:` weighting in `--score`** — Score computation now weights entries: `verified: yes` = 1.0, `verified: no` = 0.75, missing (pre-v1.6) = 1.0. Display note shows breakdown.
+- **`verified:` fallback in `--patterns`** — Pre-v1.6 entries without `verified:` field treated as full-weight (1.0), consistent with `--score` weighting.
+- **Weak Truth threshold in `--score`** — Weakest Truth only set if accuracy < 70%. If all Truths >= 70%, writes `none (all ≥70%)` and suppresses preamble-handler weak Truth behaviors.
+
+### Fixed
+
+- **Trace checkpoint ordering** — `truth_subagents` and `verification` were listed after `journal` in trace.md. Reordered to match Execution Pipeline: truth_subagents (order 5, during Assess), verification (order 8, post-output), journal (order 9). Added Pipeline stage column.
+- **Check 6 D-M menu confidence gate** — Verification subagent Check 6 implied D-M menu scope varied by confidence but didn't clarify it renders at ALL levels. Now explicit: High = D-M, Medium/Low = D-L, elevation prompt renders alongside (not blocking) D-M.
+- **Kill criteria vs elevation gate sequencing** — four-actions.md had both gates but no ordering. Now explicit: kill criteria gate fires FIRST (≥3 required), then elevation check, then D-M menu renders.
+- **Truth subagent context table** — Referenced "burn rate" and fields not in context.md. Aligned to actual context.md fields + prompt inferences per Truth.
+- **Execution Pipeline enrichment ordering** — Made explicit: `--scan-strategy` → `--since` → `--roadmap`, with reframe check rules.
+
+### Changed
+
+- `SKILL.md` — Version bumped to 2.6.3.
+- `references/internal/trace.md` — Added Order column and Pipeline stage column. Reordered checkpoints.
+- `references/internal/verification-subagent.md` — Check 6 rewritten for confidence-level clarity.
+- `references/internal/journal-schema.md` — Added `entry_type` field and YAML template entry. Schema v1.6 (no bump — additive field).
+- `references/four-actions.md` — Added explicit gate sequencing paragraph.
+- `references/flags/patterns.md` — Added `verified:` fallback rule for pre-v1.6 entries.
+- `references/flags/score.md` — Added verification weighting section and weak Truth threshold.
+
+---
+
+## [2.6.2] — 2026-03-20
+
+**Panel review fixes — Gary Tan, Mike Krieger, Boris Cherny.** 8 issues from post-ship panel review of v2.6.1. Biggest changes: `verified:` field in journal schema, mode precedence pipeline, per-Truth context filtering, and Check 3 measurability enforcement.
+
+### Added
+
+- **`verified:` field in journal schema** — Every journal entry now carries `verified: yes/no`. `yes` for `--deep` or `--go` outputs (verification subagent ran). `no` for `--quick`, standard three-response flow, simulations, and dry-run commits. Scanners (`--score`, `--patterns`) weight `verified: no` entries lower. Schema bumped to v1.6.
+- **Mode precedence pipeline (`SKILL.md`)** — Explicit 7-step execution order: Preamble → Enrichment → Reframe check → Primary mode → Post-output (verification + truth subagent synthesis) → Journal write → Trace write. With worked example for `--dry-run --deep --since [date] #decision-id`. Eliminates flag-combo ambiguity.
+- **Truth subagent per-Truth context filtering** — Shared context is now filtered per-Truth: Economic Truth gets runway/burn, Execution Truth gets team size/tech stack, User Truth gets user segment — not all constraints to all Truths. Prevents anchoring via irrelevant context bleed.
+- **`_DRY_START_DATE` timestamp tracking** — Dry-run now captures start date at invocation. Journal entry `date:` on `N) Commit` uses `_DRY_START_DATE`, not the commit timestamp. Prevents Decision Decay Index from drifting by exploration session duration.
+- **Coherence + truth-subagent conflict integration** — When a truth-subagent cross-Truth conflict mirrors an active coherence contradiction, a single merged warning fires instead of two separate notes. Prevents duplicate warnings on the same underlying tension.
+
+### Fixed
+
+- **[Boris] Check 3 measurability non-mechanical** — "Stays reasonable" passed the check because it's semantic, not numeric. Check 3 now requires all three: named metric + numeric/percentage threshold + calendar timeframe. Qualitative language explicitly fails. If user intent is clear, model infers numeric values from context rather than leaving placeholders.
+- **[Mike] Check 6 `--quick` false-fail** — `--quick` intentionally omits D-M menu, but Check 6 previously required D-M menu presence unconditionally. Check 6 now auto-passes when `--quick` is active.
+- **[Mike] Truth subagents returning-decision base case missing** — When a returning decision's first `--deep` run has no prior Truth findings, the spec was silent. Now: base case is "user context + stage + doctrine only, no delta handling."
+- **[Gary] Dry-run commits unweighted in `--score`** — Decisions committed from dry-run (never interactively pressure-tested) were indistinguishable from fully deliberated decisions. `verified: no` field marks them for lower weighting.
+
+### Changed
+
+- `SKILL.md` — Version bumped to 2.6.2. Added Execution Pipeline section with 7-step precedence order.
+- `references/internal/journal-schema.md` — Schema v1.6: added `verified:` field to YAML template and field rules. Added `_DRY_START_DATE` timestamp support. Added coherence + truth-subagent conflict integration note.
+- `references/flags/dry-run.md` — Added `_DRY_START_DATE` bash capture and commit timestamp spec.
+- `references/internal/truth-subagents.md` — Step 1 rewritten with per-Truth context filter table. Base case added. Returning decision handling preserved.
+- `references/internal/verification-subagent.md` — Check 3 rewritten with numeric/calendar enforcement. Check 6 updated with `--quick` auto-pass and `N) Commit` clarification.
+
+---
+
+## [2.6.1] — 2026-03-20
+
+**Post-ship audit fixes for v2.6.0.** 8 bugs found across the 3 new features.
+
+### Fixed
+
+- **[Critical] `--since` classified contradictorily** — `combinations.md` listed `--since` as both a valid dry-run stack AND an invalid journal-reading flag. Fixed: `--dry-run --since [date] [question]` is valid (temporal enrichment + dry-run analysis); `--dry-run --since` alone (no question) is invalid. Updated `combinations.md` and `dry-run.md`.
+- **[Moderate] `N) Commit` escape hatch ambiguity** — No spec for how `N) Commit` interacts with the verification subagent's Check 6 or with M)'s conditionality. Fixed: `dry-run.md` now specifies N always appears after the last D-M option (after M if present, after L otherwise). `verification-subagent.md` Check 6 now explicitly allows `N) Commit` during `--dry-run` without failing the check.
+- **[Moderate] `--dry-run #decision-id` behavior undefined** — Returning decision flow (DECISION_OBJECT_LOADED) was not specified for dry-run. Fixed: loads prior context for delta frame, does NOT write revision N+1 or supersede prior revisions. `N) Commit` persists as a real revision.
+- **[Minor] Truth conflict synthesis timing unclear** — `truth-subagents.md` Step 4 was ambiguous about whether synthesis happened before or after Section 2 in `--deep` output. Fixed: synthesis runs as a closing block inside Section 2 (after all five independent findings), so Section 3 paths are built from complete conflict-aware context.
+- **[Minor] Returning decision baseline for Truth subagents** — `truth-subagents.md` didn't specify whether prior Truth findings should be in shared context. Fixed: prior findings are excluded from Step 2 (fresh independent assessment); a delta block is added to Section 2 after synthesis.
+- **[Minor] Verification subagent Check 7 fingerprint consistency** — Check 7 only validated presence, not correctness. Fixed: added three sub-checks: Dominant in Grounded/Inferred list, no Truth in both lists simultaneously.
+- **[Minor] `--dry-run --export` output target undefined** — Fixed: exports to `~/.cpo/exports/[date]-[mode]-dry-run.md` with `-dry-run` marker in filename.
+- **[Minor] Trace write ambiguity during `--dry-run` verification** — Verification subagent fires during `--dry-run --deep/--go` but trace is suppressed. Fixed: `verification-subagent.md` and `journal-schema.md` both now specify trace checkpoint is also suppressed during `--dry-run`; only inline output fixes apply.
+
+### Changed
+
+- `references/flags/dry-run.md` — Combination rules expanded with `--since` split behavior, `--export` filename spec, `#decision-id` dry-run behavior, and `N) Commit` clarification.
+- `references/flags/combinations.md` — `--dry-run` section rewritten to resolve `--since` contradiction.
+- `references/internal/truth-subagents.md` — Step 1 added returning decision handling; Step 4 Section 2 timing made explicit.
+- `references/internal/verification-subagent.md` — Check 6 updated for `N) Commit`; Check 7 expanded with three sub-checks; trace integration clarified for `--dry-run`.
+- `references/internal/journal-schema.md` — `--dry-run` gate clarified: trace suppressed but verification subagent inline checks still run.
+
+---
+
+## [2.6.0] — 2026-03-20
+
+**Three new capabilities from Boris Cherny workflow analysis.** Exploratory mode, mechanical spec verification, and independent per-Truth analysis.
+
+### Added
+
+- **`--dry-run` flag** — Run the full four-action flow without writing to the decision journal. For "what if" exploration without polluting the Intelligence Loop's data. Stacks with `--go`, `--deep`, `--quick`, `--export`. Includes `N) Commit` escape hatch in D-M menu to persist a dry-run decision. Invalid with journal-reading flags (graceful fallback). New file: `references/flags/dry-run.md`.
+- **Verification subagent (`--deep` and `--go`)** — Post-output mechanical verification pass that enforces 8 spec compliance checks: exactly 3 paths, structural (not risk-posture) labels, measurable kill criteria (metric + threshold + timeframe), `← recommended` marker, evidence tags, D-M menu, truth fingerprint, confidence rating. Fixes violations inline before the user sees output. Replaces honor-system self-checks with mechanical enforcement. New file: `references/internal/verification-subagent.md`.
+- **Truth subagents (`--deep` only)** — Independent per-Truth assessment protocol for Section 2 (Five Truths Assessment). Each Truth is assessed in isolation using only shared context — no cross-Truth anchoring. Conflicts between Truths are synthesized only after all five assessments complete, making them visible instead of unconsciously smoothed. New file: `references/internal/truth-subagents.md`.
+
+### Changed
+
+- `SKILL.md` — Version bumped to 2.6.0. Added `--dry-run` to Flag Routing table. Added verification subagent reference to Self-Check Assertions section. Added truth subagents reference to `--deep` Response Format section.
+- `references/internal/journal-schema.md` — Added `--dry-run` gate to "When to Write" section.
+- `references/internal/trace.md` — Added `truth_subagents` and `verification` checkpoint rows.
+- `references/flags/help.md` — Added `--dry-run` to flags list.
+- `references/flags/combinations.md` — Added `--dry-run` combination rules section.
+
+---
+
 ## [2.5.4] — 2026-03-20
 
 **Full codebase audit — 75 files read, 7 bugs fixed across 8 files.** Comprehensive cross-reference audit of every file in the skill: all 19 modes, 30+ flags, 5 domains, 6 internal files, and all misc references. Panel-reviewed on Opus by Gary Tan (YC), Mike Krieger (Anthropic CPO), Boris Cherny (Head of Claude Code).

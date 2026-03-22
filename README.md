@@ -295,6 +295,16 @@ Each path is labeled situationally — naming what it commits to, not how risky 
 - *"Concentrate on [focus] / Sequence by [dependency] / Time-box [decision]"* — for scope/sequencing
 - *"Community-led / Product-led / Partner-led"* — for channel decisions
 
+The recommendation appears **before** the path list as a dedicated block — so the answer is always visible at the top, regardless of which letter is recommended:
+
+```
+**We recommend B:** A working demo beats an aspirational one — vault is Atlas's actual moat.
+
+A) Build native on 7702...
+B) Vault-backed Snap...  ← recommended
+C) CoW Composable...
+```
+
 ### 3) Decision hygiene
 
 Every output distinguishes between:
@@ -813,6 +823,6 @@ Every active decision has a mechanical decay score based on age, inferred assump
 
 ## Version · License
 
-Current: **v2.3.0** — [view changelog](CHANGELOG.md)
+Current: **v2.7.1** — [view changelog](CHANGELOG.md)
 
 MIT. Free forever. Go make better product decisions.

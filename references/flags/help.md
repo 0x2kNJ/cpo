@@ -10,7 +10,7 @@
 >
 > ---
 >
-> **Flags:** `--go` . `--deep` . `--quick` . `--memo` . `--silent` . `--roadmap` . `--sell-up [audience]` . `--brief` . `--trail` . `--history` . `--since` . `--outcome` . `--patterns` . `--export` . `--stack` . `--status` . `--graph` . `--kills` . `--drift` . `--save-context` . `--setup-integrations` . `--schedule-brief` . `--import-context [path]` . `--scan-strategy` . `--verify` . `--score` . `--assumptions` . `--replay #name` . `--decide` . `--compare` . `--context [name]` . `--no-context` . `--focus [topic]` . `--invalidate [topic or #id]` . `--invalidate-all` . `--update`
+> **Flags:** `--go` . `--deep` . `--quick` . `--memo` . `--silent` . `--dry-run` . `--roadmap` . `--sell-up [audience]` . `--brief` . `--trail` . `--history` . `--since` . `--outcome` . `--patterns` . `--export` . `--stack` . `--status` . `--graph` . `--kills` . `--drift` . `--save-context` . `--setup-integrations` . `--schedule-brief` . `--import-context [path]` . `--scan-strategy` . `--verify` . `--score` . `--assumptions` . `--replay #name` . `--decide` . `--compare` . `--context [name]` . `--no-context` . `--focus [topic]` . `--invalidate [topic or #id]` . `--invalidate-all` . `--update`
 >
 > **20 modes:** `blue-ocean` . `ceo` . `sequence` . `gtm` . `discovery` . `narrative` . `launch-os` . `investor-story` . `red-team` . `premortem` . `postmortem` . `org-design` . `board-memo` . `board-story` . `eng-brief` . `eng-translate` . `advisory-roundtable` . `boardroom` . `investor-roundtable` . `upward-pitch`
 >

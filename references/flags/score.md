@@ -22,7 +22,7 @@ All computation happens in prose analysis on the loaded data.
 
 | Metric | Calculation | What it measures |
 |--------|-------------|-----------------|
-| **Prediction accuracy** | confirmed / (confirmed + disconfirmed) | How often your consequence predictions come true |
+| **Prediction accuracy** | confirmed / (confirmed + disconfirmed), weighted by `verified:` field | How often your consequence predictions come true |
 | **Confidence calibration** | % of High-confidence decisions where all consequences confirmed vs. % of Low where ≥1 disconfirmed | Whether your confidence levels mean what they should |
 | **Blind spot rate** | Disconfirmed consequences where the relevant Truth was Inferred / total disconfirmed | Whether your weak spots are where you think they are |
 | **Truth accuracy** | Per-Truth accuracy when that Truth was Dominant | Which Truths you read well vs. poorly |
@@ -45,6 +45,15 @@ Your weakest Truth: [Truth name] — [X]% accuracy when Dominant
 
 [One-paragraph interpretation: what this means for how you should approach decisions going forward. Be specific — name the pattern, not just the number.]
 ```
+
+## Verification weighting
+
+When computing Prediction accuracy, Confidence calibration, and Truth accuracy, apply verification weighting:
+- Entries with `verified: yes` (from `--deep` or `--go` — passed the 8-check verification subagent) count as **1.0 weight**.
+- Entries with `verified: no` (`--quick`, standard flow, dry-run commits) count as **0.75 weight**.
+- Entries with no `verified:` field (pre-v1.6 schema) count as **1.0 weight** — do not penalize legacy entries; treat as pre-verification era.
+
+Display note in output: *"[N] entries verified (full weight), [M] unverified (0.75× weight), [P] pre-v1.6 (full weight)."*
 
 ## Minimum data requirement
 
@@ -72,6 +81,8 @@ EOF
 ```
 
 Replace all `REPLACE_*` values with the actual computed values. Never write placeholders to disk.
+
+**Weak Truth threshold:** Weakest Truth = Truth with the lowest accuracy percentage when Dominant. If the lowest accuracy is < 70%, set it as `_WEAK_TRUTH` in the profile. If all Truths are >= 70%, do not set a weak Truth — write `Weakest Truth: none (all ≥70%)` in the profile and suppress preamble-handler weak Truth behaviors.
 
 After writing: *"Score profile saved to `~/.cpo/score-profile.md` — CPO will use this to surface your [Weak Truth] blind spots more aggressively in future sessions."*
 

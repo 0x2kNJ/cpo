@@ -14,23 +14,21 @@ Each test has: **Input**, **Expected behavior**, **Pass criteria**, **Fail signa
 ```
 
 **Expected behavior:**
-- Does NOT show a menu (A/B/C options)
-- Runs all four actions in one response: Frame → Assess → Paths → Verdict
+- Delivers Response 1: Frame + Assess + grounding question (A/B/C structural angles + D) Reframe)
 - Line 1 starts with `*I'm reading this as:`
 - Line 2 starts with `*The` and names a specific Truth
-- Paths use exactly `**Bold**`, `**Balanced**`, `**Conservative**`
-- Verdict line starts with `*Verdict:` and ends with `Confidence: [level].*`
+- AskUserQuestion (or plain-text fallback) presents structural grounding angles — not risk tolerances
 
 **Pass criteria:**
-- All four structural markers present in correct order
-- No menu (A/B/C) before output
-- No questions before output
-- Verdict names one of the three paths
+- Frame line present (`*I'm reading this as:*`)
+- Dominant Truth line present (`*The [Truth] is what this turns on:*`)
+- Grounding question with lettered structural options (A/B/C + D to reframe)
+- Output stops at Gate 1 — no paths, no verdict rendered yet
 
 **Fail signals:**
-- Output shows `A) ... B) ... C) ...` menu
-- Output asks a question before delivering Frame
-- Verdict does not name Bold/Balanced/Conservative explicitly
+- Paths (A/B/C labels) appear before user confirms grounding
+- Verdict appears in first response
+- Grounding options are risk tolerances ("Bold / Balanced / Conservative" or equivalent)
 - Structural markers out of order or missing
 
 ---
@@ -268,16 +266,15 @@ Each test has: **Input**, **Expected behavior**, **Pass criteria**, **Fail signa
 **Pass criteria:**
 - Line 1: starts with `*I'm reading this as:`
 - Line 2: starts with `*The` + Truth name + `is what this turns on:`
-- Lines 3–5: `**Bold**`, `**Balanced**`, `**Conservative**` in that order
-- Final line: starts with `*Verdict:` and ends with `Confidence: [High/Medium/Low].*`
-- All in one response
+- AskUserQuestion grounding options present (structural angles, not risk tolerances)
+- Response stops at Gate 1 — no paths, no verdict
 
 **Fail signals:**
 - Any structural marker missing
 - Markers out of order
 - Any question before Line 1
 - "Assessment:", "Framing:", "Paths:" headers used instead of the enforced markers
-- Verdict does not end with `Confidence: [level].*`
+- Grounding options use Bold/Balanced/Conservative labels
 
 ---
 
@@ -328,14 +325,19 @@ actually we're pre-PMF, $200k ARR
 
 **Pass criteria:**
 - `*Running:` prefix appears
-- No `*I'm reading this as:` line
-- No `*The ... is what this turns on:` line
-- Bold/Balanced/Conservative + Verdict present
+- Frame line present (`*I'm reading this as:*`)
+- Dominant Truth line present
+- `**We recommend [letter]:**` block appears before path list
+- Exactly 3 paths with situational labels (not Bold/Balanced/Conservative)
+- `← recommended` on one path — letter matches the `We recommend` block
+- Verdict + kill criteria + D-M menu all present in same response
+- No grounding question, no Gate 1/2 stops
 
 **Fail signals:**
-- Frame line appears despite `--go`
-- Assess line appears despite `--go`
-- A question is asked before output
+- Grounding question appears despite `--go`
+- Path list has no `We recommend [letter]:` block before it
+- Bold/Balanced/Conservative used as path labels
+- Only 1 response shown instead of all 4 actions + D-M
 
 ---
 
@@ -400,5 +402,5 @@ These are behavioral tests — run them manually by invoking `/cpo` with the spe
 
 For automated testing: the expected output patterns can be used as assertions in an LLM eval harness (e.g., checking for presence/absence of specific phrases in the output).
 
-Version: 4.0.0
-Last updated: 2026-03-18
+Version: 4.1.0
+Last updated: 2026-03-20
