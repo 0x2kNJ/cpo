@@ -4,6 +4,47 @@ All notable changes documented here. Follows [Keep a Changelog](https://keepacha
 
 ---
 
+## [3.4.0] — 2026-03-22
+
+**Complete rebuild.** CPO v3.4.0 reduces from 544 lines/32KB to 406 lines/17KB while adding structural guarantees the previous version lacked. Every `[FRAME]` and `[PATHS]` response now ends with a mandatory AskUserQuestion gate — not a text STOP marker, but a mechanical call the model cannot skip. The 30+ flags and 20 modes of v2.7.1 are replaced with 8 essential flags that each do exactly one thing.
+
+### Added
+
+- **Structural gates** — `[FRAME]` and `[PATHS]` each end with a mandatory `AskUserQuestion` call. Not a "⛔ STOP" suggestion — a hard mechanical gate.
+- **Phase markers** — `[FRAME]` / `[PATHS]` / `[VERDICT]` / `[GO]` as self-contained response identifiers. The model knows which phase it's in without turn-counting.
+- **Premise checks in `[FRAME]`** — Four questions before any path exploration: Right problem (root cause or symptom)? Who benefits (specific user + human outcome)? Prove it (stage-specific forcing question). Delay test (cost of delay: high or low, and why).
+- **Door type classification** — Every decision classified as one-way or two-way on entry. One-way doors auto-suggest `--deep`; low-magnitude two-way doors auto-suggest `--quick`. Bezos framework applied mechanically, not decoratively.
+- **`--decide` inbound handoff** — Any gstack skill can route a decision fork to CPO via the `CPO Handoff Request` block. CPO skips urgency validation (the calling skill did it) and suggests returning to the caller after verdict.
+- **Prior art scan** — Preamble loads last 5 decisions and surfaces keyword matches before framing a new decision.
+- **Signals integration** — Preamble reads `~/.cpo/signals/*-latest.yaml` and surfaces red-flag signals from other skills inside `[FRAME]`.
+- **`--journal` flag** — Reads last 10 decision entries. Explicit read mode — distinct from automatic journal write (which happens after every verdict).
+- **`--review` flag** — Surfaces all active decisions and prompts for current data against kill criteria.
+- **gstack discovery** — CPO is surfaced as a suggestion in `/office-hours` (design doc approval gate), `/plan-ceo-review` (Step 0A premise challenge), and the master gstack skill (three new trigger descriptions).
+- **HARD GATE RULE** — Added to top of The Flow section: `[FRAME]` and `[PATHS]` responses MUST end with AskUserQuestion. `[VERDICT]` is terminal.
+
+### Changed
+
+- **`--save-context` reduced to 5 questions** (was 6). Operating bias question removed.
+- **`--go` adds door type** — `[GO]` template now includes `*Door type: [one-way / two-way].*`
+- **`--deep` Gate 2 offers A/B/C only** — In `--deep` mode, the 10-section expansion already covers what 1/2/3 would; Gate 2 no longer offers the pressure-test options.
+- **`--save-context` asks one question at a time** — Previously unspecified; now explicit: "Ask one question at a time via AskUserQuestion."
+- **Journal write timing** — "After every verdict" is now explicitly defined for `--go`/`--quick`: write immediately after generating the response, before the user replies.
+- **Preamble bash** — Replaced `xargs cat` (breaks on special characters) with `while read -r f; do cat "$f"; echo "---"; done`.
+- **`--decide` skips premise checks** — Skips "Right problem?", forcing question, and delay test. Keeps "Who benefits?" (still needs User Truth grounding). `#name` takes precedence over prior art rule.
+- **Conditional skip** — Preserved meaning: emit `[FRAME]` with premise checks, skip grounding AskUserQuestion only; emit `[FRAME]+[PATHS]` in one response.
+
+### Removed
+
+- **30+ flags eliminated** — `--status`, `--brief`, `--kills`, `--graph`, `--outcome`, `--verify`, `--score`, `--assumptions`, `--replay`, `--patterns`, `--sell-up`, `--drift`, `--invalidate`, and 17 more. All replaced by 8 essential flags.
+- **20 modes eliminated** — `advisory-roundtable`, `boardroom`, `investor-roundtable`, `investor-story`, `board-story`, `board-memo`, `narrative`, `gtm`, `launch-os`, `red-team`, `premortem`, `postmortem`, `eng-brief`, `eng-translate`, `ceo`, `discovery`, `org-design`, `sequence`, `blue-ocean`, `sell-up`.
+- **60 reference files eliminated** — All `flags/`, `modes/`, `domains/`, `internal/` directories archived. Replaced by 3 reference files: `examples.md`, `frameworks.md`, `handoff-contract.md`.
+- **Self-scoring/replay/batting-average** — Decision quality score, counterfactual replay, prediction verification, and founder pattern drift removed as structurally dishonest (the model was scoring its own outputs).
+- **Investor/board simulations** — Removed from core skill. Not a product decision framework feature.
+- **Decision decay index / coherence validator / dependency graph** — Removed. These require persistent computational state the skill cannot reliably maintain.
+- **CURSOR.md** — Removed; Cursor users use SKILL.md directly.
+
+---
+
 ## [2.7.1] — 2026-03-20
 
 **Recommendation block above paths.** The answer is now always first.
