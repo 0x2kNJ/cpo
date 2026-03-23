@@ -2,7 +2,7 @@
 name: cpo
 version: 4.0.0
 last_updated: 2026-03-22
-argument-hint: "[problem or question] [--go] [--quick] [--deep] [--journal] [--review] [--outcome] [--save-context] [--decide]"
+argument-hint: "[problem or question] [--go] [--quick] [--deep] [--journal] [--review] [--outcome] [--save-context] [--decide] [--version]"
 description: >-
   The operating system for product decisions — what to build, whether to build it, how to communicate it, and when to kill it — before your team commits time, headcount, or capital.
 allowed-tools:
@@ -508,6 +508,29 @@ Options considered: [optional]
 If found: use the handoff block as the prompt. Skip "Right problem?", forcing question, and delay test (the calling skill already validated context and urgency). Keep "Who benefits?" — CPO's unique contribution. Run the standard flow from Frame. After verdict, suggest returning to the calling skill.
 
 If no handoff block found: treat as a normal `/cpo` invocation.
+
+---
+
+## `--version` Mode
+
+Health check and install verification. When the user runs `/cpo --version`, output:
+
+```
+CPO v4.0.0 — product decision layer
+Install: ~/.claude/skills/cpo/SKILL.md ✅
+Context: ~/.cpo/context.md [found | not found — run /cpo --save-context to set up]
+Journal: ~/.cpo/decisions/ [N decisions logged | empty]
+Signals: ~/.cpo/signals/ [found | not found]
+```
+
+Run these checks:
+```bash
+ls ~/.cpo/context.md 2>/dev/null && echo "context: found" || echo "context: not found"
+ls ~/.cpo/decisions/ 2>/dev/null | wc -l | tr -d ' '
+ls ~/.cpo/signals/ 2>/dev/null && echo "signals: found" || echo "signals: not found"
+```
+
+No gates. No AskUserQuestion. Pure status output — done in one response.
 
 ---
 
